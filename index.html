@@ -153,6 +153,9 @@ a{color:var(--accent);}
 .set-row .ck{width:44px;height:44px;border-radius:12px;background:var(--surface2);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:18px;color:var(--faint);}
 .set-row.done .ck{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);}
 .sugg{font-size:12.5px;color:#d7f3e8;background:rgba(52,211,153,.09);border:1px solid rgba(52,211,153,.22);border-radius:10px;padding:8px 11px;margin:8px 0;line-height:1.45;}
+.weighthint,.alts,.evalitem{font-size:12.5px;color:var(--muted);background:rgba(255,255,255,.035);border:1px solid var(--line);border-radius:10px;padding:8px 10px;margin:8px 0;line-height:1.45;}
+.weighthint b,.alts b,.evalitem b{color:var(--text);}
+.alts span{color:#d7dce6;}
 .exblock .eh .vid{width:40px;height:40px;border-radius:11px;background:rgba(251,113,133,.12);border:1px solid rgba(251,113,133,.4);color:#fb7185;display:flex;align-items:center;justify-content:center;font-size:13px;text-decoration:none;flex:none;}
 .exblock .eh .vid:active{transform:scale(.94);}
 .exblock{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:15px;margin-bottom:12px;}
@@ -175,6 +178,12 @@ a{color:var(--accent);}
 .flowactions .btn{flex:1;}
 .flowactions .btn[disabled]{opacity:.32;pointer-events:none;}
 .flowhint{font-size:12.5px;color:var(--muted);line-height:1.45;margin-top:8px;}
+.evalgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px;}
+.evalitem{margin:0;}
+.evalitem .v{font-size:18px;font-weight:850;color:var(--text);}
+.evalitem .k{font-size:11px;text-transform:uppercase;letter-spacing:.6px;color:var(--faint);font-weight:800;}
+.sheettop{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px;}
+.sheetclose{border:1px solid var(--line);background:var(--surface2);border-radius:11px;padding:8px 11px;font-size:13px;font-weight:800;color:var(--text);}
 
 /* sheet (exercise detail) */
 .sheet-wrap{position:fixed;inset:0;z-index:50;display:none;}
@@ -1308,19 +1317,153 @@ function exDoneCount(dk,id){ const a=(S.logs[dk]||{})[id]||[]; return a.filter(x
 const LEG_IDS=['Barbell_Squat','Front_Barbell_Squat','Hack_Squat','Leg_Press','Romanian_Deadlift','Barbell_Deadlift','Barbell_Hip_Thrust'];
 function parseRange(reps){ if(/amrap/i.test(reps)) return {amrap:true}; const n=(reps.match(/\d+/g)||[]).map(Number); if(n.length>=2) return {min:n[0],max:n[1]}; if(n.length===1) return {min:n[0],max:n[0]}; return {min:8,max:12}; }
 function incFor(e){ const big=e.comp&&LEG_IDS.includes(e.id); return S.unit==='kg'?(big?5:2.5):(big?10:5); }
+const LOAD_META = {
+  "Incline_Dumbbell_Press": { label:'per dumbbell', mult:2 },
+  "Dumbbell_Bench_Press": { label:'per dumbbell', mult:2 },
+  "Dumbbell_Shoulder_Press": { label:'per dumbbell', mult:2 },
+  "Seated_Dumbbell_Press": { label:'per dumbbell', mult:2 },
+  "Side_Lateral_Raise": { label:'per dumbbell', mult:2 },
+  "Hammer_Curls": { label:'per dumbbell', mult:2 },
+  "Dumbbell_Lunges": { label:'per dumbbell', mult:2 },
+  "Standing_Dumbbell_Triceps_Extension": { label:'single dumbbell', mult:1 },
+  "Pullups": { label:'added or assist', mult:1 },
+  "Dips_-_Triceps_Version": { label:'added or assist', mult:1 },
+  "Hanging_Leg_Raise": { label:'added weight', mult:1 },
+  "Plank": { label:'added weight', mult:1 },
+  "Russian_Twist": { label:'held weight', mult:1 },
+};
+function loadMeta(id){
+  const x=EXERCISES[id]||{};
+  if(LOAD_META[id]) return LOAD_META[id];
+  if((x.equipment||'').includes('barbell')) return {label:'total bar weight', mult:1};
+  if((x.equipment||'').includes('cable')) return {label:'stack weight', mult:1};
+  if((x.equipment||'').includes('machine')) return {label:'machine setting', mult:1};
+  return {label:'total load', mult:1};
+}
+function totalLoadForExercise(id,weight){
+  const n=Number(weight);
+  if(!Number.isFinite(n) || n<=0) return 0;
+  return Math.round(n*loadMeta(id).mult*10)/10;
+}
+function entryWeightFromTotal(id,total){
+  const n=Number(total), meta=loadMeta(id);
+  if(!Number.isFinite(n) || n<=0) return '';
+  return Math.round((n/meta.mult)*10)/10;
+}
+function formatEntryWeight(id,weight){
+  const n=Number(weight); if(!Number.isFinite(n)||n<=0) return 'bodyweight';
+  const meta=loadMeta(id);
+  return `${n} ${S.unit} ${meta.label}`;
+}
+function formatSetLoad(id,weight){
+  const n=Number(weight); if(!Number.isFinite(n)||n<=0) return 'bodyweight';
+  const meta=loadMeta(id), total=totalLoadForExercise(id,n);
+  return meta.mult>1 ? `${n} ${S.unit} each (${total} ${S.unit} total)` : `${n} ${S.unit} ${meta.label}`;
+}
+function weightHint(id,sets){
+  const meta=loadMeta(id);
+  const first=(sets||[]).find(s=>s.w!==''&&s.w!=null);
+  const total=first ? totalLoadForExercise(id,first.w) : 0;
+  const example=meta.mult>1 ? `Example: entering 35 means two 35 ${S.unit} dumbbells, 70 ${S.unit} total.` : '';
+  const live=total&&meta.mult>1 ? ` Current total load: ${total} ${S.unit}.` : '';
+  return `Log ${meta.label}.${example?` ${example}`:''}${live}`;
+}
+const LOAD_LINKS = {
+  "Incline_Dumbbell_Press": [["Barbell_Bench_Press_-_Medium_Grip",0.5]],
+  "Dumbbell_Bench_Press": [["Barbell_Bench_Press_-_Medium_Grip",0.56]],
+  "Dumbbell_Shoulder_Press": [["Barbell_Bench_Press_-_Medium_Grip",0.36],["Incline_Dumbbell_Press",0.75]],
+  "Cable_Crossover": [["Barbell_Bench_Press_-_Medium_Grip",0.25]],
+  "Triceps_Pushdown": [["Barbell_Bench_Press_-_Medium_Grip",0.35]],
+  "Side_Lateral_Raise": [["Dumbbell_Shoulder_Press",0.43],["Barbell_Bench_Press_-_Medium_Grip",0.16]],
+  "Standing_Dumbbell_Triceps_Extension": [["Triceps_Pushdown",0.45],["Barbell_Bench_Press_-_Medium_Grip",0.12]],
+  "Romanian_Deadlift": [["Barbell_Squat",0.65],["Barbell_Deadlift",0.55]],
+  "Leg_Press": [["Barbell_Squat",1.8]],
+  "Lying_Leg_Curls": [["Romanian_Deadlift",0.35],["Barbell_Squat",0.28]],
+  "Leg_Extensions": [["Leg_Press",0.35],["Barbell_Squat",0.45]],
+  "Standing_Calf_Raises": [["Barbell_Squat",0.7],["Leg_Press",0.35]],
+  "Bent_Over_Barbell_Row": [["Barbell_Deadlift",0.55]],
+  "Wide-Grip_Lat_Pulldown": [["Bent_Over_Barbell_Row",0.75],["Barbell_Deadlift",0.35]],
+  "Seated_Cable_Rows": [["Bent_Over_Barbell_Row",0.75],["Wide-Grip_Lat_Pulldown",0.9]],
+  "Face_Pull": [["Seated_Cable_Rows",0.35],["Wide-Grip_Lat_Pulldown",0.3]],
+  "Barbell_Curl": [["Bent_Over_Barbell_Row",0.35],["Wide-Grip_Lat_Pulldown",0.3]],
+  "Hammer_Curls": [["Barbell_Curl",0.83],["Bent_Over_Barbell_Row",0.5]],
+  "Barbell_Hip_Thrust": [["Front_Barbell_Squat",0.9],["Barbell_Squat",0.8]],
+  "Dumbbell_Lunges": [["Front_Barbell_Squat",0.4],["Barbell_Squat",0.35]],
+  "Cable_Crunch": [["Front_Barbell_Squat",0.3]],
+};
+const ALTERNATES = {
+  "Barbell_Bench_Press_-_Medium_Grip": ['Dumbbell Bench Press','Push-ups','Machine Chest Press'],
+  "Incline_Dumbbell_Press": ['Incline Barbell Press','Dumbbell Bench Press','Machine Incline Press'],
+  "Dumbbell_Bench_Press": ['Barbell Bench Press','Machine Chest Press','Push-ups'],
+  "Dumbbell_Shoulder_Press": ['Seated Dumbbell Press','Machine Shoulder Press','Standing Military Press'],
+  "Seated_Dumbbell_Press": ['Dumbbell Shoulder Press','Machine Shoulder Press','Standing Military Press'],
+  "Cable_Crossover": ['Dumbbell Flye','Pec Deck','Push-ups'],
+  "Side_Lateral_Raise": ['Cable Lateral Raise','Machine Lateral Raise','Plate Front Raise'],
+  "Triceps_Pushdown": ['Overhead Dumbbell Extension','Bench Dips','Close-Grip Push-ups'],
+  "Standing_Dumbbell_Triceps_Extension": ['Cable Overhead Extension','Triceps Pushdown','Bench Dips'],
+  "Barbell_Deadlift": ['Romanian Deadlift','Trap Bar Deadlift','Rack Pull'],
+  "Romanian_Deadlift": ['Dumbbell Romanian Deadlift','Hip Thrust','Good Morning'],
+  "Pullups": ['Wide-Grip Lat Pulldown','Assisted Pull-up','Neutral-Grip Pulldown'],
+  "Wide-Grip_Lat_Pulldown": ['Pull-ups','Assisted Pull-up','Single-Arm Cable Pulldown'],
+  "Bent_Over_Barbell_Row": ['Seated Cable Row','Chest-Supported Dumbbell Row','T-Bar Row'],
+  "Seated_Cable_Rows": ['Bent-Over Barbell Row','One-Arm Dumbbell Row','Machine Row'],
+  "Face_Pull": ['Rear-Delt Flye','Band Pull-Apart','Cable External Rotation'],
+  "Barbell_Curl": ['EZ-Bar Curl','Dumbbell Curl','Cable Curl'],
+  "Hammer_Curls": ['Rope Hammer Curl','Alternating Dumbbell Curl','Cable Curl'],
+  "Barbell_Squat": ['Leg Press','Hack Squat','Goblet Squat'],
+  "Front_Barbell_Squat": ['Goblet Squat','Hack Squat','Leg Press'],
+  "Hack_Squat": ['Leg Press','Barbell Squat','Goblet Squat'],
+  "Leg_Press": ['Hack Squat','Goblet Squat','Walking Lunges'],
+  "Lying_Leg_Curls": ['Seated Leg Curl','Swiss-Ball Leg Curl','Romanian Deadlift'],
+  "Leg_Extensions": ['Sissy Squat','Goblet Squat','Leg Press'],
+  "Standing_Calf_Raises": ['Seated Calf Raise','Leg Press Calf Raise','Single-Leg Calf Raise'],
+  "Dumbbell_Lunges": ['Walking Lunges','Bulgarian Split Squat','Step-ups'],
+  "Barbell_Hip_Thrust": ['Glute Bridge','Cable Pull-Through','Romanian Deadlift'],
+  "Hanging_Leg_Raise": ['Captain Chair Knee Raise','Reverse Crunch','Cable Crunch'],
+  "Cable_Crunch": ['Machine Crunch','Decline Crunch','Swiss-Ball Crunch'],
+  "Plank": ['Dead Bug','Side Plank','Pallof Press'],
+  "Russian_Twist": ['Cable Woodchop','Pallof Press','Bicycle Crunch'],
+};
+function alternatesFor(id){ return ALTERNATES[id] || ['Closest free machine pattern','Dumbbell version','Cable version']; }
 function dayNum(dk){ const m=String(dk).match(/^w(\d+)d(\d+)$/); return m?(+m[1]-1)*7+(+m[2]):-1; }
 // most recent earlier session that logged this exercise (done sets) → array of {w,r}
 function lastPerf(exId,curDk){ const cur=dayNum(curDk); let best=-1,res=null; for(const dk in S.logs){ if(dk===curDk) continue; const n=dayNum(dk); if(n<0||n>=cur) continue; const arr=S.logs[dk][exId]; if(!arr) continue; const done=arr.filter(s=>s.done&&s.w!==''); if(!done.length) continue; if(n>best){best=n;res=done;} } return res; }
+function recentDoneSet(exId,curDk){
+  const cur=dayNum(curDk);
+  const keys=Object.keys(S.logs).filter(k=>dayNum(k)>=0&&dayNum(k)<=cur).sort((a,b)=>dayNum(b)-dayNum(a));
+  for(const dk of keys){
+    const arr=S.logs[dk]?.[exId]; if(!arr) continue;
+    const done=arr.filter(s=>s.done&&s.w!=='');
+    if(done.length) return {dk,set:done[0],total:totalLoadForExercise(exId,done[0].w)};
+  }
+  return null;
+}
+function linkedSuggestion(exId,e,curDk,rng){
+  for(const [anchorId,ratio] of (LOAD_LINKS[exId]||[])){
+    const anchor=recentDoneSet(anchorId,curDk);
+    if(!anchor?.total) continue;
+    const targetTotal=anchor.total*ratio;
+    const raw=entryWeightFromTotal(exId,targetTotal);
+    const inc=incFor(e);
+    const rounded=Math.max(inc,Math.round(raw/inc)*inc);
+    return {
+      weight:rounded,
+      reps:rng.amrap?'':rng.min,
+      note:`Based on your logged ${EXERCISES[anchorId]?.name||'lift'} (${formatSetLoad(anchorId,anchor.set.w)}), start around ${formatEntryWeight(exId,rounded)}. Adjust if warmups feel off.`
+    };
+  }
+  return null;
+}
 // double-progression suggestion: pre-fill weight + target reps, with a coaching note
 function suggest(exId,e,curDk){
   const rng=parseRange(e.reps), prev=lastPerf(exId,curDk);
-  if(!prev) return {weight:'', reps: rng.amrap?'':rng.min, note:`First time — pick a weight you can control for ${e.reps} reps.`};
+  if(!prev){ const linked=linkedSuggestion(exId,e,curDk,rng); if(linked) return linked; return {weight:'', reps: rng.amrap?'':rng.min, note:`First time — pick a weight you can control for ${e.reps} reps. ${weightHint(exId,[])}`}; }
   const w=parseFloat(prev[0].w)||''; const reps=prev.map(s=>parseInt(s.r)||0); const repsStr=reps.join(', ');
   if(rng.amrap){ const tot=reps.reduce((a,b)=>a+b,0); return {weight:w, reps:'', note:`Last time: ${repsStr} reps (${tot} total). Beat it.`}; }
   const inc=incFor(e);
-  if(w && reps.every(r=>r>=rng.max)){ const nw=Math.round((w+inc)*10)/10; return {weight:nw, reps:rng.min, note:`💪 You maxed the reps at ${w} ${S.unit} — go up to ${nw} × ${rng.min}.`}; }
-  if(w && reps.some(r=>r<rng.min)) return {weight:w, reps:rng.min, note:`Hold ${w} ${S.unit}. Last: ${repsStr}. Get ${rng.min}+ clean reps on every set.`};
-  return {weight:w, reps:w?Math.min(rng.max,Math.min(...reps)+1):rng.min, note:`Same ${w?w+' '+S.unit:'weight'}. Last: ${repsStr}. Add a rep where you can (range ${e.reps}).`};
+  if(w && reps.every(r=>r>=rng.max)){ const nw=Math.round((w+inc)*10)/10; return {weight:nw, reps:rng.min, note:`You maxed the reps at ${formatEntryWeight(exId,w)} — go up to ${formatEntryWeight(exId,nw)} × ${rng.min}.`}; }
+  if(w && reps.some(r=>r<rng.min)) return {weight:w, reps:rng.min, note:`Hold ${formatEntryWeight(exId,w)}. Last: ${repsStr}. Get ${rng.min}+ clean reps on every set.`};
+  return {weight:w, reps:w?Math.min(rng.max,Math.min(...reps)+1):rng.min, note:`Same ${w?formatEntryWeight(exId,w):'weight'}. Last: ${repsStr}. Add a rep where you can (range ${e.reps}).`};
 }
 function ytLink(name){ return 'https://www.youtube.com/results?search_query='+encodeURIComponent('how to '+name+' proper form'); }
 // Curated demo video per exercise; falls back to a YouTube search if missing.
@@ -1490,6 +1633,7 @@ function renderDayView(){
   <div class="bar" style="margin:0 0 4px"><i style="width:${prog.pct}%"></i></div>
   <div class="small muted" style="margin-bottom:14px">${prog.done}/${prog.tot} sets · ${prog.pct}% · Phase ${plan.phase+1} ${ph.name}</div>
   ${renderWorkoutFlow(plan,dk)}
+  ${workoutEvaluationCard(plan,dk)}
   <div class="hint" style="margin-top:0">🫀 ${plan.cardio.d}</div>
   ${rideCard(week,dayIndex)}
   ${workoutExportCard(plan, dk, prog)}
@@ -1503,6 +1647,8 @@ function exBlock(e,dk,idx,plan,opts={}){
   const sug=suggest(e.id,e,dk);
   const sets=setsFor(dk,e.id,e.sets, sug.weight, sug.reps);
   const inc=incFor(e);
+  const weightLabel=cap(loadMeta(e.id).label);
+  const alts=alternatesFor(e.id);
   const rows=sets.map((st,i)=>`
     <div class="set-row ${st.done?'done':''}" data-row="${e.id}|${i}">
       <div class="sn">${i+1}</div>
@@ -1518,8 +1664,10 @@ function exBlock(e,dk,idx,plan,opts={}){
     </div>
     ${e.superset&&!opts.hideSupersetTag?`<div class="supersettag">Superset: ${esc(e.ssName||'alternate with the paired move')} — minimal rest</div>`:''}
     <div class="sugg">💡 ${esc(sug.note)}</div>
+    <div class="weighthint"><b>Weight input:</b> ${esc(weightHint(e.id,sets))}</div>
+    <div class="alts"><b>If taken:</b> <span>${alts.map(esc).join(' · ')}</span></div>
     <div class="settable">
-      <div class="set-hd"><div>Set</div><div>Weight (${S.unit})</div><div>Reps</div><div></div></div>
+      <div class="set-hd"><div>Set</div><div>${esc(weightLabel)} (${S.unit})</div><div>Reps</div><div></div></div>
       ${rows}
     </div>
     <button class="restbtn" data-rest="${e.rest}|${esc(x.name)}">⏱ Rest ${e.rest}s</button>
@@ -1549,6 +1697,41 @@ function renderWorkoutFlow(plan,dk){
     </div>
     <div class="blockdots">${blocks.map((b,i)=>`<i class="${isBlockComplete(b,dk)?'done':(i===idx?'on':'')}"></i>`).join('')}</div>
     <div class="flowhint">${done>=total?'This block is saved. Move to the next one when ready.':'Tick each completed set. Your weights and reps save automatically as you type.'}</div>
+  </div>`;
+}
+function workoutEvaluationCard(plan,dk){
+  let planned=0, done=0, volume=0, top=null;
+  const misses=[], next=[];
+  for(const e of plan.ex){
+    planned+=e.sets;
+    const arr=(S.logs[dk]||{})[e.id]||[];
+    const sets=arr.filter(s=>s.done);
+    done+=sets.length;
+    const rng=parseRange(e.reps);
+    if(sets.length<e.sets) misses.push(`${EXERCISES[e.id]?.name||e.id}: ${sets.length}/${e.sets}`);
+    const reps=sets.map(s=>parseInt(s.r,10)||0);
+    const weights=sets.map(s=>Number(s.w)||0);
+    sets.forEach(s=>{
+      const reps=Number(s.r)||0, total=totalLoadForExercise(e.id,s.w);
+      volume+=total*reps;
+      if(total>0 && (!top || total>top.total)) top={name:EXERCISES[e.id]?.name||e.id,total,entry:s.w,reps:s.r,id:e.id};
+    });
+    if(!rng.amrap && sets.length>=e.sets && reps.every(r=>r>=rng.max) && weights.some(Boolean)){
+      const inc=incFor(e);
+      next.push(`${EXERCISES[e.id]?.name||e.id}: try ${formatEntryWeight(e.id,Math.round(((weights[0]||0)+inc)*10)/10)}`);
+    }
+  }
+  if(!done) return '';
+  const quality=misses.length?'Partial':'Complete';
+  const topText=top?`${top.name}: ${formatSetLoad(top.id,top.entry)} x ${top.reps}`:'No loaded sets';
+  return `<div class="card reviewcard">
+    <div class="card-h"><h3>Workout review</h3><span class="tiny faint">${quality}</span></div>
+    <div class="evalgrid">
+      <div class="evalitem"><div class="v">${done}/${planned}</div><div class="k">sets done</div></div>
+      <div class="evalitem"><div class="v">${Math.round(volume).toLocaleString()}</div><div class="k">est. volume</div></div>
+    </div>
+    <div class="evalitem" style="margin-top:8px"><b>Top set:</b> ${esc(topText)}</div>
+    <div class="evalitem" style="margin-top:8px"><b>Next time:</b> ${next.length?esc(next.slice(0,3).join(' · ')):'Repeat these loads and add reps where you can.'}</div>
   </div>`;
 }
 
@@ -1604,7 +1787,7 @@ function workoutHistory(){
   const out=[];
   for(const dk in S.logs){ const n=dayNum(dk); if(n<0) continue; const w=Math.floor(n/7)+1,d=n%7; const plan=planFor(w,d); if(plan.type!=='workout') continue;
     const log=S.logs[dk]; let done=0,top=null;
-    for(const id in log){ if(!EXERCISES[id]) continue; log[id].forEach(s=>{ if(s.done){ done++; const wt=parseFloat(s.w)||0; if(top===null||wt>top.w) top={w:wt,r:s.r,name:EXERCISES[id].name}; } }); }
+    for(const id in log){ if(!EXERCISES[id]) continue; log[id].forEach(s=>{ if(s.done){ done++; const wt=totalLoadForExercise(id,s.w); if(top===null||wt>top.w) top={w:wt,entry:s.w,r:s.r,name:EXERCISES[id].name,label:loadMeta(id).label}; } }); }
     if(done>0) out.push({dk,w,d,n,title:plan.title,done,top});
   }
   return out.sort((a,b)=>b.n-a.n);
@@ -1711,6 +1894,8 @@ function workoutExportDetail(week,dayIndex){
       .map((set,index)=>({
         set:index+1,
         weight:set.w===''||set.w==null?null:Number(set.w),
+        totalWeight:set.w===''||set.w==null?null:totalLoadForExercise(planned.id,set.w),
+        weightLabel:loadMeta(planned.id).label,
         reps:set.r===''||set.r==null?null:Number(set.r),
         done:set.done===true,
       }))
@@ -1718,9 +1903,9 @@ function workoutExportDetail(week,dayIndex){
     if(!logged.length) continue;
     doneSets+=logged.length;
     for(const set of logged){
-      const weight=Number(set.weight||0);
-      if(weight>0 && (!heaviest || weight>heaviest.weight)){
-        heaviest={ exercise:exercise.name, weight, reps:set.reps };
+      const weight=Number(set.totalWeight||set.weight||0);
+      if(weight>0 && (!heaviest || weight>heaviest.totalWeight)){
+        heaviest={ exercise:exercise.name, weight:set.weight, totalWeight:weight, weightLabel:set.weightLabel, reps:set.reps };
       }
     }
     exercises.push({
@@ -1800,7 +1985,7 @@ function workoutNotes(detail){
   for(const exercise of detail.exercises){
     lines.push(`${exercise.name} (${exercise.sets.length}/${exercise.plannedSets} sets, target ${exercise.targetReps})`);
     for(const set of exercise.sets){
-      const weight=set.weight!=null && Number.isFinite(set.weight) ? `${set.weight} ${detail.workout.unit}` : 'bodyweight';
+      const weight=set.weight!=null && Number.isFinite(set.weight) ? formatSetLoad(exercise.id,set.weight) : 'bodyweight';
       const reps=set.reps!=null && Number.isFinite(set.reps) ? `${set.reps} reps` : 'reps not entered';
       lines.push(`  Set ${set.set}: ${weight} x ${reps}`);
     }
@@ -2105,7 +2290,7 @@ function buildGarminFit(detail){
       startTime:fitTimestamp(row.start),
       duration:Math.round(row.durationSeconds*1000),
       repetitions:Number.isFinite(reps) && reps>0 ? Math.round(reps) : null,
-      weight:fitWeightRaw(row.set.weight,detail.workout.unit),
+      weight:fitWeightRaw(row.set.totalWeight || row.set.weight,detail.workout.unit),
       setType:1,
       category:row.exercise.garmin.category,
       categorySubtype:row.exercise.garmin.subtype,
@@ -2350,8 +2535,11 @@ function openSheet(id){
     {map:true, cap:'Muscles worked'},
   ];
   $('#sheet').innerHTML=`<div class="grab"></div>
-    <h2>${esc(x.name)}</h2>
-    <div class="small muted">${esc(cap(x.primary.join(', ')))}${x.secondary.length?` · <span class="faint">${esc(cap(x.secondary.join(', ')))}</span>`:''}</div>
+    <div class="sheettop">
+      <div><h2>${esc(x.name)}</h2>
+      <div class="small muted">${esc(cap(x.primary.join(', ')))}${x.secondary.length?` · <span class="faint">${esc(cap(x.secondary.join(', ')))}</span>`:''}</div></div>
+      <button class="sheetclose" data-close="1">Back</button>
+    </div>
     <div class="carousel" id="carousel">
       ${slides.map((s,i)=>`<div class="slide">${s.map?muscleMap(x.primary,x.secondary):`<img loading="lazy" src="${s.img}" alt="${esc(x.name)} ${s.cap}"/>`}<div class="cap"><span>${s.cap}</span><span class="faint">${i+1}/${slides.length}</span></div></div>`).join('')}
     </div>
@@ -2361,7 +2549,7 @@ function openSheet(id){
       <div><div class="k">Equipment</div><div class="v">${esc(x.equipment||'—')}</div></div>
       <div><div class="k">Type</div><div class="v">${esc(x.mechanic||'—')}</div></div>
       <div><div class="k">Level</div><div class="v">${esc(x.level||'—')}</div></div>
-      <div><div class="k">Primary</div><div class="v">${esc(x.primary[0]||'—')}</div></div>
+      <div><div class="k">Weight</div><div class="v">${esc(loadMeta(id).label)}</div></div>
     </div>
     <h3 style="margin:18px 0 2px;font-size:15px">How to perform</h3>
     <ol class="steps">${x.instructions.map(s=>`<li>${esc(s)}</li>`).join('')}</ol>`;

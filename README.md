@@ -7,6 +7,7 @@ A mobile-first web app to run a 12-week, 5-day gym program aimed at getting back
 - **Plan** — the full 12-week calendar (3 phases: Foundation → Build → Define). Tap any day to open it.
 - **Library** — every exercise with 3 visuals (start photo, end photo, muscle body-map) + step-by-step cues.
 - **Workout flow** — one exercise or superset at a time with automatic local saving as each set is logged.
+- **Smarter lifting guidance** — per-dumbbell vs total-load labels, logged-weight recommendations, equipment alternatives, and workout reviews.
 - **Stats** — bodyweight log, U.S. Navy body-fat estimator (height fixed at 6'1"), workout/streak counts.
 - **Garmin export** — download Garmin Connect manual-upload `.fit` strength files with mapped exercises/sets, fallback `.tcx` files, plus full FitLab JSON details.
 - **Fat-Loss Playbook** — the nutrition + lifestyle side (the part that actually gets you sub-10%).
