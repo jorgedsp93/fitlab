@@ -1,0 +1,15 @@
+{
+  "name": "FitLab — 12-Week Recomp",
+  "short_name": "FitLab",
+  "description": "A 12-week, 5-day gym program built to get back to sub-10% body fat. Track every set, see every exercise.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0b0d12",
+  "theme_color": "#0b0d12",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}

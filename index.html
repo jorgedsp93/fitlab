@@ -1,0 +1,2364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+<title>FitLab — 12-Week Recomp</title>
+<meta name="theme-color" content="#0b0d12" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="FitLab" />
+<link rel="manifest" href="manifest.webmanifest" />
+<link rel="apple-touch-icon" href="apple-touch-icon.png" />
+<style>
+:root{
+  --bg:#0b0d12; --surface:#14171f; --surface2:#1b1f2a; --surface3:#232838;
+  --text:#f4f7fb; --muted:#8b94a7; --faint:#5b6477;
+  --line:#262c3a;
+  --accent:#34d399; --accent2:#22d3ee; --accent-ink:#062018;
+  --warn:#fbbf24; --hot:#fb7185;
+  --map-base:#2a3140; --map-2:rgba(52,211,153,.40);
+  --radius:18px; --radius-sm:12px;
+  --safe-top:env(safe-area-inset-top,0px);
+  --safe-bot:env(safe-area-inset-bottom,0px);
+  --nav-h:64px;
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--text);overscroll-behavior-y:none;}
+body{font-size:16px;line-height:1.45;-webkit-font-smoothing:antialiased;}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit;}
+input{font-family:inherit;}
+a{color:var(--accent);}
+::selection{background:var(--accent);color:var(--accent-ink);}
+
+/* layout */
+#app{max-width:560px;margin:0 auto;padding:calc(var(--safe-top) + 8px) 16px calc(var(--nav-h) + var(--safe-bot) + 24px);min-height:100vh;}
+.view{animation:fade .25s ease;}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+/* header */
+.app-head{display:flex;align-items:center;justify-content:space-between;margin:4px 0 18px;}
+.app-head .hello{font-size:13px;color:var(--muted);font-weight:600;letter-spacing:.3px;text-transform:uppercase;}
+.app-head h1{font-size:26px;margin:2px 0 0;font-weight:800;letter-spacing:-.5px;}
+.iconbtn{width:42px;height:42px;border-radius:14px;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:20px;border:1px solid var(--line);}
+
+/* cards */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:16px;margin-bottom:14px;}
+.card.tight{padding:14px;}
+.card-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.card-h h3{margin:0;font-size:15px;font-weight:700;letter-spacing:.2px;}
+.muted{color:var(--muted);} .faint{color:var(--faint);} .small{font-size:13px;} .tiny{font-size:11.5px;}
+.center{text-align:center;}
+
+/* hero / phase banner */
+.hero{position:relative;overflow:hidden;border-radius:var(--radius);padding:18px;margin-bottom:14px;
+  background:linear-gradient(135deg,#0e2a23 0%,#0c2230 55%,#101725 100%);border:1px solid var(--line);}
+.hero:before{content:"";position:absolute;inset:-40% -10% auto auto;width:60%;height:160%;
+  background:radial-gradient(closest-side,rgba(52,211,153,.30),transparent);filter:blur(6px);}
+.hero .row{position:relative;display:flex;justify-content:space-between;align-items:flex-end;}
+.phase-tag{display:inline-block;font-size:11px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;
+  color:var(--accent);background:rgba(52,211,153,.12);border:1px solid rgba(52,211,153,.3);padding:4px 9px;border-radius:999px;}
+.hero h2{margin:10px 0 2px;font-size:22px;font-weight:800;letter-spacing:-.4px;}
+.hero .sub{color:#bcd;font-size:13.5px;}
+.weekpill{text-align:right;}
+.weekpill .big{font-size:30px;font-weight:800;line-height:1;}
+.weekpill .lbl{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;}
+
+/* progress bar */
+.bar{height:8px;border-radius:999px;background:var(--surface3);overflow:hidden;margin-top:12px;position:relative;}
+.bar > i{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .4s ease;}
+
+/* focus chips */
+.chips{display:flex;flex-wrap:wrap;gap:7px;margin-top:6px;}
+.chip{font-size:12px;font-weight:600;padding:5px 11px;border-radius:999px;background:var(--surface2);border:1px solid var(--line);color:#cfe;}
+.chip.k{background:rgba(52,211,153,.10);border-color:rgba(52,211,153,.30);color:var(--accent);}
+
+/* exercise list rows */
+.exrow{display:flex;align-items:center;gap:12px;padding:11px 0;border-top:1px solid var(--line);}
+.exrow:first-child{border-top:none;}
+.exrow .thumb{width:54px;height:54px;border-radius:12px;background:var(--surface3);object-fit:cover;flex:none;}
+.exrow .meta{flex:1;min-width:0;}
+.exrow .meta b{font-size:15px;font-weight:700;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.exrow .meta .sets{font-size:12.5px;color:var(--muted);margin-top:1px;}
+.exrow .go{color:var(--faint);font-size:18px;flex:none;}
+.exrow .donedot{width:10px;height:10px;border-radius:50%;background:var(--surface3);flex:none;}
+.exrow.complete .donedot{background:var(--accent);box-shadow:0 0 0 4px rgba(52,211,153,.15);}
+
+/* buttons */
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:15px;border-radius:14px;
+  font-weight:800;font-size:15.5px;letter-spacing:.2px;background:var(--surface2);border:1px solid var(--line);color:var(--text);}
+.btn.primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:var(--accent-ink);border:none;}
+.btn.ghost{background:transparent;}
+.btn:active{transform:scale(.985);}
+.btn.sm{padding:10px 14px;width:auto;font-size:13.5px;border-radius:11px;}
+
+/* segmented */
+.seg{display:flex;background:var(--surface2);border:1px solid var(--line);border-radius:12px;padding:3px;gap:3px;}
+.seg button{flex:1;padding:8px;border-radius:9px;font-size:13px;font-weight:700;color:var(--muted);}
+.seg button.on{background:var(--surface3);color:var(--text);}
+
+/* calendar */
+.weekblock{margin-bottom:12px;}
+.weekblock .wh{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);}
+.weekblock .wh.cur{border-color:rgba(52,211,153,.45);}
+.weekblock .wh .t{font-weight:800;}
+.weekblock .wh .p{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;}
+.days{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-top:8px;}
+.day{aspect-ratio:1/1.15;border-radius:12px;background:var(--surface);border:1px solid var(--line);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:4px;position:relative;}
+.day .dn{font-size:10px;color:var(--faint);font-weight:700;}
+.day .dnum{font-size:9px;color:var(--faint);font-weight:700;opacity:.8;}
+.day.today .dnum,.day.today .dn{color:var(--accent2);}
+.day.done .dnum{color:var(--accent);}
+.day .ic{font-size:16px;}
+.day.rest{opacity:.6;}
+.day.done{border-color:var(--accent);background:rgba(52,211,153,.08);}
+.day.today{outline:2px solid var(--accent2);outline-offset:1px;}
+.day .check{position:absolute;top:3px;right:4px;font-size:9px;color:var(--accent);}
+
+/* library grid */
+.libgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.libcard{background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden;}
+.libcard img{width:100%;aspect-ratio:1/1;object-fit:cover;background:var(--surface3);display:block;}
+.libcard .lc{padding:9px 10px;}
+.libcard .lc b{font-size:13px;font-weight:700;display:block;line-height:1.25;}
+.libcard .lc span{font-size:11px;color:var(--muted);}
+.section-t{font-size:13px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin:18px 2px 10px;}
+
+/* set tracker */
+.settable{margin-top:10px;}
+.set-hd,.set-row{display:grid;grid-template-columns:22px 1fr 1fr 44px;gap:6px;align-items:center;}
+.set-hd{font-size:10px;color:var(--faint);text-transform:uppercase;letter-spacing:.5px;font-weight:700;padding:0 2px 6px;text-align:center;}
+.set-hd div:first-child{text-align:left;}
+.set-row{margin-bottom:8px;}
+.set-row .sn{font-size:13px;font-weight:800;color:var(--muted);text-align:center;}
+.stepper{display:flex;align-items:center;background:var(--surface2);border:1px solid var(--line);border-radius:11px;overflow:hidden;}
+.stepper input{flex:1;min-width:0;background:transparent;border:none;text-align:center;color:var(--text);font-size:16px;font-weight:800;padding:11px 0;}
+.stepper input:focus{outline:none;}
+.stepper .stp{width:30px;flex:none;font-size:20px;font-weight:800;color:var(--accent);padding:9px 0;line-height:1;}
+.stepper .stp:active{background:var(--surface3);}
+.set-row.done .stepper{border-color:rgba(52,211,153,.45);background:rgba(52,211,153,.07);}
+.set-row .ck{width:44px;height:44px;border-radius:12px;background:var(--surface2);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:18px;color:var(--faint);}
+.set-row.done .ck{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);}
+.sugg{font-size:12.5px;color:#d7f3e8;background:rgba(52,211,153,.09);border:1px solid rgba(52,211,153,.22);border-radius:10px;padding:8px 11px;margin:8px 0;line-height:1.45;}
+.exblock .eh .vid{width:40px;height:40px;border-radius:11px;background:rgba(251,113,133,.12);border:1px solid rgba(251,113,133,.4);color:#fb7185;display:flex;align-items:center;justify-content:center;font-size:13px;text-decoration:none;flex:none;}
+.exblock .eh .vid:active{transform:scale(.94);}
+.exblock{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:15px;margin-bottom:12px;}
+.exblock .eh{display:flex;gap:12px;align-items:center;margin-bottom:4px;}
+.exblock .eh img{width:50px;height:50px;border-radius:11px;object-fit:cover;background:var(--surface3);}
+.exblock .eh .nm{flex:1;}
+.exblock .eh .nm b{font-size:16px;font-weight:800;}
+.exblock .eh .nm .sub{font-size:12.5px;color:var(--muted);}
+.exblock .eh .info{font-size:13px;color:var(--accent);font-weight:700;}
+.restbtn{margin-top:4px;display:inline-flex;align-items:center;gap:6px;font-size:12.5px;color:var(--accent2);font-weight:700;background:rgba(34,211,238,.08);border:1px solid rgba(34,211,238,.25);padding:6px 11px;border-radius:9px;}
+.supersettag{font-size:11px;font-weight:800;color:var(--warn);text-transform:uppercase;letter-spacing:.8px;}
+
+/* sheet (exercise detail) */
+.sheet-wrap{position:fixed;inset:0;z-index:50;display:none;}
+.sheet-wrap.open{display:block;}
+.sheet-bg{position:absolute;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(3px);animation:fade .2s;}
+.sheet{position:absolute;left:0;right:0;bottom:0;max-width:560px;margin:0 auto;max-height:92vh;overflow-y:auto;
+  background:var(--bg);border-radius:22px 22px 0 0;border-top:1px solid var(--line);
+  padding:10px 16px calc(28px + var(--safe-bot));animation:up .3s cubic-bezier(.2,.8,.2,1);}
+@keyframes up{from{transform:translateY(100%)}to{transform:none}}
+.grab{width:40px;height:5px;border-radius:999px;background:var(--surface3);margin:6px auto 14px;}
+.sheet h2{margin:0 0 2px;font-size:22px;font-weight:800;letter-spacing:-.4px;}
+
+/* image carousel */
+.carousel{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;margin:14px -16px;padding:0 16px;scrollbar-width:none;}
+.carousel::-webkit-scrollbar{display:none;}
+.slide{flex:0 0 86%;scroll-snap-align:center;background:var(--surface);border:1px solid var(--line);border-radius:16px;overflow:hidden;}
+.slide img,.slide .mapwrap{width:100%;aspect-ratio:4/3;object-fit:cover;background:#fff;display:block;}
+.slide .cap{padding:9px 12px;font-size:12px;font-weight:700;color:var(--muted);display:flex;justify-content:space-between;}
+.slide .mapwrap{background:var(--surface);display:flex;align-items:center;justify-content:center;padding:6px;}
+.dots{display:flex;gap:6px;justify-content:center;margin:-4px 0 12px;}
+.dots i{width:6px;height:6px;border-radius:50%;background:var(--surface3);}
+.dots i.on{background:var(--accent);width:18px;border-radius:999px;}
+
+/* steps list */
+.steps{counter-reset:s;margin:8px 0 0;padding:0;list-style:none;}
+.steps li{counter-increment:s;position:relative;padding:9px 0 9px 34px;border-top:1px solid var(--line);font-size:14px;color:#d7dce6;}
+.steps li:first-child{border-top:none;}
+.steps li:before{content:counter(s);position:absolute;left:0;top:8px;width:23px;height:23px;border-radius:7px;
+  background:var(--surface2);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:var(--accent);}
+
+/* meta grid */
+.mgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px;}
+.mgrid div{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 12px;}
+.mgrid div .k{font-size:11px;color:var(--faint);text-transform:uppercase;letter-spacing:.6px;}
+.mgrid div .v{font-size:14px;font-weight:700;margin-top:2px;text-transform:capitalize;}
+
+/* stats */
+.statgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px;}
+.stat .v{font-size:28px;font-weight:800;letter-spacing:-1px;line-height:1;}
+.stat .v small{font-size:14px;color:var(--muted);font-weight:700;}
+.stat .k{font-size:12px;color:var(--muted);margin-top:5px;font-weight:600;}
+.inlineform{display:flex;gap:8px;align-items:center;}
+.inlineform input{flex:1;background:var(--surface2);border:1px solid var(--line);border-radius:11px;padding:12px;color:var(--text);font-size:15px;font-weight:700;text-align:center;}
+.spark{display:flex;align-items:flex-end;gap:3px;height:60px;margin-top:10px;}
+.spark i{flex:1;background:linear-gradient(180deg,var(--accent),var(--accent2));border-radius:3px 3px 0 0;min-height:3px;opacity:.85;}
+
+/* guide */
+.guide h4{font-size:15px;margin:16px 0 6px;font-weight:800;}
+.guide p,.guide li{font-size:14px;color:#d2d8e2;}
+.guide ul{margin:6px 0;padding-left:20px;}
+.guide .pill-row{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0;}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 12px;flex:1;min-width:130px;}
+.kpi .k{font-size:11px;color:var(--faint);text-transform:uppercase;letter-spacing:.5px;}
+.kpi .v{font-size:18px;font-weight:800;color:var(--accent);}
+
+/* rest timer banner */
+#restbar{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(var(--nav-h) + var(--safe-bot) + 12px);
+  z-index:40;display:none;align-items:center;gap:12px;background:var(--surface3);border:1px solid var(--line);
+  border-radius:14px;padding:10px 14px;box-shadow:0 10px 30px rgba(0,0,0,.5);min-width:220px;}
+#restbar.show{display:flex;animation:up .25s;}
+#restbar .rt{font-size:22px;font-weight:800;font-variant-numeric:tabular-nums;color:var(--accent2);min-width:54px;text-align:center;}
+#restbar .rl{flex:1;font-size:12px;color:var(--muted);font-weight:600;}
+#restbar button{font-size:13px;font-weight:800;color:var(--hot);}
+
+/* bottom nav */
+nav{position:fixed;bottom:0;left:0;right:0;z-index:30;background:rgba(11,13,18,.85);backdrop-filter:blur(18px);
+  border-top:1px solid var(--line);padding-bottom:var(--safe-bot);}
+nav .inner{max-width:560px;margin:0 auto;display:flex;height:var(--nav-h);}
+nav button{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:var(--faint);font-size:10px;font-weight:700;}
+nav button .ni{font-size:21px;line-height:1;}
+nav button.on{color:var(--accent);}
+
+.empty{text-align:center;color:var(--muted);padding:40px 20px;}
+.divider{height:1px;background:var(--line);margin:14px 0;}
+.flexrow{display:flex;gap:10px;}
+.flexrow > *{flex:1;}
+.note{font-size:12.5px;color:var(--muted);background:var(--surface);border:1px dashed var(--line);border-radius:12px;padding:10px 12px;margin-top:10px;}
+.cardio{background:linear-gradient(135deg,rgba(34,211,238,.08),rgba(52,211,153,.05));border:1px solid rgba(34,211,238,.22);}
+
+/* day pager (Today header) */
+.app-head.daypager{gap:10px;}
+.app-head.daypager .pgmid{flex:1;text-align:center;min-width:0;}
+.app-head.daypager .pgmid h1{font-size:24px;margin-top:2px;}
+.app-head.daypager .pgmid a{color:var(--accent);font-weight:700;}
+.jumpwrap{position:relative;display:inline-flex;align-items:center;justify-content:center;color:var(--accent);font-weight:700;cursor:pointer;}
+.jumpwrap input[type=date]{position:absolute;inset:0;width:100%;height:100%;opacity:0;border:0;cursor:pointer;color-scheme:dark;}
+.pgbtn{width:44px;height:44px;flex:none;border-radius:14px;background:var(--surface2);border:1px solid var(--line);font-size:22px;font-weight:800;color:var(--text);display:flex;align-items:center;justify-content:center;}
+.pgbtn[disabled]{opacity:.28;}
+.pgbtn:active:not([disabled]){transform:scale(.94);}
+
+/* workout history rows */
+.histrow{display:flex;align-items:center;gap:10px;width:100%;padding:11px 0;border-top:1px solid var(--line);text-align:left;}
+.histrow:first-of-type{border-top:none;}
+.histrow .histmain{display:flex;align-items:center;gap:10px;flex:1;min-width:0;text-align:left;}
+.histrow .hd{flex:1;min-width:0;}
+.histrow .hd b{font-size:14.5px;font-weight:700;}
+.histrow .hr{display:flex;flex-direction:column;align-items:flex-end;gap:1px;}
+.histrow .hsets{font-size:12.5px;font-weight:700;color:var(--accent);}
+.histrow .go{color:var(--faint);font-size:18px;flex:none;}
+.histexport{flex:none;border:1px solid rgba(34,211,238,.32);background:rgba(34,211,238,.08);color:var(--accent2);border-radius:10px;padding:8px 10px;font-size:12px;font-weight:800;}
+.histexport:active{transform:scale(.96);}
+.exportcard{background:linear-gradient(135deg,rgba(34,211,238,.09),rgba(52,211,153,.06));border-color:rgba(34,211,238,.24);}
+.exportactions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;}
+.exportactions .btn{flex:1 1 145px;}
+.exportactions .btn.ghost{background:rgba(255,255,255,.02);}
+.exportmeta{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;}
+.exportmeta span{font-size:11.5px;font-weight:700;color:#cfe;background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:999px;padding:4px 8px;}
+
+/* simplified Today extras */
+.hint{font-size:12.5px;color:var(--muted);text-align:center;margin:14px 6px;line-height:1.6;}
+.hint a{color:var(--accent);font-weight:700;}
+.startline{display:flex;align-items:center;justify-content:center;gap:8px;font-size:12.5px;color:var(--faint);margin:22px 0 4px;}
+.startline input{background:var(--surface2);border:1px solid var(--line);color:var(--text);border-radius:9px;padding:7px 10px;font-size:13px;font-family:inherit;color-scheme:dark;}
+.ride{display:flex;align-items:center;gap:12px;width:100%;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin-bottom:4px;}
+.ride:active{transform:scale(.99);}
+.ride.on{border-color:rgba(52,211,153,.45);background:rgba(52,211,153,.07);}
+.ride .re{font-size:22px;}
+.ride .rt{flex:1;text-align:left;font-weight:700;font-size:14.5px;}
+.ride.on .rt{color:var(--accent);}
+.ride .rk{width:28px;height:28px;border-radius:8px;background:var(--surface2);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-weight:800;color:var(--faint);}
+.ride.on .rk{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);}
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<div id="restbar">
+  <div class="rt" id="rtnum">0:00</div>
+  <div class="rl" id="rtlabel">Rest</div>
+  <button id="rtskip">Skip</button>
+</div>
+
+<div class="sheet-wrap" id="sheetWrap">
+  <div class="sheet-bg" data-close="1"></div>
+  <div class="sheet" id="sheet"></div>
+</div>
+
+<nav><div class="inner" id="nav"></div></nav>
+
+<script>
+const EXERCISES = {
+"Barbell_Bench_Press_-_Medium_Grip": {
+"name": "Barbell Bench Press",
+"primary": [
+"chest"
+],
+"secondary": [
+"shoulders",
+"triceps"
+],
+"equipment": "barbell",
+"mechanic": "compound",
+"level": "beginner",
+"instructions": [
+"Lie back on a flat bench. Using a medium width grip (a grip that creates a 90-degree angle in the middle of the movement between the forearms and the upper arms), lift the bar from the rack and hold it straight over you with your arms locked. This will be your starting position.",
+"From the starting position, breathe in and begin coming down slowly until the bar touches your middle chest.",
+"After a brief pause, push the bar back to the starting position as you breathe out. Focus on pushing the bar using your chest muscles. Lock your arms and squeeze your chest in the contracted position at the top of the motion, hold for a second and then start coming down slowly again. Tip: Ideally, lowering the weight should take about twice as long as raising it.",
+"Repeat the movement for the prescribed amount of repetitions.",
+"When you are done, place the bar back in the rack."
+],
+"desc": "Lie back on a flat bench. Using a medium width grip (a grip that creates a 90-degree angle in the middle of the movement between the forearms and the upper arms), lift the bar from the rack and hold it straight over you with your arms locked. This will be your starting position.",
+"images": [
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Barbell_Bench_Press_-_Medium_Grip/0.jpg",
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Barbell_Bench_Press_-_Medium_Grip/1.jpg"
+]
+},
+"Incline_Dumbbell_Press": {
+"name": "Incline Dumbbell Press",
+"primary": [
+"chest"
+],
+"secondary": [
+"shoulders",
+"triceps"
+],
+"equipment": "dumbbell",
+"mechanic": "compound",
+"level": "beginner",
+"instructions": [
+"Lie back on an incline bench with a dumbbell in each hand atop your thighs. The palms of your hands will be facing each other.",
+"Then, using your thighs to help push the dumbbells up, lift the dumbbells one at a time so that you can hold them at shoulder width.",
+"Once you have the dumbbells raised to shoulder width, rotate your wrists forward so that the palms of your hands are facing away from you. This will be your starting position.",
+"Be sure to keep full control of the dumbbells at all times. Then breathe out and push the dumbbells up with your chest.",
+"Lock your arms at the top, hold for a second, and then start slowly lowering the weight. Tip Ideally, lowering the weights should take about twice as long as raising them.",
+"Repeat the movement for the prescribed amount of repetitions.",
+"When you are done, place the dumbbells back on your thighs and then on the floor. This is the safest manner to release the dumbbells."
+],
+"desc": "Lie back on an incline bench with a dumbbell in each hand atop your thighs. The palms of your hands will be facing each other.",
+"images": [
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Incline_Dumbbell_Press/0.jpg",
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Incline_Dumbbell_Press/1.jpg"
+]
+},
+"Dumbbell_Bench_Press": {
+"name": "Dumbbell Bench Press",
+"primary": [
+"chest"
+],
+"secondary": [
+"shoulders",
+"triceps"
+],
+"equipment": "dumbbell",
+"mechanic": "compound",
+"level": "beginner",
+"instructions": [
+"Lie down on a flat bench with a dumbbell in each hand resting on top of your thighs. The palms of your hands will be facing each other.",
+"Then, using your thighs to help raise the dumbbells up, lift the dumbbells one at a time so that you can hold them in front of you at shoulder width.",
+"Once at shoulder width, rotate your wrists forward so that the palms of your hands are facing away from you. The dumbbells should be just to the sides of your chest, with your upper arm and forearm creating a 90 degree angle. Be sure to maintain full control of the dumbbells at all times. This will be your starting position.",
+"Then, as you breathe out, use your chest to push the dumbbells up. Lock your arms at the top of the lift and squeeze your chest, hold for a second and then begin coming down slowly. Tip: Ideally, lowering the weight should take about twice as long as raising it.",
+"Repeat the movement for the prescribed amount of repetitions of your training program."
+],
+"desc": "Lie down on a flat bench with a dumbbell in each hand resting on top of your thighs. The palms of your hands will be facing each other.",
+"images": [
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Dumbbell_Bench_Press/0.jpg",
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Dumbbell_Bench_Press/1.jpg"
+]
+},
+"Standing_Military_Press": {
+"name": "Overhead Barbell Press",
+"primary": [
+"shoulders"
+],
+"secondary": [
+"triceps"
+],
+"equipment": "barbell",
+"mechanic": "compound",
+"level": "beginner",
+"instructions": [
+"Start by placing a barbell that is about chest high on a squat rack. Once you have selected the weights, grab the barbell using a pronated (palms facing forward) grip. Make sure to grip the bar wider than shoulder width apart from each other.",
+"Slightly bend the knees and place the barbell on your collar bone. Lift the barbell up keeping it lying on your chest. Take a step back and position your feet shoulder width apart from each other.",
+"Once you pick up the barbell with the correct grip length, lift the bar up over your head by locking your arms. Hold at about shoulder level and slightly in front of your head. This is your starting position.",
+"Lower the bar down to the collarbone slowly as you inhale.",
+"Lift the bar back up to the starting position as you exhale.",
+"Repeat for the recommended amount of repetitions."
+],
+"desc": "Start by placing a barbell that is about chest high on a squat rack. Once you have selected the weights, grab the barbell using a pronated (palms facing forward) grip. Make sure to grip the bar wider than shoulder width apart from each other.",
+"images": [
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Standing_Military_Press/0.jpg",
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Standing_Military_Press/1.jpg"
+]
+},
+"Dumbbell_Shoulder_Press": {
+"name": "Dumbbell Shoulder Press",
+"primary": [
+"shoulders"
+],
+"secondary": [
+"triceps"
+],
+"equipment": "dumbbell",
+"mechanic": "compound",
+"level": "intermediate",
+"instructions": [
+"While holding a dumbbell in each hand, sit on a military press bench or utility bench that has back support. Place the dumbbells upright on top of your thighs.",
+"Now raise the dumbbells to shoulder height one at a time using your thighs to help propel them up into position.",
+"Make sure to rotate your wrists so that the palms of your hands are facing forward. This is your starting position.",
+"Now, exhale and push the dumbbells upward until they touch at the top.",
+"Then, after a brief pause at the top contracted position, slowly lower the weights back down to the starting position while inhaling.",
+"Repeat for the recommended amount of repetitions."
+],
+"desc": "While holding a dumbbell in each hand, sit on a military press bench or utility bench that has back support. Place the dumbbells upright on top of your thighs.",
+"images": [
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Dumbbell_Shoulder_Press/0.jpg",
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Dumbbell_Shoulder_Press/1.jpg"
+]
+},
+"Seated_Dumbbell_Press": {
+"name": "Seated Dumbbell Press",
+"primary": [
+"shoulders"
+],
+"secondary": [
+"triceps"
+],
+"equipment": "dumbbell",
+"mechanic": "compound",
+"level": "beginner",
+"instructions": [
+"Grab a couple of dumbbells and sit on a military press bench or a utility bench that has a back support on it as you place the dumbbells upright on top of your thighs.",
+"Clean the dumbbells up one at a time by using your thighs to bring the dumbbells up to shoulder height at each side.",
+"Rotate the wrists so that the palms of your hands are facing forward. This is your starting position.",
+"As you exhale, push the dumbbells up until they touch at the top.",
+"After a second pause, slowly come down back to the starting position as you inhale.",
+"Repeat for the recommended amount of repetitions."
+],
+"desc": "Grab a couple of dumbbells and sit on a military press bench or a utility bench that has a back support on it as you place the dumbbells upright on top of your thighs.",
+"images": [
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Seated_Dumbbell_Press/0.jpg",
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Seated_Dumbbell_Press/1.jpg"
+]
+},
+"Side_Lateral_Raise": {
+"name": "Dumbbell Lateral Raise",
+"primary": [
+"shoulders"
+],
+"secondary": [],
+"equipment": "dumbbell",
+"mechanic": "isolation",
+"level": "beginner",
+"instructions": [
+"Pick a couple of dumbbells and stand with a straight torso and the dumbbells by your side at arms length with the palms of the hand facing you. This will be your starting position.",
+"While maintaining the torso in a stationary position (no swinging), lift the dumbbells to your side with a slight bend on the elbow and the hands slightly tilted forward as if pouring water in a glass. Continue to go up until you arms are parallel to the floor. Exhale as you execute this movement and pause for a second at the top.",
+"Lower the dumbbells back down slowly to the starting position as you inhale.",
+"Repeat for the recommended amount of repetitions."
+],
+"desc": "Pick a couple of dumbbells and stand with a straight torso and the dumbbells by your side at arms length with the palms of the hand facing you. This will be your starting position.",
+"images": [
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Side_Lateral_Raise/0.jpg",
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Side_Lateral_Raise/1.jpg"
+]
+},
+"Cable_Crossover": {
+"name": "Cable Chest Fly",
+"primary": [
+"chest"
+],
+"secondary": [
+"shoulders"
+],
+"equipment": "cable",
+"mechanic": "isolation",
+"level": "beginner",
+"instructions": [
+"To get yourself into the starting position, place the pulleys on a high position (above your head), select the resistance to be used and hold the pulleys in each hand.",
+"Step forward in front of an imaginary straight line between both pulleys while pulling your arms together in front of you. Your torso should have a small forward bend from the waist. This will be your starting position.",
+"With a slight bend on your elbows in order to prevent stress at the biceps tendon, extend your arms to the side (straight out at both sides) in a wide arc until you feel a stretch on your chest. Breathe in as you perform this portion of the movement. Tip: Keep in mind that throughout the movement, the arms and torso should remain stationary; the movement should only occur at the shoulder joint.",
+"Return your arms back to the starting position as you breathe out. Make sure to use the same arc of motion used to lower the weights.",
+"Hold for a second at the starting position and repeat the movement for the prescribed amount of repetitions."
+],
+"desc": "To get yourself into the starting position, place the pulleys on a high position (above your head), select the resistance to be used and hold the pulleys in each hand.",
+"images": [
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Cable_Crossover/0.jpg",
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Cable_Crossover/1.jpg"
+]
+},
+"Triceps_Pushdown": {
+"name": "Triceps Pushdown",
+"primary": [
+"triceps"
+],
+"secondary": [],
+"equipment": "cable",
+"mechanic": "isolation",
+"level": "beginner",
+"instructions": [
+"Attach a straight or angled bar to a high pulley and grab with an overhand grip (palms facing down) at shoulder width.",
+"Standing upright with the torso straight and a very small inclination forward, bring the upper arms close to your body and perpendicular to the floor. The forearms should be pointing up towards the pulley as they hold the bar. This is your starting position.",
+"Using the triceps, bring the bar down until it touches the front of your thighs and the arms are fully extended perpendicular to the floor. The upper arms should always remain stationary next to your torso and only the forearms should move. Exhale as you perform this movement.",
+"After a second hold at the contracted position, bring the bar slowly up to the starting point. Breathe in as you perform this step.",
+"Repeat for the recommended amount of repetitions."
+],
+"desc": "Attach a straight or angled bar to a high pulley and grab with an overhand grip (palms facing down) at shoulder width.",
+"images": [
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Triceps_Pushdown/0.jpg",
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Triceps_Pushdown/1.jpg"
+]
+},
+"Dips_-_Triceps_Version": {
+"name": "Triceps Dips",
+"primary": [
+"triceps"
+],
+"secondary": [
+"chest",
+"shoulders"
+],
+"equipment": "body only",
+"mechanic": "compound",
+"level": "beginner",
+"instructions": [
+"To get into the starting position, hold your body at arm's length with your arms nearly locked above the bars.",
+"Now, inhale and slowly lower yourself downward. Your torso should remain upright and your elbows should stay close to your body. This helps to better focus on tricep involvement. Lower yourself until there is a 90 degree angle formed between the upper arm and forearm.",
+"Then, exhale and push your torso back up using your triceps to bring your body back to the starting position.",
+"Repeat the movement for the prescribed amount of repetitions."
+],
+"desc": "To get into the starting position, hold your body at arm's length with your arms nearly locked above the bars.",
+"images": [
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Dips_-_Triceps_Version/0.jpg",
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Dips_-_Triceps_Version/1.jpg"
+]
+},
+"Standing_Dumbbell_Triceps_Extension": {
+"name": "Overhead Triceps Extension",
+"primary": [
+"triceps"
+],
+"secondary": [],
+"equipment": "dumbbell",
+"mechanic": "isolation",
+"level": "beginner",
+"instructions": [
+"To begin, stand up with a dumbbell held by both hands. Your feet should be about shoulder width apart from each other. Slowly use both hands to grab the dumbbell and lift it over your head until both arms are fully extended.",
+"The resistance should be resting in the palms of your hands with your thumbs around it. The palm of the hands should be facing up towards the ceiling. This will be your starting position.",
+"Keeping your upper arms close to your head with elbows in and perpendicular to the floor, lower the resistance in a semicircular motion behind your head until your forearms touch your biceps. Tip: The upper arms should remain stationary and only the forearms should move. Breathe in as you perform this step.",
+"Go back to the starting position by using the triceps to raise the dumbbell. Breathe out as you perform this step.",
+"Repeat for the recommended amount of repetitions."
+],
+"desc": "To begin, stand up with a dumbbell held by both hands. Your feet should be about shoulder width apart from each other. Slowly use both hands to grab the dumbbell and lift it over your head until both arms are fully extended.",
+"images": [
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Standing_Dumbbell_Triceps_Extension/0.jpg",
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Standing_Dumbbell_Triceps_Extension/1.jpg"
+]
+},
+"Barbell_Deadlift": {
+"name": "Barbell Deadlift",
+"primary": [
+"lower back"
+],
+"secondary": [
+"calves",
+"forearms",
+"glutes",
+"hamstrings",
+"lats",
+"middle back",
+"quadriceps",
+"traps"
+],
+"equipment": "barbell",
+"mechanic": "compound",
+"level": "intermediate",
+"instructions": [
+"Stand in front of a loaded barbell.",
+"While keeping the back as straight as possible, bend your knees, bend forward and grasp the bar using a medium (shoulder width) overhand grip. This will be the starting position of the exercise. Tip: If it is difficult to hold on to the bar with this grip, alternate your grip or use wrist straps.",
+"While holding the bar, start the lift by pushing with your legs while simultaneously getting your torso to the upright position as you breathe out. In the upright position, stick your chest out and contract the back by bringing the shoulder blades back. Think of how the soldiers in the military look when they are in standing in attention.",
+"Go back to the starting position by bending at the knees while simultaneously leaning the torso forward at the waist while keeping the back straight. When the weights on the bar touch the floor you are back at the starting position and ready to perform another repetition.",
+"Perform the amount of repetitions prescribed in the program."
+],
+"desc": "Stand in front of a loaded barbell.",
+"images": [
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Barbell_Deadlift/0.jpg",
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Barbell_Deadlift/1.jpg"
+]
+},
+"Romanian_Deadlift": {
+"name": "Romanian Deadlift",
+"primary": [
+"hamstrings"
+],
+"secondary": [
+"calves",
+"glutes",
+"lower back"
+],
+"equipment": "barbell",
+"mechanic": "compound",
+"level": "intermediate",
+"instructions": [
+"Put a barbell in front of you on the ground and grab it using a pronated (palms facing down) grip that a little wider than shoulder width. Tip: Depending on the weight used, you may need wrist wraps to perform the exercise and also a raised platform in order to allow for better range of motion.",
+"Bend the knees slightly and keep the shins vertical, hips back and back straight. This will be your starting position.",
+"Keeping your back and arms completely straight at all times, use your hips to lift the bar as you exhale. Tip: The movement should not be fast but steady and under control.",
+"Once you are standing completely straight up, lower the bar by pushing the hips back, only slightly bending the knees, unlike when squatting. Tip: Take a deep breath at the start of the movement and keep your chest up. Hold your breath as you lower and exhale as you complete the movement.",
+"Repeat for the recommended amount of repetitions."
+],
+"desc": "Put a barbell in front of you on the ground and grab it using a pronated (palms facing down) grip that a little wider than shoulder width. Tip: Depending on the weight used, you may need wrist wraps to perform the exercise and also a raised platform in order to allow for better range of motion.",
+"images": [
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Romanian_Deadlift/0.jpg",
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Romanian_Deadlift/1.jpg"
+]
+},
+"Pullups": {
+"name": "Pull-Ups",
+"primary": [
+"lats"
+],
+"secondary": [
+"biceps",
+"middle back"
+],
+"equipment": "body only",
+"mechanic": "compound",
+"level": "beginner",
+"instructions": [
+"Grab the pull-up bar with the palms facing forward using the prescribed grip. Note on grips: For a wide grip, your hands need to be spaced out at a distance wider than your shoulder width. For a medium grip, your hands need to be spaced out at a distance equal to your shoulder width and for a close grip at a distance smaller than your shoulder width.",
+"As you have both arms extended in front of you holding the bar at the chosen grip width, bring your torso back around 30 degrees or so while creating a curvature on your lower back and sticking your chest out. This is your starting position.",
+"Pull your torso up until the bar touches your upper chest by drawing the shoulders and the upper arms down and back. Exhale as you perform this portion of the movement. Tip: Concentrate on squeezing the back muscles once you reach the full contracted position. The upper torso should remain stationary as it moves through space and only the arms should move. The forearms should do no other work other than hold the bar.",
+"After a second on the contracted position, start to inhale and slowly lower your torso back to the starting position when your arms are fully extended and the lats are fully stretched.",
+"Repeat this motion for the prescribed amount of repetitions."
+],
+"desc": "Grab the pull-up bar with the palms facing forward using the prescribed grip. Note on grips: For a wide grip, your hands need to be spaced out at a distance wider than your shoulder width. For a medium grip, your hands need to be spaced out at a distance equal to your shoulder width and for a close grip at a distance smaller than your shoulder width.",
+"images": [
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Pullups/0.jpg",
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Pullups/1.jpg"
+]
+},
+"Wide-Grip_Lat_Pulldown": {
+"name": "Wide-Grip Lat Pulldown",
+"primary": [
+"lats"
+],
+"secondary": [
+"biceps",
+"middle back",
+"shoulders"
+],
+"equipment": "cable",
+"mechanic": "compound",
+"level": "beginner",
+"instructions": [
+"Sit down on a pull-down machine with a wide bar attached to the top pulley. Make sure that you adjust the knee pad of the machine to fit your height. These pads will prevent your body from being raised by the resistance attached to the bar.",
+"Grab the bar with the palms facing forward using the prescribed grip. Note on grips: For a wide grip, your hands need to be spaced out at a distance wider than shoulder width. For a medium grip, your hands need to be spaced out at a distance equal to your shoulder width and for a close grip at a distance smaller than your shoulder width.",
+"As you have both arms extended in front of you holding the bar at the chosen grip width, bring your torso back around 30 degrees or so while creating a curvature on your lower back and sticking your chest out. This is your starting position.",
+"As you breathe out, bring the bar down until it touches your upper chest by drawing the shoulders and the upper arms down and back. Tip: Concentrate on squeezing the back muscles once you reach the full contracted position. The upper torso should remain stationary and only the arms should move. The forearms should do no other work except for holding the bar; therefore do not try to pull down the bar using the forearms.",
+"After a second at the contracted position squeezing your shoulder blades together, slowly raise the bar back to the starting position when your arms are fully extended and the lats are fully stretched. Inhale during this portion of the movement.",
+"Repeat this motion for the prescribed amount of repetitions."
+],
+"desc": "Sit down on a pull-down machine with a wide bar attached to the top pulley. Make sure that you adjust the knee pad of the machine to fit your height. These pads will prevent your body from being raised by the resistance attached to the bar.",
+"images": [
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Wide-Grip_Lat_Pulldown/0.jpg",
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Wide-Grip_Lat_Pulldown/1.jpg"
+]
+},
+"Bent_Over_Barbell_Row": {
+"name": "Bent-Over Barbell Row",
+"primary": [
+"middle back"
+],
+"secondary": [
+"biceps",
+"lats",
+"shoulders"
+],
+"equipment": "barbell",
+"mechanic": "compound",
+"level": "beginner",
+"instructions": [
+"Holding a barbell with a pronated grip (palms facing down), bend your knees slightly and bring your torso forward, by bending at the waist, while keeping the back straight until it is almost parallel to the floor. Tip: Make sure that you keep the head up. The barbell should hang directly in front of you as your arms hang perpendicular to the floor and your torso. This is your starting position.",
+"Now, while keeping the torso stationary, breathe out and lift the barbell to you. Keep the elbows close to the body and only use the forearms to hold the weight. At the top contracted position, squeeze the back muscles and hold for a brief pause.",
+"Then inhale and slowly lower the barbell back to the starting position.",
+"Repeat for the recommended amount of repetitions."
+],
+"desc": "Holding a barbell with a pronated grip (palms facing down), bend your knees slightly and bring your torso forward, by bending at the waist, while keeping the back straight until it is almost parallel to the floor. Tip: Make sure that you keep the head up. The barbell should hang directly in front of you as your arms hang perpendicular to the floor and your torso. This is your starting position.",
+"images": [
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Bent_Over_Barbell_Row/0.jpg",
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Bent_Over_Barbell_Row/1.jpg"
+]
+},
+"Seated_Cable_Rows": {
+"name": "Seated Cable Row",
+"primary": [
+"middle back"
+],
+"secondary": [
+"biceps",
+"lats",
+"shoulders"
+],
+"equipment": "cable",
+"mechanic": "compound",
+"level": "beginner",
+"instructions": [
+"For this exercise you will need access to a low pulley row machine with a V-bar. Note: The V-bar will enable you to have a neutral grip where the palms of your hands face each other. To get into the starting position, first sit down on the machine and place your feet on the front platform or crossbar provided making sure that your knees are slightly bent and not locked.",
+"Lean over as you keep the natural alignment of your back and grab the V-bar handles.",
+"With your arms extended pull back until your torso is at a 90-degree angle from your legs. Your back should be slightly arched and your chest should be sticking out. You should be feeling a nice stretch on your lats as you hold the bar in front of you. This is the starting position of the exercise.",
+"Keeping the torso stationary, pull the handles back towards your torso while keeping the arms close to it until you touch the abdominals. Breathe out as you perform that movement. At that point you should be squeezing your back muscles hard. Hold that contraction for a second and slowly go back to the original position while breathing in.",
+"Repeat for the recommended amount of repetitions."
+],
+"desc": "For this exercise you will need access to a low pulley row machine with a V-bar. Note: The V-bar will enable you to have a neutral grip where the palms of your hands face each other. To get into the starting position, first sit down on the machine and place your feet on the front platform or crossbar provided making sure that your knees are slightly bent and not locked.",
+"images": [
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Seated_Cable_Rows/0.jpg",
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Seated_Cable_Rows/1.jpg"
+]
+},
+"Face_Pull": {
+"name": "Face Pull",
+"primary": [
+"shoulders"
+],
+"secondary": [
+"middle back"
+],
+"equipment": "cable",
+"mechanic": "compound",
+"level": "intermediate",
+"instructions": [
+"Facing a high pulley with a rope or dual handles attached, pull the weight directly towards your face, separating your hands as you do so. Keep your upper arms parallel to the ground."
+],
+"desc": "Facing a high pulley with a rope or dual handles attached, pull the weight directly towards your face, separating your hands as you do so. Keep your upper arms parallel to the ground.",
+"images": [
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Face_Pull/0.jpg",
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Face_Pull/1.jpg"
+]
+},
+"Barbell_Curl": {
+"name": "Barbell Curl",
+"primary": [
+"biceps"
+],
+"secondary": [
+"forearms"
+],
+"equipment": "barbell",
+"mechanic": "isolation",
+"level": "beginner",
+"instructions": [
+"Stand up with your torso upright while holding a barbell at a shoulder-width grip. The palm of your hands should be facing forward and the elbows should be close to the torso. This will be your starting position.",
+"While holding the upper arms stationary, curl the weights forward while contracting the biceps as you breathe out. Tip: Only the forearms should move.",
+"Continue the movement until your biceps are fully contracted and the bar is at shoulder level. Hold the contracted position for a second and squeeze the biceps hard.",
+"Slowly begin to bring the bar back to starting position as your breathe in.",
+"Repeat for the recommended amount of repetitions."
+],
+"desc": "Stand up with your torso upright while holding a barbell at a shoulder-width grip. The palm of your hands should be facing forward and the elbows should be close to the torso. This will be your starting position.",
+"images": [
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Barbell_Curl/0.jpg",
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Barbell_Curl/1.jpg"
+]
+},
+"Hammer_Curls": {
+"name": "Hammer Curl",
+"primary": [
+"biceps"
+],
+"secondary": [],
+"equipment": "dumbbell",
+"mechanic": "isolation",
+"level": "beginner",
+"instructions": [
+"Stand up with your torso upright and a dumbbell on each hand being held at arms length. The elbows should be close to the torso.",
+"The palms of the hands should be facing your torso. This will be your starting position.",
+"Now, while holding your upper arm stationary, exhale and curl the weight forward while contracting the biceps. Continue to raise the weight until the biceps are fully contracted and the dumbbell is at shoulder level. Hold the contracted position for a brief moment as you squeeze the biceps. Tip: Focus on keeping the elbow stationary and only moving your forearm.",
+"After the brief pause, inhale and slowly begin the lower the dumbbells back down to the starting position.",
+"Repeat for the recommended amount of repetitions."
+],
+"desc": "Stand up with your torso upright and a dumbbell on each hand being held at arms length. The elbows should be close to the torso.",
+"images": [
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Hammer_Curls/0.jpg",
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Hammer_Curls/1.jpg"
+]
+},
+"Barbell_Squat": {
+"name": "Barbell Back Squat",
+"primary": [
+"quadriceps"
+],
+"secondary": [
+"calves",
+"glutes",
+"hamstrings",
+"lower back"
+],
+"equipment": "barbell",
+"mechanic": "compound",
+"level": "beginner",
+"instructions": [
+"This exercise is best performed inside a squat rack for safety purposes. To begin, first set the bar on a rack to just below shoulder level. Once the correct height is chosen and the bar is loaded, step under the bar and place the back of your shoulders (slightly below the neck) across it.",
+"Hold on to the bar using both arms at each side and lift it off the rack by first pushing with your legs and at the same time straightening your torso.",
+"Step away from the rack and position your legs using a shoulder width medium stance with the toes slightly pointed out. Keep your head up at all times and also maintain a straight back. This will be your starting position. (Note: For the purposes of this discussion we will use the medium stance described above which targets overall development; however you can choose any of the three stances discussed in the foot stances section).",
+"Begin to slowly lower the bar by bending the knees and hips as you maintain a straight posture with the head up. Continue down until the angle between the upper leg and the calves becomes slightly less than 90-degrees. Inhale as you perform this portion of the movement. Tip: If you performed the exercise correctly, the front of the knees should make an imaginary straight line with the toes that is perpendicular to the front. If your knees are past that imaginary line (if they are past your toes) then you are placing undue stress on the knee and the exercise has been performed incorrectly.",
+"Begin to raise the bar as you exhale by pushing the floor with the heel of your foot as you straighten the legs again and go back to the starting position.",
+"Repeat for the recommended amount of repetitions."
+],
+"desc": "This exercise is best performed inside a squat rack for safety purposes. To begin, first set the bar on a rack to just below shoulder level. Once the correct height is chosen and the bar is loaded, step under the bar and place the back of your shoulders (slightly below the neck) across it.",
+"images": [
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Barbell_Squat/0.jpg",
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Barbell_Squat/1.jpg"
+]
+},
+"Front_Barbell_Squat": {
+"name": "Front Squat",
+"primary": [
+"quadriceps"
+],
+"secondary": [
+"calves",
+"glutes",
+"hamstrings"
+],
+"equipment": "barbell",
+"mechanic": "compound",
+"level": "expert",
+"instructions": [
+"This exercise is best performed inside a squat rack for safety purposes. To begin, first set the bar on a rack that best matches your height. Once the correct height is chosen and the bar is loaded, bring your arms up under the bar while keeping the elbows high and the upper arm slightly above parallel to the floor. Rest the bar on top of the deltoids and cross your arms while grasping the bar for total control.",
+"Lift the bar off the rack by first pushing with your legs and at the same time straightening your torso.",
+"Step away from the rack and position your legs using a shoulder width medium stance with the toes slightly pointed out. Keep your head up at all times as looking down will get you off balance and also maintain a straight back. This will be your starting position. (Note: For the purposes of this discussion we will use the medium stance described above which targets overall development; however you can choose any of the three stances described in the foot positioning section).",
+"Begin to slowly lower the bar by bending the knees as you maintain a straight posture with the head up. Continue down until the angle between the upper leg and the calves becomes slightly less than 90-degrees (which is the point in which the upper legs are below parallel to the floor). Inhale as you perform this portion of the movement. Tip: If you performed the exercise correctly, the front of the knees should make an imaginary straight line with the toes that is perpendicular to the front. If your knees are past that imaginary line (if they are past your toes) then you are placing undue stress on the knee and the exercise has been performed incorrectly.",
+"Begin to raise the bar as you exhale by pushing the floor mainly with the middle of your foot as you straighten the legs again and go back to the starting position.",
+"Repeat for the recommended amount of repetitions."
+],
+"desc": "This exercise is best performed inside a squat rack for safety purposes. To begin, first set the bar on a rack that best matches your height. Once the correct height is chosen and the bar is loaded, bring your arms up under the bar while keeping the elbows high and the upper arm slightly above parallel to the floor. Rest the bar on top of the deltoids and cross your arms while grasping the bar for total control.",
+"images": [
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Front_Barbell_Squat/0.jpg",
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Front_Barbell_Squat/1.jpg"
+]
+},
+"Hack_Squat": {
+"name": "Hack Squat",
+"primary": [
+"quadriceps"
+],
+"secondary": [
+"calves",
+"glutes",
+"hamstrings"
+],
+"equipment": "machine",
+"mechanic": "compound",
+"level": "beginner",
+"instructions": [
+"Place the back of your torso against the back pad of the machine and hook your shoulders under the shoulder pads provided.",
+"Position your legs in the platform using a shoulder width medium stance with the toes slightly pointed out. Tip: Keep your head up at all times and also maintain the back on the pad at all times.",
+"Place your arms on the side handles of the machine and disengage the safety bars (which on most designs is done by moving the side handles from a facing front position to a diagonal position).",
+"Now straighten your legs without locking the knees. This will be your starting position. (Note: For the purposes of this discussion we will use the medium stance described above which targets overall development; however you can choose any of the three stances described in the foot positioning section).",
+"Begin to slowly lower the unit by bending the knees as you maintain a straight posture with the head up (back on the pad at all times). Continue down until the angle between the upper leg and the calves becomes slightly less than 90-degrees (which is the point in which the upper legs are below parallel to the floor). Inhale as you perform this portion of the movement. Tip: If you performed the exercise correctly, the front of the knees should make an imaginary straight line with the toes that is perpendicular to the front. If your knees are past that imaginary line (if they are past your toes) then you are placing undue stress on the knee and the exercise has been performed incorrectly.",
+"Begin to raise the unit as you exhale by pushing the floor with mainly with the heel of your foot as you straighten the legs again and go back to the starting position.",
+"Repeat for the recommended amount of repetitions."
+],
+"desc": "Place the back of your torso against the back pad of the machine and hook your shoulders under the shoulder pads provided.",
+"images": [
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Hack_Squat/0.jpg",
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Hack_Squat/1.jpg"
+]
+},
+"Leg_Press": {
+"name": "Leg Press",
+"primary": [
+"quadriceps"
+],
+"secondary": [
+"calves",
+"glutes",
+"hamstrings"
+],
+"equipment": "machine",
+"mechanic": "compound",
+"level": "beginner",
+"instructions": [
+"Using a leg press machine, sit down on the machine and place your legs on the platform directly in front of you at a medium (shoulder width) foot stance. (Note: For the purposes of this discussion we will use the medium stance described above which targets overall development; however you can choose any of the three stances described in the foot positioning section).",
+"Lower the safety bars holding the weighted platform in place and press the platform all the way up until your legs are fully extended in front of you. Tip: Make sure that you do not lock your knees. Your torso and the legs should make a perfect 90-degree angle. This will be your starting position.",
+"As you inhale, slowly lower the platform until your upper and lower legs make a 90-degree angle.",
+"Pushing mainly with the heels of your feet and using the quadriceps go back to the starting position as you exhale.",
+"Repeat for the recommended amount of repetitions and ensure to lock the safety pins properly once you are done. You do not want that platform falling on you fully loaded."
+],
+"desc": "Using a leg press machine, sit down on the machine and place your legs on the platform directly in front of you at a medium (shoulder width) foot stance. (Note: For the purposes of this discussion we will use the medium stance described above which targets overall development; however you can choose any of the three stances described in the foot positioning section).",
+"images": [
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Leg_Press/0.jpg",
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Leg_Press/1.jpg"
+]
+},
+"Lying_Leg_Curls": {
+"name": "Lying Leg Curl",
+"primary": [
+"hamstrings"
+],
+"secondary": [],
+"equipment": "machine",
+"mechanic": "isolation",
+"level": "beginner",
+"instructions": [
+"Adjust the machine lever to fit your height and lie face down on the leg curl machine with the pad of the lever on the back of your legs (just a few inches under the calves). Tip: Preferably use a leg curl machine that is angled as opposed to flat since an angled position is more favorable for hamstrings recruitment.",
+"Keeping the torso flat on the bench, ensure your legs are fully stretched and grab the side handles of the machine. Position your toes straight (or you can also use any of the other two stances described on the foot positioning section). This will be your starting position.",
+"As you exhale, curl your legs up as far as possible without lifting the upper legs from the pad. Once you hit the fully contracted position, hold it for a second.",
+"As you inhale, bring the legs back to the initial position. Repeat for the recommended amount of repetitions."
+],
+"desc": "Adjust the machine lever to fit your height and lie face down on the leg curl machine with the pad of the lever on the back of your legs (just a few inches under the calves). Tip: Preferably use a leg curl machine that is angled as opposed to flat since an angled position is more favorable for hamstrings recruitment.",
+"images": [
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Lying_Leg_Curls/0.jpg",
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Lying_Leg_Curls/1.jpg"
+]
+},
+"Leg_Extensions": {
+"name": "Leg Extension",
+"primary": [
+"quadriceps"
+],
+"secondary": [],
+"equipment": "machine",
+"mechanic": "isolation",
+"level": "beginner",
+"instructions": [
+"For this exercise you will need to use a leg extension machine. First choose your weight and sit on the machine with your legs under the pad (feet pointed forward) and the hands holding the side bars. This will be your starting position. Tip: You will need to adjust the pad so that it falls on top of your lower leg (just above your feet). Also, make sure that your legs form a 90-degree angle between the lower and upper leg. If the angle is less than 90-degrees then that means the knee is over the toes which in turn creates undue stress at the knee joint. If the machine is designed that way, either look for another machine or just make sure that when you start executing the exercise you stop going down once you hit the 90-degree angle.",
+"Using your quadriceps, extend your legs to the maximum as you exhale. Ensure that the rest of the body remains stationary on the seat. Pause a second on the contracted position.",
+"Slowly lower the weight back to the original position as you inhale, ensuring that you do not go past the 90-degree angle limit.",
+"Repeat for the recommended amount of times."
+],
+"desc": "For this exercise you will need to use a leg extension machine. First choose your weight and sit on the machine with your legs under the pad (feet pointed forward) and the hands holding the side bars. This will be your starting position. Tip: You will need to adjust the pad so that it falls on top of your lower leg (just above your feet). Also, make sure that your legs form a 90-degree angle between the lower and upper leg. If the angle is less than 90-degrees then that means the knee is over the toes which in turn creates undue stress at the knee joint. If the machine is designed that way, either look for another machine or just make sure that when you start executing the exercise you stop going down once you hit the 90-degree angle.",
+"images": [
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Leg_Extensions/0.jpg",
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Leg_Extensions/1.jpg"
+]
+},
+"Standing_Calf_Raises": {
+"name": "Standing Calf Raise",
+"primary": [
+"calves"
+],
+"secondary": [],
+"equipment": "machine",
+"mechanic": "isolation",
+"level": "beginner",
+"instructions": [
+"Adjust the padded lever of the calf raise machine to fit your height.",
+"Place your shoulders under the pads provided and position your toes facing forward (or using any of the two other positions described at the beginning of the chapter). The balls of your feet should be secured on top of the calf block with the heels extending off it. Push the lever up by extending your hips and knees until your torso is standing erect. The knees should be kept with a slight bend; never locked. Toes should be facing forward, outwards or inwards as described at the beginning of the chapter. This will be your starting position.",
+"Raise your heels as you breathe out by extending your ankles as high as possible and flexing your calf. Ensure that the knee is kept stationary at all times. There should be no bending at any time. Hold the contracted position by a second before you start to go back down.",
+"Go back slowly to the starting position as you breathe in by lowering your heels as you bend the ankles until calves are stretched.",
+"Repeat for the recommended amount of repetitions."
+],
+"desc": "Adjust the padded lever of the calf raise machine to fit your height.",
+"images": [
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Standing_Calf_Raises/0.jpg",
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Standing_Calf_Raises/1.jpg"
+]
+},
+"Dumbbell_Lunges": {
+"name": "Dumbbell Walking Lunge",
+"primary": [
+"quadriceps"
+],
+"secondary": [
+"calves",
+"glutes",
+"hamstrings"
+],
+"equipment": "dumbbell",
+"mechanic": "compound",
+"level": "beginner",
+"instructions": [
+"Stand with your torso upright holding two dumbbells in your hands by your sides. This will be your starting position.",
+"Step forward with your right leg around 2 feet or so from the foot being left stationary behind and lower your upper body down, while keeping the torso upright and maintaining balance. Inhale as you go down. Note: As in the other exercises, do not allow your knee to go forward beyond your toes as you come down, as this will put undue stress on the knee joint. Make sure that you keep your front shin perpendicular to the ground.",
+"Using mainly the heel of your foot, push up and go back to the starting position as you exhale.",
+"Repeat the movement for the recommended amount of repetitions and then perform with the left leg."
+],
+"desc": "Stand with your torso upright holding two dumbbells in your hands by your sides. This will be your starting position.",
+"images": [
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Dumbbell_Lunges/0.jpg",
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Dumbbell_Lunges/1.jpg"
+]
+},
+"Barbell_Hip_Thrust": {
+"name": "Barbell Hip Thrust",
+"primary": [
+"glutes"
+],
+"secondary": [
+"calves",
+"hamstrings"
+],
+"equipment": "barbell",
+"mechanic": "compound",
+"level": "intermediate",
+"instructions": [
+"Begin seated on the ground with a bench directly behind you. Have a loaded barbell over your legs. Using a fat bar or having a pad on the bar can greatly reduce the discomfort caused by this exercise.",
+"Roll the bar so that it is directly above your hips, and lean back against the bench so that your shoulder blades are near the top of it.",
+"Begin the movement by driving through your feet, extending your hips vertically through the bar. Your weight should be supported by your shoulder blades and your feet. Extend as far as possible, then reverse the motion to return to the starting position."
+],
+"desc": "Begin seated on the ground with a bench directly behind you. Have a loaded barbell over your legs. Using a fat bar or having a pad on the bar can greatly reduce the discomfort caused by this exercise.",
+"images": [
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Barbell_Hip_Thrust/0.jpg",
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Barbell_Hip_Thrust/1.jpg"
+]
+},
+"Hanging_Leg_Raise": {
+"name": "Hanging Leg Raise",
+"primary": [
+"abdominals"
+],
+"secondary": [],
+"equipment": "body only",
+"mechanic": "isolation",
+"level": "expert",
+"instructions": [
+"Hang from a chin-up bar with both arms extended at arms length in top of you using either a wide grip or a medium grip. The legs should be straight down with the pelvis rolled slightly backwards. This will be your starting position.",
+"Raise your legs until the torso makes a 90-degree angle with the legs. Exhale as you perform this movement and hold the contraction for a second or so.",
+"Go back slowly to the starting position as you breathe in.",
+"Repeat for the recommended amount of repetitions."
+],
+"desc": "Hang from a chin-up bar with both arms extended at arms length in top of you using either a wide grip or a medium grip. The legs should be straight down with the pelvis rolled slightly backwards. This will be your starting position.",
+"images": [
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Hanging_Leg_Raise/0.jpg",
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Hanging_Leg_Raise/1.jpg"
+]
+},
+"Cable_Crunch": {
+"name": "Cable Crunch",
+"primary": [
+"abdominals"
+],
+"secondary": [],
+"equipment": "cable",
+"mechanic": "isolation",
+"level": "beginner",
+"instructions": [
+"Kneel below a high pulley that contains a rope attachment.",
+"Grasp cable rope attachment and lower the rope until your hands are placed next to your face.",
+"Flex your hips slightly and allow the weight to hyperextend the lower back. This will be your starting position.",
+"With the hips stationary, flex the waist as you contract the abs so that the elbows travel towards the middle of the thighs. Exhale as you perform this portion of the movement and hold the contraction for a second.",
+"Slowly return to the starting position as you inhale. Tip: Make sure that you keep constant tension on the abs throughout the movement. Also, do not choose a weight so heavy that the lower back handles the brunt of the work.",
+"Repeat for the recommended amount of repetitions."
+],
+"desc": "Kneel below a high pulley that contains a rope attachment.",
+"images": [
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Cable_Crunch/0.jpg",
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Cable_Crunch/1.jpg"
+]
+},
+"Plank": {
+"name": "Plank",
+"primary": [
+"abdominals"
+],
+"secondary": [],
+"equipment": "body only",
+"mechanic": "isolation",
+"level": "beginner",
+"instructions": [
+"Get into a prone position on the floor, supporting your weight on your toes and your forearms. Your arms are bent and directly below the shoulder.",
+"Keep your body straight at all times, and hold this position as long as possible. To increase difficulty, an arm or leg can be raised."
+],
+"desc": "Get into a prone position on the floor, supporting your weight on your toes and your forearms. Your arms are bent and directly below the shoulder.",
+"images": [
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Plank/0.jpg",
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Plank/1.jpg"
+]
+},
+"Russian_Twist": {
+"name": "Russian Twist",
+"primary": [
+"abdominals"
+],
+"secondary": [
+"lower back"
+],
+"equipment": "body only",
+"mechanic": "compound",
+"level": "intermediate",
+"instructions": [
+"Lie down on the floor placing your feet either under something that will not move or by having a partner hold them. Your legs should be bent at the knees.",
+"Elevate your upper body so that it creates an imaginary V-shape with your thighs. Your arms should be fully extended in front of you perpendicular to your torso and with the hands clasped. This is the starting position.",
+"Twist your torso to the right side until your arms are parallel with the floor while breathing out.",
+"Hold the contraction for a second and move back to the starting position while breathing out. Now move to the opposite side performing the same techniques you applied to the right side.",
+"Repeat for the recommended amount of repetitions."
+],
+"desc": "Lie down on the floor placing your feet either under something that will not move or by having a partner hold them. Your legs should be bent at the knees.",
+"images": [
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Russian_Twist/0.jpg",
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Russian_Twist/1.jpg"
+]
+}
+};
+
+/* ---------- 12-week, 5-day program ---------- */
+// dayIndex: 0 Mon..6 Sun.  Training Mon/Tue/Wed/Fri/Sat, recovery Thu, rest Sun.
+const SPLIT = [
+  { key:'push', title:'Push Day', focus:['chest','shoulders','triceps'], type:'workout',
+    ex:[
+      {id:'Barbell_Bench_Press_-_Medium_Grip', sets:4, reps:'6–8', rest:120, comp:true},
+      {id:'Incline_Dumbbell_Press', sets:3, reps:'8–12', rest:90, comp:true},
+      {id:'Dumbbell_Shoulder_Press', sets:3, reps:'8–12', rest:90, comp:true},
+      {id:'Cable_Crossover', sets:3, reps:'12–15', rest:60},
+      {id:'Side_Lateral_Raise', sets:3, reps:'12–20', rest:45},
+      {id:'Triceps_Pushdown', sets:3, reps:'10–15', rest:60},
+      {id:'Standing_Dumbbell_Triceps_Extension', sets:3, reps:'10–15', rest:60},
+    ]},
+  { key:'pull', title:'Pull Day', focus:['lats','middle back','traps','biceps'], type:'workout',
+    ex:[
+      {id:'Barbell_Deadlift', sets:3, reps:'5', rest:150, comp:true, note:'Stop 1–2 reps shy of failure. Form first.'},
+      {id:'Pullups', sets:3, reps:'AMRAP', rest:90, comp:true, note:'Use assist band or lat pulldown if needed.'},
+      {id:'Bent_Over_Barbell_Row', sets:3, reps:'8–10', rest:90, comp:true},
+      {id:'Wide-Grip_Lat_Pulldown', sets:3, reps:'10–12', rest:75},
+      {id:'Seated_Cable_Rows', sets:3, reps:'10–12', rest:75},
+      {id:'Face_Pull', sets:3, reps:'15–20', rest:45},
+      {id:'Barbell_Curl', sets:3, reps:'8–12', rest:60},
+      {id:'Hammer_Curls', sets:3, reps:'10–12', rest:60},
+    ]},
+  { key:'legs', title:'Leg Day', focus:['quadriceps','hamstrings','glutes','calves'], type:'workout',
+    ex:[
+      {id:'Barbell_Squat', sets:4, reps:'6–8', rest:150, comp:true},
+      {id:'Romanian_Deadlift', sets:3, reps:'8–10', rest:120, comp:true},
+      {id:'Leg_Press', sets:3, reps:'10–12', rest:90, comp:true},
+      {id:'Lying_Leg_Curls', sets:3, reps:'10–15', rest:60},
+      {id:'Leg_Extensions', sets:3, reps:'12–15', rest:60},
+      {id:'Standing_Calf_Raises', sets:4, reps:'12–20', rest:45},
+    ]},
+  { key:'recovery', title:'Active Recovery', focus:['conditioning','mobility'], type:'rest' },
+  { key:'upper', title:'Upper Day', focus:['chest','lats','shoulders','biceps','triceps'], type:'workout',
+    ex:[
+      {id:'Incline_Dumbbell_Press', sets:3, reps:'8–12', rest:90, comp:true},
+      {id:'Wide-Grip_Lat_Pulldown', sets:3, reps:'10–12', rest:90, comp:true},
+      {id:'Seated_Dumbbell_Press', sets:3, reps:'8–12', rest:90, comp:true},
+      {id:'Seated_Cable_Rows', sets:3, reps:'10–12', rest:75},
+      {id:'Side_Lateral_Raise', sets:3, reps:'15–20', rest:45},
+      {id:'Barbell_Curl', sets:3, reps:'10–12', rest:60},
+      {id:'Triceps_Pushdown', sets:3, reps:'10–15', rest:60},
+    ]},
+  { key:'lower', title:'Lower + Core', focus:['quadriceps','glutes','hamstrings','abdominals'], type:'workout',
+    ex:[
+      {id:'Front_Barbell_Squat', sets:3, reps:'8–10', rest:120, comp:true},
+      {id:'Barbell_Hip_Thrust', sets:3, reps:'10–12', rest:90, comp:true},
+      {id:'Dumbbell_Lunges', sets:3, reps:'10–12 / leg', rest:90},
+      {id:'Lying_Leg_Curls', sets:3, reps:'12–15', rest:60},
+      {id:'Standing_Calf_Raises', sets:4, reps:'15–20', rest:45},
+      {id:'Hanging_Leg_Raise', sets:3, reps:'10–15', rest:60},
+      {id:'Cable_Crunch', sets:3, reps:'12–15', rest:45},
+    ]},
+  { key:'rest', title:'Rest Day', focus:['recover','reset'], type:'rest' },
+];
+
+const PHASES = [
+  { name:'Foundation', weeks:'Weeks 1–4', steps:9000, color:'#34d399',
+    tag:'Build the base. Groove technique, establish a moderate calorie deficit (~300–400 kcal).' },
+  { name:'Build', weeks:'Weeks 5–8', steps:10000, color:'#22d3ee',
+    tag:'Push volume & intensity. Add a metabolic finisher, tighten the deficit (~400–500 kcal).' },
+  { name:'Define', weeks:'Weeks 9–12', steps:12000, color:'#fbbf24',
+    tag:'Hold strength, dial up conditioning & steps, sharpen nutrition to chase sub-10%.' },
+];
+const phaseOf = (w)=> w<=4?0 : w<=8?1 : 2;
+
+const COMMUTE_KCAL = 600; // est. round-trip bike ride for the Stats tally
+
+// One short cardio line per day. Riding (commute or recreational) always counts — log it on any day.
+function cardioFor(phase, dayIndex){
+  const base = SPLIT[dayIndex];
+  if(base.key==='recovery') return { d:'Easy Zone 2 — a bike ride, walk or light row at a conversational pace, plus a few minutes of stretching.' };
+  if(base.key==='rest') return { d:'Take it easy: light steps, stretch, good sleep. A casual ride is totally fine if you feel like it.' };
+  let d;
+  if(phase===0) d='Optional: 8–10 min easy cardio to finish.';
+  else if(phase===1) d='Optional finisher: 10 min of 30 s hard / 90 s easy on a bike or rower.';
+  else d='Optional: 12–18 min conditioning, or a longer ride.';
+  return { d: d+' Your bike rides already count as cardio — don’t overdo it.' };
+}
+
+// Resolve a day's plan with phase adjustments applied
+function planFor(week, dayIndex){
+  const phase = phaseOf(week);
+  const base = SPLIT[dayIndex];
+  const day = { week, dayIndex, phase, key:base.key, title:base.title, focus:base.focus, type:base.type };
+  day.cardio = cardioFor(phase, dayIndex);
+  if(base.type==='rest'){ day.ex=[]; return day; }
+  day.ex = base.ex.map((e,i)=>{
+    const x = Object.assign({}, e);
+    if(phase===1 && e.comp) x.sets = e.sets + 1;                  // Build: +1 set on compounds
+    if(phase===2 && i >= base.ex.length-2) x.superset = true;     // Define: superset last two moves
+    return x;
+  });
+  return day;
+}
+
+/* ---------- muscle body map ---------- */
+const REGION = {chest:'Chest', lats:'Back','middle back':'Back', traps:'Back','lower back':'Back',
+  shoulders:'Shoulders', biceps:'Arms', triceps:'Arms', forearms:'Arms',
+  quadriceps:'Legs', hamstrings:'Legs', glutes:'Legs', calves:'Legs', abdominals:'Core'};
+
+// front (cx≈80) and back (cx≈240) stylized figures
+const MAP_SHAPES = [
+  // FRONT
+  {v:'f',m:null,t:'c',x:80,y:22,r:12},                       // head
+  {v:'f',m:null,t:'r',x:75,y:33,w:10,h:7,r:3},               // neck
+  {v:'f',m:'shoulders',t:'e',x:58,y:50,rx:12,ry:9},
+  {v:'f',m:'shoulders',t:'e',x:102,y:50,rx:12,ry:9},
+  {v:'f',m:'chest',t:'r',x:64,y:46,w:14,h:16,r:5},
+  {v:'f',m:'chest',t:'r',x:82,y:46,w:14,h:16,r:5},
+  {v:'f',m:'biceps',t:'r',x:45,y:58,w:11,h:23,r:5},
+  {v:'f',m:'biceps',t:'r',x:104,y:58,w:11,h:23,r:5},
+  {v:'f',m:'forearms',t:'r',x:43,y:83,w:10,h:25,r:5},
+  {v:'f',m:'forearms',t:'r',x:107,y:83,w:10,h:25,r:5},
+  {v:'f',m:'abdominals',t:'r',x:68,y:64,w:24,h:32,r:6},
+  {v:'f',m:'quadriceps',t:'r',x:65,y:98,w:13,h:40,r:7},
+  {v:'f',m:'quadriceps',t:'r',x:82,y:98,w:13,h:40,r:7},
+  {v:'f',m:null,t:'r',x:67,y:140,w:10,h:34,r:5},             // shin
+  {v:'f',m:null,t:'r',x:83,y:140,w:10,h:34,r:5},
+  // BACK (offset +160)
+  {v:'b',m:null,t:'c',x:240,y:22,r:12},
+  {v:'b',m:'traps',t:'r',x:228,y:38,w:24,h:14,r:5},
+  {v:'b',m:'shoulders',t:'e',x:218,y:52,rx:12,ry:9},
+  {v:'b',m:'shoulders',t:'e',x:262,y:52,rx:12,ry:9},
+  {v:'b',m:'triceps',t:'r',x:205,y:58,w:11,h:23,r:5},
+  {v:'b',m:'triceps',t:'r',x:264,y:58,w:11,h:23,r:5},
+  {v:'b',m:'forearms',t:'r',x:203,y:83,w:10,h:25,r:5},
+  {v:'b',m:'forearms',t:'r',x:267,y:83,w:10,h:25,r:5},
+  {v:'b',m:'lats',t:'r',x:224,y:53,w:13,h:24,r:5},
+  {v:'b',m:'lats',t:'r',x:243,y:53,w:13,h:24,r:5},
+  {v:'b',m:'middle back',t:'r',x:235,y:50,w:10,h:20,r:4},
+  {v:'b',m:'lower back',t:'r',x:230,y:77,w:20,h:13,r:4},
+  {v:'b',m:'glutes',t:'r',x:226,y:90,w:13,h:18,r:6},
+  {v:'b',m:'glutes',t:'r',x:241,y:90,w:13,h:18,r:6},
+  {v:'b',m:'hamstrings',t:'r',x:226,y:110,w:13,h:30,r:6},
+  {v:'b',m:'hamstrings',t:'r',x:241,y:110,w:13,h:30,r:6},
+  {v:'b',m:'calves',t:'r',x:227,y:142,w:11,h:32,r:5},
+  {v:'b',m:'calves',t:'r',x:242,y:142,w:11,h:32,r:5},
+];
+function muscleMap(primary, secondary){
+  const P = new Set(primary||[]), S = new Set(secondary||[]);
+  let body='';
+  for(const s of MAP_SHAPES){
+    let fill='var(--map-base)', stroke='none';
+    if(s.m && P.has(s.m)){ fill='var(--accent)'; }
+    else if(s.m && S.has(s.m)){ fill='var(--map-2)'; }
+    if(s.t==='c') body+=`<circle cx="${s.x}" cy="${s.y}" r="${s.r}" fill="${fill}"/>`;
+    else if(s.t==='e') body+=`<ellipse cx="${s.x}" cy="${s.y}" rx="${s.rx}" ry="${s.ry}" fill="${fill}"/>`;
+    else body+=`<rect x="${s.x}" y="${s.y}" width="${s.w}" height="${s.h}" rx="${s.r}" fill="${fill}"/>`;
+  }
+  return `<svg class="mapwrap" viewBox="0 0 320 196" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+    ${body}
+    <text x="80" y="190" text-anchor="middle" fill="var(--faint)" font-size="11" font-weight="700">FRONT</text>
+    <text x="240" y="190" text-anchor="middle" fill="var(--faint)" font-size="11" font-weight="700">BACK</text>
+  </svg>`;
+}
+
+/* ---------- state ---------- */
+const todayISO = ()=> new Date().toISOString().slice(0,10);
+// The 7-day cycle counts forward from a user-chosen start date: Day 1 = startDate.
+const DEFAULT = { startDate:todayISO(), unit:'lb', logs:{}, done:{}, lastW:{}, bw:[], bf:[], heightCm:185.4, rides:{} };
+let S = load();
+function load(){ try{ const s=Object.assign({}, DEFAULT, JSON.parse(localStorage.getItem('fitlab_v1')||'{}'));
+  if(!s.startDate) s.startDate=todayISO();   // upgrades from older versions begin today
+  if(!s.rides) s.rides=s.commute||{};
+  return s; }catch(e){ return Object.assign({},DEFAULT);} }
+let saveT; function save(){ clearTimeout(saveT); saveT=setTimeout(()=>localStorage.setItem('fitlab_v1', JSON.stringify(S)),120); }
+
+const dayKey = (w,d)=>`w${w}d${d}`;
+function daysSinceStart(){ const a=new Date(S.startDate+'T00:00'); const b=new Date(todayISO()+'T00:00'); return Math.floor((b-a)/86400000); }
+function todayPos(){ const d=daysSinceStart(); if(d<0) return {week:1,dayIndex:0,before:true}; const week=Math.floor(d/7)+1; return {week, dayIndex:d%7, done:week>12}; }
+function dateForPos(w,d){ const base=new Date(S.startDate+'T00:00'); base.setDate(base.getDate()+(w-1)*7+d); return base; }
+const rideOn = (w,d)=> !!S.rides[dayKey(w,d)];
+
+/* ---------- helpers ---------- */
+const $=(s,r=document)=>r.querySelector(s);
+const esc=(t)=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const cap=(t)=>t.replace(/\b\w/g,c=>c.toUpperCase());
+const fmtDate=(d)=>d.toLocaleDateString(undefined,{weekday:'long',month:'short',day:'numeric'});
+const ymd=(d)=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+const DOW=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+function setsFor(dk,id,count,defW,defR){ S.logs[dk]=S.logs[dk]||{}; const a=S.logs[dk][id]; if(a&&a.length===count) return a; const n=Array.from({length:count},(_,i)=>(a&&a[i])||{w:(defW!=null?String(defW):''),r:(defR!=null?String(defR):''),done:false}); S.logs[dk][id]=n; return n; }
+function exDoneCount(dk,id){ const a=(S.logs[dk]||{})[id]||[]; return a.filter(x=>x.done).length; }
+
+/* ---------- auto-progression engine ---------- */
+const LEG_IDS=['Barbell_Squat','Front_Barbell_Squat','Hack_Squat','Leg_Press','Romanian_Deadlift','Barbell_Deadlift','Barbell_Hip_Thrust'];
+function parseRange(reps){ if(/amrap/i.test(reps)) return {amrap:true}; const n=(reps.match(/\d+/g)||[]).map(Number); if(n.length>=2) return {min:n[0],max:n[1]}; if(n.length===1) return {min:n[0],max:n[0]}; return {min:8,max:12}; }
+function incFor(e){ const big=e.comp&&LEG_IDS.includes(e.id); return S.unit==='kg'?(big?5:2.5):(big?10:5); }
+function dayNum(dk){ const m=String(dk).match(/^w(\d+)d(\d+)$/); return m?(+m[1]-1)*7+(+m[2]):-1; }
+// most recent earlier session that logged this exercise (done sets) → array of {w,r}
+function lastPerf(exId,curDk){ const cur=dayNum(curDk); let best=-1,res=null; for(const dk in S.logs){ if(dk===curDk) continue; const n=dayNum(dk); if(n<0||n>=cur) continue; const arr=S.logs[dk][exId]; if(!arr) continue; const done=arr.filter(s=>s.done&&s.w!==''); if(!done.length) continue; if(n>best){best=n;res=done;} } return res; }
+// double-progression suggestion: pre-fill weight + target reps, with a coaching note
+function suggest(exId,e,curDk){
+  const rng=parseRange(e.reps), prev=lastPerf(exId,curDk);
+  if(!prev) return {weight:'', reps: rng.amrap?'':rng.min, note:`First time — pick a weight you can control for ${e.reps} reps.`};
+  const w=parseFloat(prev[0].w)||''; const reps=prev.map(s=>parseInt(s.r)||0); const repsStr=reps.join(', ');
+  if(rng.amrap){ const tot=reps.reduce((a,b)=>a+b,0); return {weight:w, reps:'', note:`Last time: ${repsStr} reps (${tot} total). Beat it.`}; }
+  const inc=incFor(e);
+  if(w && reps.every(r=>r>=rng.max)){ const nw=Math.round((w+inc)*10)/10; return {weight:nw, reps:rng.min, note:`💪 You maxed the reps at ${w} ${S.unit} — go up to ${nw} × ${rng.min}.`}; }
+  if(w && reps.some(r=>r<rng.min)) return {weight:w, reps:rng.min, note:`Hold ${w} ${S.unit}. Last: ${repsStr}. Get ${rng.min}+ clean reps on every set.`};
+  return {weight:w, reps:w?Math.min(rng.max,Math.min(...reps)+1):rng.min, note:`Same ${w?w+' '+S.unit:'weight'}. Last: ${repsStr}. Add a rep where you can (range ${e.reps}).`};
+}
+function ytLink(name){ return 'https://www.youtube.com/results?search_query='+encodeURIComponent('how to '+name+' proper form'); }
+// Curated demo video per exercise; falls back to a YouTube search if missing.
+const VIDEOS = {"Barbell_Bench_Press_-_Medium_Grip": "https://www.youtube.com/watch?v=7iOgPtRiY1A", "Incline_Dumbbell_Press": "https://www.youtube.com/watch?v=8fXfwG4ftaQ", "Dumbbell_Bench_Press": "https://www.youtube.com/watch?v=1V3vpcaxRYQ", "Standing_Military_Press": "https://www.youtube.com/watch?v=3RdVYQ8l_V8", "Dumbbell_Shoulder_Press": "https://www.youtube.com/watch?v=k6tzKisR3NY", "Seated_Dumbbell_Press": "https://www.youtube.com/watch?v=fAlu-BsnPqE", "Side_Lateral_Raise": "https://www.youtube.com/watch?v=Myim1WH6Qec", "Cable_Crossover": "https://www.youtube.com/watch?v=Jokaz7dBJNg", "Triceps_Pushdown": "https://www.youtube.com/watch?v=7OF77JMEXhM", "Dips_-_Triceps_Version": "https://www.youtube.com/watch?v=thx13oPVK5c", "Standing_Dumbbell_Triceps_Extension": "https://www.youtube.com/watch?v=AYqg9S5FrUU", "Barbell_Deadlift": "https://www.youtube.com/watch?v=ZaTM37cfiDs", "Romanian_Deadlift": "https://www.youtube.com/watch?v=ecuZtKTNI9U", "Pullups": "https://www.youtube.com/watch?v=OEXosPwzFdc", "Wide-Grip_Lat_Pulldown": "https://www.youtube.com/watch?v=hl98TV4nlTM", "Bent_Over_Barbell_Row": "https://www.youtube.com/watch?v=p9RihhjmJsw", "Seated_Cable_Rows": "https://www.youtube.com/watch?v=8QuMq1GMMng", "Face_Pull": "https://www.youtube.com/watch?v=NQ8h8rEzmZQ", "Barbell_Curl": "https://www.youtube.com/watch?v=MKWBV29S6c0", "Hammer_Curls": "https://www.youtube.com/watch?v=K9LiwcGuqA0", "Barbell_Squat": "https://www.youtube.com/watch?v=ZaSetOZFo-k", "Front_Barbell_Squat": "https://www.youtube.com/watch?v=WftnRk3ukeA", "Hack_Squat": "https://www.youtube.com/watch?v=g9i05umL5vc", "Leg_Press": "https://www.youtube.com/watch?v=nDh_BlnLCGc", "Lying_Leg_Curls": "https://www.youtube.com/watch?v=3gZm9wGTsEo", "Leg_Extensions": "https://www.youtube.com/watch?v=tWFBltkWhBE", "Standing_Calf_Raises": "https://www.youtube.com/watch?v=B30JglFGx8Y", "Dumbbell_Lunges": "https://www.youtube.com/watch?v=5eQd_hsXESI", "Barbell_Hip_Thrust": "https://www.youtube.com/watch?v=W86oVlnLqY4", "Hanging_Leg_Raise": "https://www.youtube.com/watch?v=WFAziRYp2bg", "Cable_Crunch": "https://www.youtube.com/watch?v=x10ihjIYy8s", "Plank": "https://www.youtube.com/watch?v=v25dawSzRTM", "Russian_Twist": "https://www.youtube.com/watch?v=hL10_LcXyCM"};
+function videoLink(id,name){ return VIDEOS[id] || ytLink(name); }
+function dayProgress(plan){ const dk=dayKey(plan.week,plan.dayIndex); let tot=0,done=0; for(const e of plan.ex){ tot+=e.sets; done+=Math.min(exDoneCount(dk,e.id),e.sets);} return {done,tot,pct: tot?Math.round(done/tot*100):0}; }
+function isWorkoutComplete(plan){ if(plan.type==='rest') return !!S.done[dayKey(plan.week,plan.dayIndex)]; const p=dayProgress(plan); return p.tot>0 && p.done>=p.tot; }
+function proteinTarget(){ const w=lastBW(); if(!w) return '≈180 g'; const lb=S.unit==='kg'?w*2.205:w; return Math.round(lb)+' g'; }
+function lastBW(){ return S.bw.length? S.bw[S.bw.length-1].v : null; }
+
+/* ---------- router ---------- */
+let view='today';
+const TABS=[['today','Today','◆'],['plan','Plan','▦'],['stats','Stats','◷']];
+function go(v){ view=v; dayOffset=0; render(); window.scrollTo({top:0}); }
+function render(){
+  const r = {today:renderToday, plan:renderPlan, library:renderLibrary, stats:renderStats, guide:renderGuide, day:renderDayView}[view];
+  $('#app').innerHTML = r ? r() : '';
+  renderNav();
+}
+function renderNav(){
+  $('#nav').innerHTML = TABS.map(([v,l,i])=>`<button data-go="${v}" class="${view===v?'on':''}"><span class="ni">${i}</span>${l}</button>`).join('');
+}
+
+/* ---------- TODAY ---------- */
+let viewingPos=null; // {week,dayIndex} when drilling into a day
+let dayOffset=0;     // days away from today, for the ‹ › pager on the Today screen
+function renderToday(){
+  const baseNum=daysSinceStart();
+  if(baseNum>83 && dayOffset===0){
+    return `<div class="app-head"><div><div class="hello">FitLab</div><h1>Program complete 🎉</h1></div></div>
+    <div class="card center"><p class="muted">You finished all 12 weeks. Reassess your body fat, take photos, and either run it back or start a maintenance block.</p>
+    <button class="btn primary" data-restart="1">Start a new 12 weeks</button></div>`;
+  }
+  const base=Math.max(0,baseNum);
+  const num=Math.min(83,Math.max(0,base+dayOffset));
+  const week=Math.floor(num/7)+1, dayIndex=num%7;
+  const isToday=(dayOffset===0);
+  const plan=planFor(week,dayIndex);
+  const dk=dayKey(week,dayIndex);
+  const prog=dayProgress(plan);
+  const complete=isWorkoutComplete(plan);
+  const date=dateForPos(week,dayIndex);
+  return `
+  <div class="app-head daypager">
+    <button class="pgbtn" data-day-step="-1" ${num<=0?'disabled':''} aria-label="Previous day">‹</button>
+    <div class="pgmid">
+      <label class="jumpwrap hello">📅 ${isToday?'Today · ':''}${fmtDate(date)}
+        <input type="date" id="jumpIn" value="${ymd(date)}" min="${S.startDate}" max="${ymd(dateForPos(12,6))}">
+      </label>
+      <h1>${plan.title}</h1>
+      <div class="small muted" style="margin-top:2px">Week ${week} · Day ${dayIndex+1} of 7${isToday?'':' · <a data-day-today="1">back to today</a>'}</div>
+    </div>
+    <button class="pgbtn" data-day-step="1" ${num>=83?'disabled':''} aria-label="Next day">›</button>
+  </div>
+
+  ${plan.type==='workout' ? `
+  <div class="card tight">${plan.ex.map(e=>exRow(e,dk)).join('')}</div>
+  <button class="btn primary" data-open-day="${week}.${dayIndex}">${complete?'✓ Done — review':(prog.done>0?`Continue · ${prog.done}/${prog.tot} sets`:'Start workout')}</button>
+  ` : `
+  <div class="card center" style="padding:26px 18px">
+    <div style="font-size:40px;line-height:1">${plan.key==='recovery'?'🚶':'🛌'}</div>
+    <p class="muted" style="margin:10px 0 0">${plan.cardio.d}</p>
+  </div>`}
+
+  ${rideCard(week,dayIndex)}
+
+  <div class="hint">${plan.type==='workout'?`🫀 ${plan.cardio.d}<br>`:''}👟 ${PHASES[plan.phase].steps.toLocaleString()} steps · 🥩 ${proteinTarget()} protein · <a data-go="guide">tips</a></div>
+
+  ${isToday?`<div class="startline">🗓 Cycle started <input type="date" id="startIn" value="${S.startDate}"></div>`:''}
+  `;
+}
+// One-tap bike-ride logger — available any day (commute or a long ride)
+function rideCard(w,d){
+  const on=rideOn(w,d);
+  return `<button class="ride ${on?'on':''}" data-ride="${dayKey(w,d)}">
+    <span class="re">🚲</span>
+    <span class="rt">${on?'Bike ride logged today':'Log a bike ride'}</span>
+    <span class="rk">${on?'✓':'+'}</span>
+  </button>`;
+}
+function exRow(e,dk){
+  const x=EXERCISES[e.id]; if(!x) return '';
+  const dc=exDoneCount(dk,e.id), complete=dc>=e.sets;
+  return `<div class="exrow ${complete?'complete':''}" data-ex="${e.id}">
+    <img class="thumb" loading="lazy" src="${x.images[0]}" alt=""/>
+    <div class="meta"><b>${esc(x.name)}</b><div class="sets">${e.sets} × ${e.reps}${e.superset?' · superset':''}</div></div>
+    <span class="donedot"></span>
+  </div>`;
+}
+
+/* ---------- DAY VIEW (workout tracker) ---------- */
+function renderDayView(){
+  const {week,dayIndex}=viewingPos;
+  const plan=planFor(week,dayIndex);
+  const dk=dayKey(week,dayIndex);
+  const ph=PHASES[plan.phase];
+  const date=dateForPos(week,dayIndex);
+  if(plan.type==='rest'){
+    return `${backHead(plan.title, `Week ${week} · Day ${dayIndex+1} of 7 · ${fmtDate(date)}`)}
+    <div class="card center" style="padding:24px 18px"><div style="font-size:38px;line-height:1">${plan.key==='recovery'?'🚶':'🛌'}</div><p class="muted" style="margin:10px 0 0">${plan.cardio.d}</p></div>
+    ${rideCard(week,dayIndex)}
+    <button class="btn ${S.done[dk]?'':'primary'}" data-restdone="${dk}">${S.done[dk]?'✓ Logged — tap to undo':'Mark day done'}</button>`;
+  }
+  const prog=dayProgress(plan);
+  return `${backHead(plan.title, `Week ${week} · Day ${dayIndex+1} of 7 · ${fmtDate(date)}`)}
+  <div class="bar" style="margin:0 0 4px"><i style="width:${prog.pct}%"></i></div>
+  <div class="small muted" style="margin-bottom:14px">${prog.done}/${prog.tot} sets · ${prog.pct}% · Phase ${plan.phase+1} ${ph.name}</div>
+  ${plan.ex.map((e,i)=>exBlock(e,dk,i,plan)).join('')}
+  <div class="hint" style="margin-top:0">🫀 ${plan.cardio.d}</div>
+  ${rideCard(week,dayIndex)}
+  ${workoutExportCard(plan, dk, prog)}
+  <div class="note">Progressive overload: when you hit the top of the rep range on every set, add a little weight next time. In a deficit, just holding your numbers is a win — it means you're keeping muscle.</div>`;
+}
+function backHead(title,sub){
+  return `<div class="app-head"><div><button class="hello" data-back="1" style="display:flex;align-items:center;gap:6px">‹ Back</button><h1 style="font-size:23px">${esc(title)}</h1><div class="small muted">${esc(sub)}</div></div></div>`;
+}
+function exBlock(e,dk,idx,plan){
+  const x=EXERCISES[e.id]; if(!x) return '';
+  const sug=suggest(e.id,e,dk);
+  const sets=setsFor(dk,e.id,e.sets, sug.weight, sug.reps);
+  const inc=incFor(e);
+  const rows=sets.map((st,i)=>`
+    <div class="set-row ${st.done?'done':''}" data-row="${e.id}|${i}">
+      <div class="sn">${i+1}</div>
+      <div class="stepper"><button class="stp" data-adj="${e.id}|${i}|w|${-inc}">−</button><input inputmode="decimal" data-field="w" data-ex="${e.id}" data-i="${i}" value="${st.w}" placeholder="${S.unit}"/><button class="stp" data-adj="${e.id}|${i}|w|${inc}">+</button></div>
+      <div class="stepper"><button class="stp" data-adj="${e.id}|${i}|r|-1">−</button><input inputmode="numeric" data-field="r" data-ex="${e.id}" data-i="${i}" value="${st.r}" placeholder="${e.reps}"/><button class="stp" data-adj="${e.id}|${i}|r|1">+</button></div>
+      <button class="ck" data-ck="${e.id}|${i}|${e.rest}">✓</button>
+    </div>`).join('');
+  return `<div class="exblock">
+    <div class="eh">
+      <img src="${x.images[0]}" alt="" data-ex="${e.id}"/>
+      <div class="nm" data-ex="${e.id}"><b>${esc(x.name)}</b><div class="sub">${e.sets} × ${e.reps} · rest ${e.rest}s</div></div>
+      <a class="vid" href="${videoLink(e.id,x.name)}" target="_blank" rel="noopener" title="Watch video demo">▶</a>
+    </div>
+    ${e.superset?`<div class="supersettag">⚡ Superset with ${idx>0?esc((EXERCISES[plan.ex[idx-1].id]||{}).name||''):'previous'} — minimal rest</div>`:''}
+    <div class="sugg">💡 ${esc(sug.note)}</div>
+    <div class="settable">
+      <div class="set-hd"><div>Set</div><div>Weight (${S.unit})</div><div>Reps</div><div></div></div>
+      ${rows}
+    </div>
+    <button class="restbtn" data-rest="${e.rest}|${esc(x.name)}">⏱ Rest ${e.rest}s</button>
+  </div>`;
+}
+
+/* ---------- PLAN (12-week calendar) ---------- */
+function renderPlan(){
+  const pos=todayPos();
+  let html=`<div class="app-head"><div><div class="hello">12-Week Plan</div><h1>Your Calendar</h1></div></div>`;
+  const shortDate=(dt)=>dt.toLocaleDateString(undefined,{month:'short',day:'numeric'});
+  for(let w=1;w<=12;w++){
+    const ph=PHASES[phaseOf(w)];
+    const cur=w===pos.week && !pos.done;
+    const wStart=dateForPos(w,0), wEnd=dateForPos(w,6);
+    html+=`<div class="weekblock">
+      <div class="wh ${cur?'cur':''}">
+        <div><div class="t">Week ${w}${cur?' · now':''}</div><div class="p" style="color:${ph.color}">${ph.name}</div></div>
+        <div class="small muted" style="text-align:right">${shortDate(wStart)} – ${shortDate(wEnd)}</div>
+      </div>
+      <div class="days">${SPLIT.map((d,di)=>{
+        const plan=planFor(w,di);
+        const done=isWorkoutComplete(plan);
+        const isToday=cur && di===pos.dayIndex;
+        const ic = d.type==='rest' ? (d.key==='recovery'?'🚶':'🛌') : ({push:'🟧',pull:'🟦',legs:'🟩',upper:'🟪',lower:'🟨'}[d.key]||'💪');
+        return `<button class="day ${d.type==='rest'?'rest':''} ${done?'done':''} ${isToday?'today':''}" data-open-day="${w}.${di}">
+          <span class="dn">D${di+1}</span><span class="ic">${ic}</span><span class="dnum">${dateForPos(w,di).getDate()}</span>${done?'<span class="check">✓</span>':''}
+        </button>`;
+      }).join('')}</div>
+    </div>`;
+  }
+  html+=`<div class="card" style="margin-top:6px"><div class="card-h"><h3>Legend</h3></div>
+    <div class="chips"><span class="chip">🟧 Push</span><span class="chip">🟦 Pull</span><span class="chip">🟩 Legs</span><span class="chip">🟪 Upper</span><span class="chip">🟨 Lower+Core</span><span class="chip">🚶 Recovery</span><span class="chip">🛌 Rest</span></div></div>`;
+  return html;
+}
+
+/* ---------- LIBRARY ---------- */
+function renderLibrary(){
+  const groups={Chest:[],Back:[],Shoulders:[],Arms:[],Legs:[],Core:[]};
+  for(const id in EXERCISES){ const r=REGION[EXERCISES[id].primary[0]]||'Other'; (groups[r]=groups[r]||[]).push(id); }
+  let html=`<div class="app-head"><div><div class="hello">Exercise Library</div><h1>How to Lift</h1></div></div>
+  <div class="card tight"><div class="small muted">Every move in your program — with photos, a muscle map, and step-by-step form cues. Tap any card.</div></div>`;
+  for(const g in groups){ if(!groups[g].length) continue;
+    html+=`<div class="section-t">${g}</div><div class="libgrid">`;
+    for(const id of groups[g]){ const x=EXERCISES[id];
+      html+=`<button class="libcard" data-ex="${id}"><img loading="lazy" src="${x.images[0]}" alt=""/><div class="lc"><b>${esc(x.name)}</b><span>${esc(x.equipment||'')}</span></div></button>`;
+    }
+    html+=`</div>`;
+  }
+  return html;
+}
+
+/* ---------- STATS ---------- */
+// past sessions that have logged sets, newest first
+function workoutHistory(){
+  const out=[];
+  for(const dk in S.logs){ const n=dayNum(dk); if(n<0) continue; const w=Math.floor(n/7)+1,d=n%7; const plan=planFor(w,d); if(plan.type!=='workout') continue;
+    const log=S.logs[dk]; let done=0,top=null;
+    for(const id in log){ if(!EXERCISES[id]) continue; log[id].forEach(s=>{ if(s.done){ done++; const wt=parseFloat(s.w)||0; if(top===null||wt>top.w) top={w:wt,r:s.r,name:EXERCISES[id].name}; } }); }
+    if(done>0) out.push({dk,w,d,n,title:plan.title,done,top});
+  }
+  return out.sort((a,b)=>b.n-a.n);
+}
+
+/* ---------- Garmin export ---------- */
+function workoutExportCard(plan, dk, prog){
+  if(plan.type!=='workout') return '';
+  const detail=workoutExportDetail(plan.week,plan.dayIndex);
+  const hasSets=detail.summary.doneSets>0;
+  return `<div class="card exportcard">
+    <div class="card-h"><h3>↥ Garmin export</h3><span class="tiny faint">manual upload</span></div>
+    <div class="small muted">${hasSets
+      ? `Create a Garmin FIT strength activity from the ${prog.done} logged set${prog.done===1?'':'s'} in this FitLab workout. FIT maps your exercises to Garmin strength categories; TCX remains available as a fallback.`
+      : 'Log at least one set, then export this workout as a mapped Garmin strength file.'}</div>
+    ${hasSets ? `
+    <div class="exportmeta">
+      <span>${detail.summary.doneExercises} exercises</span>
+      <span>${detail.summary.doneSets} sets</span>
+      <span>≈ ${Math.round(detail.summary.durationSeconds/60)} min</span>
+    </div>` : ''}
+    <div class="exportactions">
+      <button class="btn primary sm" data-garmin-fit-export="${plan.week}.${plan.dayIndex}">Export mapped FIT</button>
+      <button class="btn ghost sm" data-garmin-export="${plan.week}.${plan.dayIndex}">Fallback TCX</button>
+      <button class="btn ghost sm" data-json-export="${plan.week}.${plan.dayIndex}">Details JSON</button>
+    </div>
+  </div>`;
+}
+
+function cleanFilePart(value){
+  return String(value||'fitlab')
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g,'-')
+    .replace(/^-+|-+$/g,'') || 'fitlab';
+}
+
+function xmlEscape(value){
+  return String(value??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+}
+
+function cdataSafe(value){
+  return String(value??'').replace(/]]>/g,']]]]><![CDATA[>');
+}
+
+function isoNoMs(date){
+  return new Date(date).toISOString().replace(/\.\d{3}Z$/,'Z');
+}
+
+// Garmin FIT strength exercise mapping. The category/subtype numbers come from
+// Garmin FIT profile 21.205 exerciseCategory and *ExerciseName enums.
+const GARMIN_STRENGTH_MAP = {
+  "Barbell_Bench_Press_-_Medium_Grip": { category:0, subtype:1, label:'Barbell Bench Press' },
+  "Incline_Dumbbell_Press": { category:0, subtype:9, label:'Incline Dumbbell Bench Press' },
+  "Dumbbell_Bench_Press": { category:0, subtype:6, label:'Dumbbell Bench Press' },
+  "Standing_Military_Press": { category:24, subtype:25, label:'Military Press' },
+  "Dumbbell_Shoulder_Press": { category:24, subtype:24, label:'Dumbbell Shoulder Press' },
+  "Seated_Dumbbell_Press": { category:24, subtype:17, label:'Seated Dumbbell Shoulder Press' },
+  "Side_Lateral_Raise": { category:14, subtype:34, label:'Dumbbell Lateral Raise' },
+  "Cable_Crossover": { category:9, subtype:0, label:'Cable Crossover' },
+  "Triceps_Pushdown": { category:30, subtype:39, label:'Triceps Pressdown' },
+  "Dips_-_Triceps_Version": { category:30, subtype:2, label:'Body Weight Dip' },
+  "Standing_Dumbbell_Triceps_Extension": { category:30, subtype:15, label:'Overhead Dumbbell Triceps Extension' },
+  "Barbell_Deadlift": { category:8, subtype:0, label:'Barbell Deadlift' },
+  "Romanian_Deadlift": { category:8, subtype:23, label:'Romanian Deadlift' },
+  "Pullups": { category:21, subtype:38, label:'Pull Up' },
+  "Wide-Grip_Lat_Pulldown": { category:21, subtype:25, label:'Wide Grip Lat Pulldown' },
+  "Bent_Over_Barbell_Row": { category:23, subtype:46, label:'Bent Over Row With Barbell' },
+  "Seated_Cable_Rows": { category:23, subtype:18, label:'Seated Cable Row' },
+  "Face_Pull": { category:23, subtype:5, label:'Face Pull' },
+  "Barbell_Curl": { category:7, subtype:3, label:'Barbell Biceps Curl' },
+  "Hammer_Curls": { category:7, subtype:16, label:'Dumbbell Hammer Curl' },
+  "Barbell_Squat": { category:28, subtype:6, label:'Barbell Back Squat' },
+  "Front_Barbell_Squat": { category:28, subtype:8, label:'Barbell Front Squat' },
+  "Hack_Squat": { category:28, subtype:9, label:'Barbell Hack Squat' },
+  "Leg_Press": { category:28, subtype:0, label:'Leg Press' },
+  "Lying_Leg_Curls": { category:15, subtype:0, label:'Leg Curl' },
+  "Leg_Extensions": { category:37, subtype:29, label:'Leg Extension' },
+  "Standing_Calf_Raises": { category:1, subtype:18, label:'Standing Calf Raise' },
+  "Dumbbell_Lunges": { category:17, subtype:21, label:'Dumbbell Lunge' },
+  "Barbell_Hip_Thrust": { category:10, subtype:1, label:'Barbell Hip Thrust With Bench' },
+  "Hanging_Leg_Raise": { category:16, subtype:1, label:'Hanging Leg Raise' },
+  "Cable_Crunch": { category:6, subtype:1, label:'Cable Crunch' },
+  "Plank": { category:19, subtype:43, label:'Plank' },
+  "Russian_Twist": { category:5, subtype:46, label:'Russian Twist' },
+};
+
+function garminExerciseFor(id){
+  return GARMIN_STRENGTH_MAP[id] || { category:65534, subtype:0, label:(EXERCISES[id]?.name || id || 'Unknown Exercise') };
+}
+
+function workoutExportDetail(week,dayIndex){
+  const plan=planFor(week,dayIndex);
+  const dk=dayKey(week,dayIndex);
+  const workoutDate=dateForPos(week,dayIndex);
+  const exercises=[];
+  let doneSets=0;
+  let heaviest=null;
+
+  for(const planned of plan.ex){
+    const exercise=EXERCISES[planned.id];
+    if(!exercise) continue;
+    const logged=((S.logs[dk]||{})[planned.id]||[])
+      .map((set,index)=>({
+        set:index+1,
+        weight:set.w===''||set.w==null?null:Number(set.w),
+        reps:set.r===''||set.r==null?null:Number(set.r),
+        done:set.done===true,
+      }))
+      .filter(set=>set.done);
+    if(!logged.length) continue;
+    doneSets+=logged.length;
+    for(const set of logged){
+      const weight=Number(set.weight||0);
+      if(weight>0 && (!heaviest || weight>heaviest.weight)){
+        heaviest={ exercise:exercise.name, weight, reps:set.reps };
+      }
+    }
+    exercises.push({
+      id:planned.id,
+      name:exercise.name,
+      targetReps:planned.reps,
+      plannedSets:planned.sets,
+      restSeconds:planned.rest||60,
+      primary:exercise.primary||[],
+      secondary:exercise.secondary||[],
+      equipment:exercise.equipment||'',
+      garmin:garminExerciseFor(planned.id),
+      sets:logged,
+    });
+  }
+
+  const durationSeconds=estimateWorkoutSeconds(exercises);
+  let start=new Date(workoutDate.getFullYear(),workoutDate.getMonth(),workoutDate.getDate(),18,0,0);
+  const now=new Date();
+  if(start>now) start=new Date(now.getTime()-durationSeconds*1000);
+  const end=new Date(start.getTime()+durationSeconds*1000);
+  const calories=Math.max(25,Math.round(durationSeconds/60*6));
+
+  return {
+    source:'FitLab',
+    exportVersion:1,
+    exportedAt:new Date().toISOString(),
+    workout:{
+      key:dk,
+      week,
+      dayIndex,
+      dayNumber:dayIndex+1,
+      title:plan.title,
+      date:ymd(workoutDate),
+      phase:PHASES[plan.phase].name,
+      unit:S.unit,
+      rideLogged:rideOn(week,dayIndex),
+      cardioNote:plan.cardio?.d||'',
+    },
+    timing:{
+      startTime:start.toISOString(),
+      endTime:end.toISOString(),
+      durationSeconds,
+    },
+    summary:{
+      doneExercises:exercises.length,
+      doneSets,
+      durationSeconds,
+      calories,
+      heaviest,
+    },
+    exercises,
+  };
+}
+
+function estimateWorkoutSeconds(exercises){
+  let seconds=0;
+  for(const exercise of exercises){
+    const sets=exercise.sets.length;
+    if(!sets) continue;
+    seconds+=sets*45;
+    seconds+=Math.max(0,sets-1)*(exercise.restSeconds||60);
+    seconds+=45;
+  }
+  return Math.max(300,Math.round(seconds));
+}
+
+function workoutNotes(detail){
+  const lines=[
+    `FitLab ${detail.workout.title}`,
+    `Week ${detail.workout.week} Day ${detail.workout.dayNumber} · ${detail.workout.date} · ${detail.workout.phase}`,
+    `Logged ${detail.summary.doneSets} sets across ${detail.summary.doneExercises} exercises.`,
+    `Unit: ${detail.workout.unit}`,
+  ];
+  if(detail.workout.rideLogged) lines.push('Bike ride was also logged in FitLab for this day.');
+  lines.push('', 'Exercises:');
+  for(const exercise of detail.exercises){
+    lines.push(`${exercise.name} (${exercise.sets.length}/${exercise.plannedSets} sets, target ${exercise.targetReps})`);
+    for(const set of exercise.sets){
+      const weight=set.weight!=null && Number.isFinite(set.weight) ? `${set.weight} ${detail.workout.unit}` : 'bodyweight';
+      const reps=set.reps!=null && Number.isFinite(set.reps) ? `${set.reps} reps` : 'reps not entered';
+      lines.push(`  Set ${set.set}: ${weight} x ${reps}`);
+    }
+  }
+  return lines.join('\n');
+}
+
+function tcxActivity(detail){
+  const start=isoNoMs(detail.timing.startTime);
+  const end=isoNoMs(detail.timing.endTime);
+  const totalSeconds=Math.max(1,Math.round(detail.timing.durationSeconds));
+  const notes=workoutNotes(detail);
+  return `<Activity Sport="Other">
+      <Id>${start}</Id>
+      <Lap StartTime="${start}">
+        <TotalTimeSeconds>${totalSeconds}</TotalTimeSeconds>
+        <DistanceMeters>0.0</DistanceMeters>
+        <Calories>${detail.summary.calories}</Calories>
+        <Intensity>Active</Intensity>
+        <TriggerMethod>Manual</TriggerMethod>
+        <Track>
+          <Trackpoint><Time>${start}</Time><DistanceMeters>0.0</DistanceMeters></Trackpoint>
+          <Trackpoint><Time>${end}</Time><DistanceMeters>0.0</DistanceMeters></Trackpoint>
+        </Track>
+      </Lap>
+      <Notes><![CDATA[${cdataSafe(notes)}]]></Notes>
+      <Creator xsi:type="Application_t">
+        <Name>FitLab</Name>
+        <Build><Version><VersionMajor>1</VersionMajor><VersionMinor>0</VersionMinor></Version></Build>
+        <LangID>en</LangID>
+        <PartNumber>FITLAB-LOCAL</PartNumber>
+      </Creator>
+    </Activity>`;
+}
+
+function buildGarminTcx(details){
+  const list=Array.isArray(details)?details:[details];
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<TrainingCenterDatabase
+  xmlns="http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2 http://www.garmin.com/xmlschemas/TrainingCenterDatabasev2.xsd">
+  <Activities>
+    ${list.map(tcxActivity).join('\n    ')}
+  </Activities>
+  <Author xsi:type="Application_t">
+    <Name>FitLab</Name>
+    <Build><Version><VersionMajor>1</VersionMajor><VersionMinor>0</VersionMinor></Version></Build>
+    <LangID>en</LangID>
+    <PartNumber>FITLAB-LOCAL</PartNumber>
+  </Author>
+</TrainingCenterDatabase>`;
+}
+
+const FIT_EPOCH_MS = 631065600000;
+const FIT_PROFILE_VERSION = 21205;
+const FIT_TYPES = { ENUM:0x00, UINT8:0x02, STRING:0x07, UINT16:0x84, UINT32:0x86, UINT32Z:0x8c };
+const FIT_INVALID = { 0x00:0xff, 0x02:0xff, 0x84:0xffff, 0x86:0xffffffff, 0x8c:0 };
+const FIT_CRC_TABLE = [
+  0x0000,0xcc01,0xd801,0x1400,0xf001,0x3c00,0x2800,0xe401,
+  0xa001,0x6c00,0x7800,0xb401,0x5000,0x9c01,0x8801,0x4400
+];
+
+const FIT_FIELDS = {
+  fileId: [
+    {key:'type',num:0,size:1,type:FIT_TYPES.ENUM},
+    {key:'manufacturer',num:1,size:2,type:FIT_TYPES.UINT16},
+    {key:'product',num:2,size:2,type:FIT_TYPES.UINT16},
+    {key:'serialNumber',num:3,size:4,type:FIT_TYPES.UINT32Z},
+    {key:'timeCreated',num:4,size:4,type:FIT_TYPES.UINT32},
+  ],
+  deviceInfo: [
+    {key:'timestamp',num:253,size:4,type:FIT_TYPES.UINT32},
+    {key:'deviceIndex',num:0,size:1,type:FIT_TYPES.UINT8},
+    {key:'manufacturer',num:2,size:2,type:FIT_TYPES.UINT16},
+    {key:'product',num:4,size:2,type:FIT_TYPES.UINT16},
+    {key:'softwareVersion',num:5,size:2,type:FIT_TYPES.UINT16},
+    {key:'productName',num:27,size:16,type:FIT_TYPES.STRING},
+  ],
+  event: [
+    {key:'timestamp',num:253,size:4,type:FIT_TYPES.UINT32},
+    {key:'event',num:0,size:1,type:FIT_TYPES.ENUM},
+    {key:'eventType',num:1,size:1,type:FIT_TYPES.ENUM},
+    {key:'data',num:3,size:4,type:FIT_TYPES.UINT32},
+  ],
+  record: [
+    {key:'timestamp',num:253,size:4,type:FIT_TYPES.UINT32},
+    {key:'distance',num:5,size:4,type:FIT_TYPES.UINT32},
+  ],
+  exerciseTitle: [
+    {key:'messageIndex',num:254,size:2,type:FIT_TYPES.UINT16},
+    {key:'exerciseCategory',num:0,size:2,type:FIT_TYPES.UINT16},
+    {key:'exerciseName',num:1,size:2,type:FIT_TYPES.UINT16},
+    {key:'wktStepName',num:2,size:48,type:FIT_TYPES.STRING},
+  ],
+  set: [
+    {key:'timestamp',num:254,size:4,type:FIT_TYPES.UINT32},
+    {key:'messageIndex',num:10,size:2,type:FIT_TYPES.UINT16},
+    {key:'startTime',num:6,size:4,type:FIT_TYPES.UINT32},
+    {key:'duration',num:0,size:4,type:FIT_TYPES.UINT32},
+    {key:'repetitions',num:3,size:2,type:FIT_TYPES.UINT16},
+    {key:'weight',num:4,size:2,type:FIT_TYPES.UINT16},
+    {key:'setType',num:5,size:1,type:FIT_TYPES.UINT8},
+    {key:'category',num:7,size:2,type:FIT_TYPES.UINT16},
+    {key:'categorySubtype',num:8,size:2,type:FIT_TYPES.UINT16},
+    {key:'weightDisplayUnit',num:9,size:2,type:FIT_TYPES.UINT16},
+  ],
+  lap: [
+    {key:'timestamp',num:253,size:4,type:FIT_TYPES.UINT32},
+    {key:'event',num:0,size:1,type:FIT_TYPES.ENUM},
+    {key:'eventType',num:1,size:1,type:FIT_TYPES.ENUM},
+    {key:'startTime',num:2,size:4,type:FIT_TYPES.UINT32},
+    {key:'totalElapsedTime',num:7,size:4,type:FIT_TYPES.UINT32},
+    {key:'totalTimerTime',num:8,size:4,type:FIT_TYPES.UINT32},
+    {key:'totalDistance',num:9,size:4,type:FIT_TYPES.UINT32},
+    {key:'totalCalories',num:11,size:2,type:FIT_TYPES.UINT16},
+    {key:'sport',num:25,size:1,type:FIT_TYPES.ENUM},
+    {key:'subSport',num:39,size:1,type:FIT_TYPES.ENUM},
+    {key:'intensity',num:23,size:1,type:FIT_TYPES.ENUM},
+    {key:'lapTrigger',num:24,size:1,type:FIT_TYPES.ENUM},
+  ],
+  session: [
+    {key:'timestamp',num:253,size:4,type:FIT_TYPES.UINT32},
+    {key:'event',num:0,size:1,type:FIT_TYPES.ENUM},
+    {key:'eventType',num:1,size:1,type:FIT_TYPES.ENUM},
+    {key:'startTime',num:2,size:4,type:FIT_TYPES.UINT32},
+    {key:'sport',num:5,size:1,type:FIT_TYPES.ENUM},
+    {key:'subSport',num:6,size:1,type:FIT_TYPES.ENUM},
+    {key:'totalElapsedTime',num:7,size:4,type:FIT_TYPES.UINT32},
+    {key:'totalTimerTime',num:8,size:4,type:FIT_TYPES.UINT32},
+    {key:'totalDistance',num:9,size:4,type:FIT_TYPES.UINT32},
+    {key:'totalCalories',num:11,size:2,type:FIT_TYPES.UINT16},
+    {key:'firstLapIndex',num:25,size:2,type:FIT_TYPES.UINT16},
+    {key:'numLaps',num:26,size:2,type:FIT_TYPES.UINT16},
+    {key:'trigger',num:28,size:1,type:FIT_TYPES.ENUM},
+    {key:'sportProfileName',num:110,size:32,type:FIT_TYPES.STRING},
+  ],
+  activity: [
+    {key:'timestamp',num:253,size:4,type:FIT_TYPES.UINT32},
+    {key:'totalTimerTime',num:0,size:4,type:FIT_TYPES.UINT32},
+    {key:'numSessions',num:1,size:2,type:FIT_TYPES.UINT16},
+    {key:'type',num:2,size:1,type:FIT_TYPES.ENUM},
+    {key:'event',num:3,size:1,type:FIT_TYPES.ENUM},
+    {key:'eventType',num:4,size:1,type:FIT_TYPES.ENUM},
+    {key:'localTimestamp',num:5,size:4,type:FIT_TYPES.UINT32},
+  ],
+};
+
+function fitTimestamp(date){
+  return Math.max(0,Math.round((new Date(date).getTime()-FIT_EPOCH_MS)/1000));
+}
+
+function fitCrc(bytes,start=0,end=bytes.length){
+  let crc=0;
+  for(let i=start;i<end;i++){
+    let tmp=FIT_CRC_TABLE[crc & 0xf];
+    crc=(crc>>4)&0x0fff;
+    crc=crc ^ tmp ^ FIT_CRC_TABLE[bytes[i] & 0xf];
+    tmp=FIT_CRC_TABLE[crc & 0xf];
+    crc=(crc>>4)&0x0fff;
+    crc=crc ^ tmp ^ FIT_CRC_TABLE[(bytes[i]>>4)&0xf];
+  }
+  return crc & 0xffff;
+}
+
+class FitWriter{
+  constructor(){ this.bytes=[]; }
+  u8(v){ this.bytes.push((v??0)&0xff); }
+  u16(v){ this.u8(v); this.u8((v??0)>>8); }
+  u32(v){ v=Number(v??0)>>>0; this.u8(v); this.u8(v>>8); this.u8(v>>16); this.u8(v>>24); }
+  str(value,size){
+    const encoded=new TextEncoder().encode(String(value??''));
+    const limit=Math.max(0,size-1);
+    for(let i=0;i<size;i++) this.u8(i<Math.min(encoded.length,limit)?encoded[i]:0);
+  }
+  writeValue(field,value){
+    if(field.type===FIT_TYPES.STRING){ this.str(value,field.size); return; }
+    const invalid=FIT_INVALID[field.type] ?? 0xff;
+    const v=Number.isFinite(Number(value)) ? Number(value) : invalid;
+    if(field.type===FIT_TYPES.UINT16) this.u16(v);
+    else if(field.type===FIT_TYPES.UINT32 || field.type===FIT_TYPES.UINT32Z) this.u32(v);
+    else this.u8(v);
+  }
+  definition(localNum,globalNum,fields){
+    this.u8(0x40 | localNum);
+    this.u8(0);
+    this.u8(0);
+    this.u16(globalNum);
+    this.u8(fields.length);
+    fields.forEach(f=>{ this.u8(f.num); this.u8(f.size); this.u8(f.type); });
+  }
+  message(localNum,fields,values){
+    this.u8(localNum);
+    fields.forEach(f=>this.writeValue(f,values[f.key]));
+  }
+  close(){
+    const data=new Uint8Array(this.bytes);
+    const header=new Uint8Array(14);
+    const hv=new DataView(header.buffer);
+    header[0]=14;
+    header[1]=2;
+    hv.setUint16(2,FIT_PROFILE_VERSION,true);
+    hv.setUint32(4,data.length,true);
+    header[8]=0x2e; header[9]=0x46; header[10]=0x49; header[11]=0x54;
+    hv.setUint16(12,fitCrc(header,0,12),true);
+    const withoutCrc=new Uint8Array(header.length+data.length);
+    withoutCrc.set(header,0);
+    withoutCrc.set(data,header.length);
+    const out=new Uint8Array(withoutCrc.length+2);
+    out.set(withoutCrc,0);
+    new DataView(out.buffer).setUint16(out.length-2,fitCrc(withoutCrc),true);
+    return out;
+  }
+}
+
+function fitWeightRaw(weight,unit){
+  const n=Number(weight);
+  if(!Number.isFinite(n) || n<=0) return null;
+  const kg=unit==='kg' ? n : n/2.2046226218;
+  return Math.max(0,Math.min(0xfffe,Math.round(kg*16)));
+}
+
+function fitWorkoutSets(detail){
+  const rows=[];
+  let cursor=new Date(detail.timing.startTime).getTime();
+  for(const exercise of detail.exercises){
+    for(const set of exercise.sets){
+      const reps=Number(set.reps);
+      const activeSeconds=Math.max(20,Math.min(90,(Number.isFinite(reps)&&reps>0?reps:8)*4+12));
+      const start=new Date(cursor);
+      const end=new Date(cursor+activeSeconds*1000);
+      rows.push({exercise,set,start,end,durationSeconds:activeSeconds});
+      cursor=end.getTime()+(exercise.restSeconds||60)*1000;
+    }
+  }
+  return rows;
+}
+
+function fitWorkoutFilename(detail){
+  return `fitlab-garmin-${detail.workout.date}-${cleanFilePart(detail.workout.title)}.fit`;
+}
+
+function buildGarminFit(detail){
+  const writer=new FitWriter();
+  const startFit=fitTimestamp(detail.timing.startTime);
+  const endFit=fitTimestamp(detail.timing.endTime);
+  const totalMs=Math.max(1000,Math.round(detail.timing.durationSeconds*1000));
+  const calories=Math.max(0,Math.min(0xfffe,Math.round(detail.summary.calories||0)));
+  const productName='FitLab';
+  const title=`FitLab ${detail.workout.title}`;
+  const defs=[
+    [0,0,FIT_FIELDS.fileId],
+    [1,23,FIT_FIELDS.deviceInfo],
+    [2,21,FIT_FIELDS.event],
+    [3,20,FIT_FIELDS.record],
+    [4,264,FIT_FIELDS.exerciseTitle],
+    [5,225,FIT_FIELDS.set],
+    [6,19,FIT_FIELDS.lap],
+    [7,18,FIT_FIELDS.session],
+    [8,34,FIT_FIELDS.activity],
+  ];
+  defs.forEach(d=>writer.definition(d[0],d[1],d[2]));
+
+  writer.message(0,FIT_FIELDS.fileId,{
+    type:4,
+    manufacturer:255,
+    product:1,
+    serialNumber:0xf17ab001,
+    timeCreated:fitTimestamp(detail.exportedAt),
+  });
+  writer.message(1,FIT_FIELDS.deviceInfo,{
+    timestamp:startFit,
+    deviceIndex:0,
+    manufacturer:255,
+    product:1,
+    softwareVersion:100,
+    productName,
+  });
+  writer.message(2,FIT_FIELDS.event,{ timestamp:startFit, event:0, eventType:0, data:0 });
+  writer.message(3,FIT_FIELDS.record,{ timestamp:startFit, distance:0 });
+
+  const uniqueExercises=[];
+  const seen=new Set();
+  for(const exercise of detail.exercises){
+    const key=`${exercise.garmin.category}.${exercise.garmin.subtype}`;
+    if(seen.has(key)) continue;
+    seen.add(key);
+    uniqueExercises.push(exercise);
+  }
+  uniqueExercises.forEach((exercise,index)=>writer.message(4,FIT_FIELDS.exerciseTitle,{
+    messageIndex:index,
+    exerciseCategory:exercise.garmin.category,
+    exerciseName:exercise.garmin.subtype,
+    wktStepName:exercise.garmin.label || exercise.name,
+  }));
+
+  fitWorkoutSets(detail).forEach((row,index)=>{
+    const reps=Number(row.set.reps);
+    writer.message(5,FIT_FIELDS.set,{
+      timestamp:fitTimestamp(row.end),
+      messageIndex:index,
+      startTime:fitTimestamp(row.start),
+      duration:Math.round(row.durationSeconds*1000),
+      repetitions:Number.isFinite(reps) && reps>0 ? Math.round(reps) : null,
+      weight:fitWeightRaw(row.set.weight,detail.workout.unit),
+      setType:1,
+      category:row.exercise.garmin.category,
+      categorySubtype:row.exercise.garmin.subtype,
+      weightDisplayUnit:detail.workout.unit==='kg'?1:2,
+    });
+  });
+
+  writer.message(3,FIT_FIELDS.record,{ timestamp:endFit, distance:0 });
+  writer.message(6,FIT_FIELDS.lap,{
+    timestamp:endFit,
+    event:0,
+    eventType:1,
+    startTime:startFit,
+    totalElapsedTime:totalMs,
+    totalTimerTime:totalMs,
+    totalDistance:0,
+    totalCalories:calories,
+    sport:4,
+    subSport:20,
+    intensity:0,
+    lapTrigger:0,
+  });
+  writer.message(7,FIT_FIELDS.session,{
+    timestamp:endFit,
+    event:0,
+    eventType:1,
+    startTime:startFit,
+    sport:4,
+    subSport:20,
+    totalElapsedTime:totalMs,
+    totalTimerTime:totalMs,
+    totalDistance:0,
+    totalCalories:calories,
+    firstLapIndex:0,
+    numLaps:1,
+    trigger:1,
+    sportProfileName:title,
+  });
+  writer.message(2,FIT_FIELDS.event,{ timestamp:endFit, event:0, eventType:1, data:0 });
+  writer.message(8,FIT_FIELDS.activity,{
+    timestamp:endFit,
+    totalTimerTime:totalMs,
+    numSessions:1,
+    type:0,
+    event:26,
+    eventType:1,
+    localTimestamp:endFit,
+  });
+  return writer.close();
+}
+
+function downloadBytes(filename,bytes,mime){
+  const blob=new Blob([bytes],{type:mime});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;
+  a.download=filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+
+function downloadText(filename,content,mime){
+  const blob=new Blob([content],{type:mime});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;
+  a.download=filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+
+function exportGarminWorkout(week,dayIndex){
+  const detail=workoutExportDetail(week,dayIndex);
+  if(!detail.summary.doneSets){ alert('Log at least one set before exporting to Garmin.'); return; }
+  const name=`fitlab-garmin-${detail.workout.date}-${cleanFilePart(detail.workout.title)}.tcx`;
+  downloadText(name,buildGarminTcx(detail),'application/vnd.garmin.tcx+xml;charset=utf-8');
+}
+
+function exportGarminFitWorkout(week,dayIndex){
+  const detail=workoutExportDetail(week,dayIndex);
+  if(!detail.summary.doneSets){ alert('Log at least one set before exporting to Garmin.'); return; }
+  downloadBytes(fitWorkoutFilename(detail),buildGarminFit(detail),'application/vnd.garmin.fit');
+}
+
+function exportWorkoutJson(week,dayIndex){
+  const detail=workoutExportDetail(week,dayIndex);
+  if(!detail.summary.doneSets){ alert('Log at least one set before exporting workout details.'); return; }
+  const name=`fitlab-details-${detail.workout.date}-${cleanFilePart(detail.workout.title)}.json`;
+  downloadText(name,JSON.stringify(detail,null,2),'application/json;charset=utf-8');
+}
+
+function exportedWorkoutDetails(){
+  return workoutHistory()
+    .slice()
+    .sort((a,b)=>a.n-b.n)
+    .map(item=>workoutExportDetail(item.w,item.d))
+    .filter(detail=>detail.summary.doneSets>0);
+}
+
+function exportAllGarminWorkouts(){
+  const details=exportedWorkoutDetails();
+  if(!details.length){ alert('No logged workouts to export yet.'); return; }
+  downloadText('fitlab-garmin-all-workouts.tcx',buildGarminTcx(details),'application/vnd.garmin.tcx+xml;charset=utf-8');
+}
+
+function exportAllGarminFitWorkouts(){
+  const details=exportedWorkoutDetails();
+  if(!details.length){ alert('No logged workouts to export yet.'); return; }
+  details.forEach(detail=>downloadBytes(fitWorkoutFilename(detail),buildGarminFit(detail),'application/vnd.garmin.fit'));
+}
+
+function exportAllWorkoutJson(){
+  const details=exportedWorkoutDetails();
+  if(!details.length){ alert('No logged workouts to export yet.'); return; }
+  downloadText('fitlab-workout-details.json',JSON.stringify({source:'FitLab',exportedAt:new Date().toISOString(),workouts:details},null,2),'application/json;charset=utf-8');
+}
+function renderStats(){
+  const pos=todayPos();
+  let totalSets=0, completedWorkouts=0;
+  for(let w=1;w<=12;w++) for(let d=0;d<7;d++){ const pl=planFor(w,d); if(pl.type==='workout'&&isWorkoutComplete(pl)) completedWorkouts++; const dk=dayKey(w,d); const log=S.logs[dk]||{}; for(const id in log) totalSets+=log[id].filter(s=>s.done).length; }
+  const bw=lastBW();
+  const bf=S.bf.length?S.bf[S.bf.length-1].v:null;
+  const bwSeries=S.bw.slice(-14).map(x=>x.v);
+  let rides=0; for(const k in S.rides) if(S.rides[k]) rides++;
+  const history=workoutHistory();
+  return `<div class="app-head"><div><div class="hello">Progress</div><h1>Your Stats</h1></div></div>
+  <div class="statgrid">
+    <div class="stat"><div class="v">${completedWorkouts}</div><div class="k">✅ Workouts done</div></div>
+    <div class="stat"><div class="v">${pos.done?12:pos.week}<small>/12</small></div><div class="k">📅 Current week</div></div>
+    <div class="stat"><div class="v">${bf!=null?bf+'<small>%</small>':'—'}</div><div class="k">📉 Last body fat</div></div>
+    <div class="stat"><div class="v">${rides}</div><div class="k">🚲 Rides logged</div></div>
+  </div>
+
+  ${history.length ? `
+  <div class="card exportcard">
+    <div class="card-h"><h3>↥ Garmin export</h3><span class="tiny faint">${history.length} workout${history.length===1?'':'s'}</span></div>
+    <div class="small muted">Downloads mapped Garmin FIT strength files from your logged FitLab sets. TCX remains available as a broad fallback.</div>
+    <div class="exportactions">
+      <button class="btn primary sm" data-garmin-fit-export-all="1">Export all FIT files</button>
+      <button class="btn ghost sm" data-garmin-export-all="1">Export all TCX</button>
+      <button class="btn ghost sm" data-json-export-all="1">Full details JSON</button>
+    </div>
+  </div>` : ''}
+
+  ${history.length ? `
+  <div class="card tight">
+    <div class="card-h"><h3>🕘 Workout history</h3><span class="tiny faint">tap to review</span></div>
+    ${history.slice(0,15).map(it=>`<div class="histrow">
+      <button class="histmain" data-open-day="${it.w}.${it.d}">
+        <div class="hd"><b>${esc(it.title)}</b><div class="tiny muted">${fmtDate(dateForPos(it.w,it.d))} · W${it.w} D${it.d+1}</div></div>
+        <div class="hr"><span class="hsets">${it.done} sets</span>${it.top&&it.top.w?`<span class="tiny faint">top ${it.top.w}${S.unit}×${it.top.r||'?'}</span>`:''}</div>
+        <span class="go">›</span>
+      </button>
+      <button class="histexport" data-garmin-fit-export="${it.w}.${it.d}">FIT</button>
+    </div>`).join('')}
+  </div>` : ''}
+
+  <div class="card">
+    <div class="card-h"><h3>⚖️ Bodyweight</h3>
+      <div class="seg" style="width:auto"><button data-unit="lb" class="${S.unit==='lb'?'on':''}">lb</button><button data-unit="kg" class="${S.unit==='kg'?'on':''}">kg</button></div>
+    </div>
+    <div class="inlineform"><input id="bwIn" inputmode="decimal" placeholder="Weight in ${S.unit}"/><button class="btn primary sm" data-logbw="1">Log</button></div>
+    ${bwSeries.length>1?`<div class="spark">${sparkBars(bwSeries)}</div><div class="tiny muted center" style="margin-top:6px">last ${bwSeries.length} entries · now ${bw} ${S.unit}</div>`:`<div class="tiny muted" style="margin-top:8px">Log weekly, same time of day. Trend matters more than any single number.</div>`}
+  </div>
+
+  <div class="card">
+    <div class="card-h"><h3>📐 Body-Fat Estimate</h3><span class="tiny faint">U.S. Navy method</span></div>
+    <div class="small muted" style="margin-bottom:8px">Height fixed at <b>6'1" (185 cm)</b>. Measure relaxed waist at the navel and neck below the larynx (same unit).</div>
+    <div class="seg" style="margin-bottom:8px"><button data-mu="in" class="${(S.measUnit||'in')==='in'?'on':''}">inches</button><button data-mu="cm" class="${S.measUnit==='cm'?'on':''}">cm</button></div>
+    <div class="flexrow">
+      <input id="waistIn" inputmode="decimal" class="inlineform" style="width:100%;background:var(--surface2);border:1px solid var(--line);border-radius:11px;padding:12px;color:var(--text);text-align:center;font-weight:700" placeholder="Waist"/>
+      <input id="neckIn" inputmode="decimal" style="width:100%;background:var(--surface2);border:1px solid var(--line);border-radius:11px;padding:12px;color:var(--text);text-align:center;font-weight:700" placeholder="Neck"/>
+    </div>
+    <button class="btn primary sm" style="width:100%;margin-top:10px" data-calcbf="1">Estimate & log body fat</button>
+    <div id="bfOut" class="center" style="margin-top:10px"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-h"><h3>📆 Start date</h3></div>
+    <div class="small muted" style="margin-bottom:8px">Day 1 of the cycle. Change it any time — the 7-day pattern (Push · Pull · Legs · Recovery · Upper · Lower+Core · Rest) counts forward from here.</div>
+    <div class="inlineform"><input type="date" id="startIn2" value="${S.startDate}" style="flex:1;background:var(--surface2);border:1px solid var(--line);border-radius:11px;padding:12px;color:var(--text);font-weight:700;color-scheme:dark"/><button class="btn primary sm" data-startday="1">Start today</button></div>
+  </div>
+
+  <button class="btn ghost" data-go="guide">🔥 Open the Fat-Loss Playbook</button>
+  <button class="btn ghost" data-reset="1" style="color:var(--hot);margin-top:10px">Reset all data</button>`;
+}
+function sparkBars(arr){ const mn=Math.min(...arr),mx=Math.max(...arr),rng=(mx-mn)||1; return arr.map(v=>`<i style="height:${10+((v-mn)/rng)*50}px"></i>`).join(''); }
+
+/* ---------- GUIDE ---------- */
+function renderGuide(){
+  return `<div class="app-head"><div><button class="hello" data-go="today" style="display:flex;align-items:center;gap:6px">‹ Today</button><h1>Fat-Loss Playbook</h1></div></div>
+  <div class="card guide">
+    <p style="margin-top:0"><b>The honest truth:</b> getting back under 10% body fat is <b>~80% nutrition</b>. The 5-day plan keeps your muscle and ramps your daily burn — but the abs are made in the kitchen.</p>
+    <div class="pill-row">
+      <div class="kpi"><div class="k">Maintenance ≈</div><div class="v">~2,650 kcal</div></div>
+      <div class="kpi"><div class="k">Cut target ≈</div><div class="v">~2,150 kcal</div></div>
+      <div class="kpi"><div class="k">Protein</div><div class="v">1 g / lb</div></div>
+    </div>
+    <p class="tiny faint">Rough starting points for a ~190 lb, 6'1" man. Adjust off your real weekly weight trend.</p>
+
+    <h4>🚲 Your bike riding is the engine</h4>
+    <p>Riding to work both ways is ~600 kcal/day. Across a normal work week that's roughly <b>~3,000 kcal ≈ 0.85 lb of fat</b> burned <i>before</i> any gym cardio — a huge, sustainable lever.</p>
+    <ul><li>That's why the gym finishers are <b>optional</b> — your rides already cover the cardio. Don't double up and tank recovery.</li>
+    <li>Don't "eat back" the riding calories — let them widen your deficit. Just keep protein high and fuel your lifts.</li>
+    <li>Tap <b>Log a bike ride</b> on any day (commute or a long weekend ride). Rained out? Just skip it and lean on steps.</li></ul>
+
+    <h4>1 · Eat in a deficit you can sustain</h4>
+    <ul><li>Aim to lose <b>0.5–1% of bodyweight per week</b>. Faster than that and you'll shed muscle.</li>
+    <li>Track for 2 weeks to learn portions, then you can eyeball it.</li>
+    <li>Weekly weight <i>trend</i> flat for 10+ days? Drop ~150 kcal or add a ride/steps.</li></ul>
+
+    <h4>2 · Protein is non-negotiable</h4>
+    <ul><li>~1 g per lb of goal bodyweight protects muscle while cutting and keeps you full.</li>
+    <li>Anchor every meal with a palm-or-two of protein: eggs, chicken, beef, fish, Greek yogurt, whey.</li></ul>
+
+    <h4>3 · Move all day, not just in the gym</h4>
+    <ul><li>The commute + steps are the most underrated fat-loss tools — hit the daily goal on your Today screen.</li>
+    <li>Lifting holds muscle; the commute Zone-2 adds burn without wrecking recovery.</li></ul>
+
+    <h4>4 · Sleep & stress</h4>
+    <ul><li>7–9 h sleep. Under-sleeping raises hunger hormones and tanks training quality.</li>
+    <li>Manage stress — chronic cortisol makes the last few % stubborn.</li></ul>
+
+    <h4>5 · The last mile (sub-10%)</h4>
+    <ul><li>The final few percent are slow. Stay patient, keep lifting heavy, don't crash-diet.</li>
+    <li>Consider a weekly refeed/higher-carb day in Phase 3 to keep training hard.</li>
+    <li>Track body fat in Stats every 2 weeks — and judge with photos in consistent lighting.</li></ul>
+    <div class="note">Not medical advice. If you have health conditions, check with a doctor before a calorie deficit or new training.</div>
+  </div>`;
+}
+
+/* ---------- EXERCISE DETAIL SHEET ---------- */
+function openSheet(id){
+  const x=EXERCISES[id]; if(!x) return;
+  const slides=[
+    {img:x.images[0], cap:'Start position'},
+    {img:x.images[1], cap:'End position'},
+    {map:true, cap:'Muscles worked'},
+  ];
+  $('#sheet').innerHTML=`<div class="grab"></div>
+    <h2>${esc(x.name)}</h2>
+    <div class="small muted">${esc(cap(x.primary.join(', ')))}${x.secondary.length?` · <span class="faint">${esc(cap(x.secondary.join(', ')))}</span>`:''}</div>
+    <div class="carousel" id="carousel">
+      ${slides.map((s,i)=>`<div class="slide">${s.map?muscleMap(x.primary,x.secondary):`<img loading="lazy" src="${s.img}" alt="${esc(x.name)} ${s.cap}"/>`}<div class="cap"><span>${s.cap}</span><span class="faint">${i+1}/${slides.length}</span></div></div>`).join('')}
+    </div>
+    <div class="dots" id="dots">${slides.map((_,i)=>`<i class="${i===0?'on':''}"></i>`).join('')}</div>
+    <a class="btn" href="${videoLink(id,x.name)}" target="_blank" rel="noopener" style="background:rgba(251,113,133,.12);border-color:rgba(251,113,133,.4);color:#fb7185;text-decoration:none">▶ Watch video demonstration</a>
+    <div class="mgrid" style="margin-top:12px">
+      <div><div class="k">Equipment</div><div class="v">${esc(x.equipment||'—')}</div></div>
+      <div><div class="k">Type</div><div class="v">${esc(x.mechanic||'—')}</div></div>
+      <div><div class="k">Level</div><div class="v">${esc(x.level||'—')}</div></div>
+      <div><div class="k">Primary</div><div class="v">${esc(x.primary[0]||'—')}</div></div>
+    </div>
+    <h3 style="margin:18px 0 2px;font-size:15px">How to perform</h3>
+    <ol class="steps">${x.instructions.map(s=>`<li>${esc(s)}</li>`).join('')}</ol>`;
+  $('#sheetWrap').classList.add('open');
+  const car=$('#carousel');
+  car.onscroll=()=>{ const i=Math.round(car.scrollLeft/(car.scrollWidth/3)); $('#dots').querySelectorAll('i').forEach((d,di)=>d.classList.toggle('on',di===i)); };
+}
+function closeSheet(){ $('#sheetWrap').classList.remove('open'); }
+
+/* ---------- rest timer ---------- */
+let rtInt=null;
+function startRest(sec,label){
+  clearInterval(rtInt); let t=sec;
+  const bar=$('#restbar'); bar.classList.add('show'); $('#rtlabel').textContent=label||'Rest';
+  const tick=()=>{ $('#rtnum').textContent=Math.floor(t/60)+':'+String(t%60).padStart(2,'0'); if(t<=0){ clearInterval(rtInt); bar.classList.remove('show'); if(navigator.vibrate)navigator.vibrate([120,60,120]); } t--; };
+  tick(); rtInt=setInterval(tick,1000);
+}
+$('#rtskip').onclick=()=>{ clearInterval(rtInt); $('#restbar').classList.remove('show'); };
+
+/* ---------- events ---------- */
+document.addEventListener('click',(e)=>{
+  const t=e.target;
+  const c=(s)=>t.closest(s);
+  if(c('[data-close]')||t.classList.contains('sheet-bg')){ closeSheet(); return; }
+  const nav=c('[data-go]'); if(nav){ go(nav.dataset.go); return; }
+  const dstep=c('[data-day-step]'); if(dstep){ const base=Math.max(0,daysSinceStart()); dayOffset=Math.min(83-base,Math.max(-base,dayOffset+parseInt(dstep.dataset.dayStep,10))); render(); window.scrollTo({top:0}); return; }
+  if(c('[data-day-today]')){ dayOffset=0; render(); return; }
+  const back=c('[data-back]'); if(back){ go('today'); return; }
+  const gfx=c('[data-garmin-fit-export]'); if(gfx){ const [w,d]=gfx.dataset.garminFitExport.split('.').map(Number); exportGarminFitWorkout(w,d); return; }
+  const gx=c('[data-garmin-export]'); if(gx){ const [w,d]=gx.dataset.garminExport.split('.').map(Number); exportGarminWorkout(w,d); return; }
+  const jx=c('[data-json-export]'); if(jx){ const [w,d]=jx.dataset.jsonExport.split('.').map(Number); exportWorkoutJson(w,d); return; }
+  if(c('[data-garmin-fit-export-all]')){ exportAllGarminFitWorkouts(); return; }
+  if(c('[data-garmin-export-all]')){ exportAllGarminWorkouts(); return; }
+  if(c('[data-json-export-all]')){ exportAllWorkoutJson(); return; }
+  const od=c('[data-open-day]'); if(od){ const [w,d]=od.dataset.openDay.split('.').map(Number); viewingPos={week:w,dayIndex:d}; go('day'); return; }
+  const exEl=c('[data-ex]'); if(exEl && !c('input') && !c('[data-ck]') && !c('[data-rest]')){ openSheet(exEl.dataset.ex); return; }
+  const rest=c('[data-rest]'); if(rest){ const [s,n]=rest.dataset.rest.split('|'); startRest(+s,'Rest · '+n); return; }
+  const adj=c('[data-adj]'); if(adj){ adjustSet(adj.dataset.adj); return; }
+  const ck=c('[data-ck]'); if(ck){ toggleSet(ck.dataset.ck); return; }
+  if(c('[data-restdone]')){ const dk=c('[data-restdone]').dataset.restdone; S.done[dk]=!S.done[dk]; save(); render(); return; }
+  const rd=c('[data-ride]'); if(rd){ const k=rd.dataset.ride; S.rides[k]=!S.rides[k]; if(navigator.vibrate)navigator.vibrate(20); save(); render(); return; }
+  if(c('[data-logbw]')){ logBW(); return; }
+  if(c('[data-calcbf]')){ calcBF(); return; }
+  const un=c('[data-unit]'); if(un){ S.unit=un.dataset.unit; save(); render(); return; }
+  const mu=c('[data-mu]'); if(mu){ S.measUnit=mu.dataset.mu; save(); render(); return; }
+  if(c('[data-startday]')){ S.startDate=todayISO(); save(); go('today'); return; }
+  if(c('[data-restart]')){ S.startDate=todayISO(); S.logs={}; S.done={}; S.rides={}; save(); go('today'); return; }
+  if(c('[data-reset]')){ if(confirm('Erase all logged sets, weights and body-fat history? This cannot be undone.')){ localStorage.removeItem('fitlab_v1'); S=load(); go('today'); } return; }
+});
+// date pickers
+document.addEventListener('change',(e)=>{
+  const el=e.target;
+  if(el.id==='startIn'||el.id==='startIn2'){ if(el.value){ S.startDate=el.value; dayOffset=0; save(); render(); } return; }
+  if(el.id==='jumpIn'){ if(el.value){ const sel=new Date(el.value+'T00:00'), st=new Date(S.startDate+'T00:00'); const selNum=Math.round((sel-st)/86400000); const base=Math.max(0,daysSinceStart()); dayOffset=Math.min(83,Math.max(0,selNum))-base; render(); window.scrollTo({top:0}); } return; }
+});
+// set weight/reps inputs (no re-render → keeps focus)
+document.addEventListener('input',(e)=>{
+  const inp=e.target; if(!inp.dataset||!inp.dataset.field) return;
+  const {field,ex,i}=inp.dataset; const dk=dayKey(viewingPos.week,viewingPos.dayIndex);
+  const arr=S.logs[dk][ex]; arr[i][field]=inp.value;
+  if(field==='w'&&inp.value) S.lastW[ex]=inp.value;
+  save();
+});
+function toggleSet(token){
+  const [ex,i,rest]=token.split('|'); const dk=dayKey(viewingPos.week,viewingPos.dayIndex);
+  const arr=S.logs[dk][ex]; const st=arr[+i]; st.done=!st.done;
+  const row=document.querySelector(`[data-row="${ex}|${i}"]`); if(row) row.classList.toggle('done',st.done);
+  if(st.done){ if(navigator.vibrate)navigator.vibrate(20); startRest(+rest,'Rest'); }
+  // update top progress bar without full re-render
+  const plan=planFor(viewingPos.week,viewingPos.dayIndex); const p=dayProgress(plan);
+  const bar=document.querySelector('.bar > i'); if(bar) bar.style.width=p.pct+'%';
+  const lbl=document.querySelector('.bar + .small'); if(lbl) lbl.textContent=`${p.done}/${p.tot} sets · ${p.pct}% · Phase ${plan.phase+1} ${PHASES[plan.phase].name}`;
+  save();
+}
+// ± stepper: adjust weight/reps in place (no re-render → keeps scroll position)
+function adjustSet(token){
+  const [ex,i,field,deltaStr]=token.split('|'); const delta=parseFloat(deltaStr);
+  const dk=dayKey(viewingPos.week,viewingPos.dayIndex);
+  const st=S.logs[dk][ex][+i];
+  let v=parseFloat(st[field]); if(isNaN(v)) v=0;
+  v=Math.max(0, Math.round((v+delta)*100)/100);
+  st[field]=v?String(v):'';
+  if(field==='w'&&v) S.lastW[ex]=String(v);
+  const row=document.querySelector(`[data-row="${ex}|${i}"]`);
+  if(row){ const inp=row.querySelector(`input[data-field="${field}"]`); if(inp) inp.value=st[field]; }
+  if(navigator.vibrate)navigator.vibrate(8);
+  save();
+}
+function logBW(){ const v=parseFloat($('#bwIn').value); if(!v||v<=0) return; S.bw.push({d:todayISO(),v:Math.round(v*10)/10}); save(); render(); }
+function calcBF(){
+  const mu=S.measUnit||'in';
+  let waist=parseFloat($('#waistIn').value), neck=parseFloat($('#neckIn').value);
+  if(!waist||!neck||waist<=neck){ $('#bfOut').innerHTML='<span class="small" style="color:var(--hot)">Enter waist & neck (waist must exceed neck).</span>'; return; }
+  // U.S. Navy formula uses INCHES. Convert cm input to inches; height 185.4cm = 73.0in.
+  if(mu==='cm'){ waist/=2.54; neck/=2.54; }
+  const hIn=S.heightCm/2.54;
+  const bf=86.010*Math.log10(waist-neck)-70.041*Math.log10(hIn)+36.76;
+  const val=Math.max(2,Math.round(bf*10)/10);
+  S.bf.push({d:todayISO(),v:val}); save();
+  const tag = val<10?'You\'re already sub-10% — now it\'s about staying sharp 🔥':val<15?'Solid. Keep the deficit honest and you\'ll see abs soon.':val<20?'Good base — lock in protein + steps and it\'ll move.':'Great starting point. Trust the process — consistency wins.';
+  $('#bfOut').innerHTML=`<div class="stat" style="display:inline-block;min-width:160px"><div class="v">${val}<small>%</small></div><div class="k">${tag}</div></div>`;
+}
+
+/* ---------- boot ---------- */
+render();
+if('serviceWorker' in navigator){ window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{})); }
+</script>
+</body>
+</html>
