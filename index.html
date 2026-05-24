@@ -85,6 +85,16 @@ a{color:var(--accent);}
 .exrow .go{color:var(--faint);font-size:18px;flex:none;}
 .exrow .donedot{width:10px;height:10px;border-radius:50%;background:var(--surface3);flex:none;}
 .exrow.complete .donedot{background:var(--accent);box-shadow:0 0 0 4px rgba(52,211,153,.15);}
+.miniworkout{display:flex;flex-direction:column;gap:10px;}
+.miniworkout .mwrow{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 0;border-top:1px solid var(--line);}
+.miniworkout .mwrow:first-child{border-top:none;}
+.miniworkout .mwtitle{font-size:14px;font-weight:800;}
+.miniworkout .mwsub{font-size:12px;color:var(--muted);margin-top:1px;}
+.miniworkout .mwcount{font-size:12px;font-weight:800;color:var(--accent);white-space:nowrap;}
+.blockdots{display:flex;gap:5px;margin-top:10px;}
+.blockdots i{height:5px;flex:1;border-radius:999px;background:var(--surface3);}
+.blockdots i.done{background:var(--accent);}
+.blockdots i.on{background:var(--accent2);}
 
 /* buttons */
 .btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:15px;border-radius:14px;
@@ -154,6 +164,17 @@ a{color:var(--accent);}
 .exblock .eh .info{font-size:13px;color:var(--accent);font-weight:700;}
 .restbtn{margin-top:4px;display:inline-flex;align-items:center;gap:6px;font-size:12.5px;color:var(--accent2);font-weight:700;background:rgba(34,211,238,.08);border:1px solid rgba(34,211,238,.25);padding:6px 11px;border-radius:9px;}
 .supersettag{font-size:11px;font-weight:800;color:var(--warn);text-transform:uppercase;letter-spacing:.8px;}
+.flowcard{background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,.01));border:1px solid var(--line);border-radius:var(--radius);padding:14px;margin-bottom:14px;}
+.flowtop{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:10px;}
+.flowbadge{font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.8px;color:var(--accent2);background:rgba(34,211,238,.09);border:1px solid rgba(34,211,238,.24);border-radius:999px;padding:4px 9px;white-space:nowrap;}
+.flowcard h2{font-size:20px;line-height:1.15;margin:0 0 3px;font-weight:850;}
+.flowcard .flowsub{font-size:12.5px;color:var(--muted);}
+.flowmoves{display:flex;flex-direction:column;gap:12px;}
+.flowmoves .exblock{margin-bottom:0;}
+.flowactions{display:flex;gap:8px;margin:12px 0 4px;}
+.flowactions .btn{flex:1;}
+.flowactions .btn[disabled]{opacity:.32;pointer-events:none;}
+.flowhint{font-size:12.5px;color:var(--muted);line-height:1.45;margin-top:8px;}
 
 /* sheet (exercise detail) */
 .sheet-wrap{position:fixed;inset:0;z-index:50;display:none;}
@@ -1102,54 +1123,54 @@ const EXERCISES = {
 const SPLIT = [
   { key:'push', title:'Push Day', focus:['chest','shoulders','triceps'], type:'workout',
     ex:[
-      {id:'Barbell_Bench_Press_-_Medium_Grip', sets:4, reps:'6–8', rest:120, comp:true},
+      {id:'Barbell_Bench_Press_-_Medium_Grip', sets:3, reps:'6–8', rest:120, comp:true},
       {id:'Incline_Dumbbell_Press', sets:3, reps:'8–12', rest:90, comp:true},
       {id:'Dumbbell_Shoulder_Press', sets:3, reps:'8–12', rest:90, comp:true},
-      {id:'Cable_Crossover', sets:3, reps:'12–15', rest:60},
-      {id:'Side_Lateral_Raise', sets:3, reps:'12–20', rest:45},
-      {id:'Triceps_Pushdown', sets:3, reps:'10–15', rest:60},
-      {id:'Standing_Dumbbell_Triceps_Extension', sets:3, reps:'10–15', rest:60},
+      {id:'Cable_Crossover', sets:2, reps:'12–15', rest:30, ss:'push-a', ssName:'Chest + triceps pump'},
+      {id:'Triceps_Pushdown', sets:2, reps:'10–15', rest:30, ss:'push-a', ssName:'Chest + triceps pump'},
+      {id:'Side_Lateral_Raise', sets:3, reps:'12–20', rest:30, ss:'push-b', ssName:'Delts + overhead triceps'},
+      {id:'Standing_Dumbbell_Triceps_Extension', sets:3, reps:'10–15', rest:30, ss:'push-b', ssName:'Delts + overhead triceps'},
     ]},
   { key:'pull', title:'Pull Day', focus:['lats','middle back','traps','biceps'], type:'workout',
     ex:[
       {id:'Barbell_Deadlift', sets:3, reps:'5', rest:150, comp:true, note:'Stop 1–2 reps shy of failure. Form first.'},
-      {id:'Pullups', sets:3, reps:'AMRAP', rest:90, comp:true, note:'Use assist band or lat pulldown if needed.'},
-      {id:'Bent_Over_Barbell_Row', sets:3, reps:'8–10', rest:90, comp:true},
-      {id:'Wide-Grip_Lat_Pulldown', sets:3, reps:'10–12', rest:75},
-      {id:'Seated_Cable_Rows', sets:3, reps:'10–12', rest:75},
-      {id:'Face_Pull', sets:3, reps:'15–20', rest:45},
-      {id:'Barbell_Curl', sets:3, reps:'8–12', rest:60},
-      {id:'Hammer_Curls', sets:3, reps:'10–12', rest:60},
+      {id:'Pullups', sets:3, reps:'AMRAP', rest:45, comp:true, ss:'pull-a', ssName:'Vertical pull + rear delts', note:'Use assist band or lat pulldown if needed.'},
+      {id:'Face_Pull', sets:3, reps:'15–20', rest:45, ss:'pull-a', ssName:'Vertical pull + rear delts'},
+      {id:'Bent_Over_Barbell_Row', sets:3, reps:'8–10', rest:45, comp:true, ss:'pull-b', ssName:'Row + curl'},
+      {id:'Barbell_Curl', sets:3, reps:'8–12', rest:45, ss:'pull-b', ssName:'Row + curl'},
+      {id:'Wide-Grip_Lat_Pulldown', sets:3, reps:'10–12', rest:45, ss:'pull-c', ssName:'Pulldown + hammer curl'},
+      {id:'Hammer_Curls', sets:3, reps:'10–12', rest:45, ss:'pull-c', ssName:'Pulldown + hammer curl'},
+      {id:'Seated_Cable_Rows', sets:2, reps:'10–12', rest:60},
     ]},
   { key:'legs', title:'Leg Day', focus:['quadriceps','hamstrings','glutes','calves'], type:'workout',
     ex:[
-      {id:'Barbell_Squat', sets:4, reps:'6–8', rest:150, comp:true},
+      {id:'Barbell_Squat', sets:3, reps:'6–8', rest:150, comp:true},
       {id:'Romanian_Deadlift', sets:3, reps:'8–10', rest:120, comp:true},
-      {id:'Leg_Press', sets:3, reps:'10–12', rest:90, comp:true},
-      {id:'Lying_Leg_Curls', sets:3, reps:'10–15', rest:60},
-      {id:'Leg_Extensions', sets:3, reps:'12–15', rest:60},
-      {id:'Standing_Calf_Raises', sets:4, reps:'12–20', rest:45},
+      {id:'Leg_Press', sets:3, reps:'10–12', rest:45, comp:true, ss:'legs-a', ssName:'Leg press + calves'},
+      {id:'Standing_Calf_Raises', sets:3, reps:'12–20', rest:45, ss:'legs-a', ssName:'Leg press + calves'},
+      {id:'Lying_Leg_Curls', sets:3, reps:'10–15', rest:45, ss:'legs-b', ssName:'Hamstring + quad finisher'},
+      {id:'Leg_Extensions', sets:3, reps:'12–15', rest:45, ss:'legs-b', ssName:'Hamstring + quad finisher'},
     ]},
   { key:'recovery', title:'Active Recovery', focus:['conditioning','mobility'], type:'rest' },
   { key:'upper', title:'Upper Day', focus:['chest','lats','shoulders','biceps','triceps'], type:'workout',
     ex:[
-      {id:'Incline_Dumbbell_Press', sets:3, reps:'8–12', rest:90, comp:true},
-      {id:'Wide-Grip_Lat_Pulldown', sets:3, reps:'10–12', rest:90, comp:true},
-      {id:'Seated_Dumbbell_Press', sets:3, reps:'8–12', rest:90, comp:true},
-      {id:'Seated_Cable_Rows', sets:3, reps:'10–12', rest:75},
+      {id:'Incline_Dumbbell_Press', sets:3, reps:'8–12', rest:45, comp:true, ss:'upper-a', ssName:'Incline press + pulldown'},
+      {id:'Wide-Grip_Lat_Pulldown', sets:3, reps:'10–12', rest:45, comp:true, ss:'upper-a', ssName:'Incline press + pulldown'},
+      {id:'Seated_Dumbbell_Press', sets:3, reps:'8–12', rest:45, comp:true, ss:'upper-b', ssName:'Shoulder press + row'},
+      {id:'Seated_Cable_Rows', sets:3, reps:'10–12', rest:45, ss:'upper-b', ssName:'Shoulder press + row'},
       {id:'Side_Lateral_Raise', sets:3, reps:'15–20', rest:45},
-      {id:'Barbell_Curl', sets:3, reps:'10–12', rest:60},
-      {id:'Triceps_Pushdown', sets:3, reps:'10–15', rest:60},
+      {id:'Barbell_Curl', sets:3, reps:'10–12', rest:35, ss:'upper-c', ssName:'Biceps + triceps'},
+      {id:'Triceps_Pushdown', sets:3, reps:'10–15', rest:35, ss:'upper-c', ssName:'Biceps + triceps'},
     ]},
   { key:'lower', title:'Lower + Core', focus:['quadriceps','glutes','hamstrings','abdominals'], type:'workout',
     ex:[
       {id:'Front_Barbell_Squat', sets:3, reps:'8–10', rest:120, comp:true},
-      {id:'Barbell_Hip_Thrust', sets:3, reps:'10–12', rest:90, comp:true},
-      {id:'Dumbbell_Lunges', sets:3, reps:'10–12 / leg', rest:90},
-      {id:'Lying_Leg_Curls', sets:3, reps:'12–15', rest:60},
-      {id:'Standing_Calf_Raises', sets:4, reps:'15–20', rest:45},
-      {id:'Hanging_Leg_Raise', sets:3, reps:'10–15', rest:60},
-      {id:'Cable_Crunch', sets:3, reps:'12–15', rest:45},
+      {id:'Barbell_Hip_Thrust', sets:3, reps:'10–12', rest:45, comp:true, ss:'lower-a', ssName:'Glutes + hanging core'},
+      {id:'Hanging_Leg_Raise', sets:3, reps:'10–15', rest:45, ss:'lower-a', ssName:'Glutes + hanging core'},
+      {id:'Dumbbell_Lunges', sets:3, reps:'10–12 / leg', rest:45, ss:'lower-b', ssName:'Lunges + cable crunch'},
+      {id:'Cable_Crunch', sets:3, reps:'12–15', rest:45, ss:'lower-b', ssName:'Lunges + cable crunch'},
+      {id:'Lying_Leg_Curls', sets:3, reps:'12–15', rest:45, ss:'lower-c', ssName:'Hamstrings + calves'},
+      {id:'Standing_Calf_Raises', sets:3, reps:'15–20', rest:45, ss:'lower-c', ssName:'Hamstrings + calves'},
     ]},
   { key:'rest', title:'Rest Day', focus:['recover','reset'], type:'rest' },
 ];
@@ -1187,8 +1208,8 @@ function planFor(week, dayIndex){
   if(base.type==='rest'){ day.ex=[]; return day; }
   day.ex = base.ex.map((e,i)=>{
     const x = Object.assign({}, e);
-    if(phase===1 && e.comp) x.sets = e.sets + 1;                  // Build: +1 set on compounds
-    if(phase===2 && i >= base.ex.length-2) x.superset = true;     // Define: superset last two moves
+    if(phase===1 && e.comp && !e.ss) x.sets = e.sets + 1;          // Build: +1 set on solo compounds
+    x.superset = !!e.ss;
     return x;
   });
   return day;
@@ -1258,11 +1279,12 @@ function muscleMap(primary, secondary){
 /* ---------- state ---------- */
 const todayISO = ()=> new Date().toISOString().slice(0,10);
 // The 7-day cycle counts forward from a user-chosen start date: Day 1 = startDate.
-const DEFAULT = { startDate:todayISO(), unit:'lb', logs:{}, done:{}, lastW:{}, bw:[], bf:[], heightCm:185.4, rides:{} };
+const DEFAULT = { startDate:todayISO(), unit:'lb', logs:{}, done:{}, lastW:{}, bw:[], bf:[], heightCm:185.4, rides:{}, flow:{} };
 let S = load();
 function load(){ try{ const s=Object.assign({}, DEFAULT, JSON.parse(localStorage.getItem('fitlab_v1')||'{}'));
   if(!s.startDate) s.startDate=todayISO();   // upgrades from older versions begin today
   if(!s.rides) s.rides=s.commute||{};
+  if(!s.flow) s.flow={};
   return s; }catch(e){ return Object.assign({},DEFAULT);} }
 let saveT; function save(){ clearTimeout(saveT); saveT=setTimeout(()=>localStorage.setItem('fitlab_v1', JSON.stringify(S)),120); }
 
@@ -1306,6 +1328,56 @@ const VIDEOS = {"Barbell_Bench_Press_-_Medium_Grip": "https://www.youtube.com/wa
 function videoLink(id,name){ return VIDEOS[id] || ytLink(name); }
 function dayProgress(plan){ const dk=dayKey(plan.week,plan.dayIndex); let tot=0,done=0; for(const e of plan.ex){ tot+=e.sets; done+=Math.min(exDoneCount(dk,e.id),e.sets);} return {done,tot,pct: tot?Math.round(done/tot*100):0}; }
 function isWorkoutComplete(plan){ if(plan.type==='rest') return !!S.done[dayKey(plan.week,plan.dayIndex)]; const p=dayProgress(plan); return p.tot>0 && p.done>=p.tot; }
+function workoutBlocks(plan){
+  if(plan.type!=='workout') return [];
+  const blocks=[];
+  for(let i=0;i<plan.ex.length;){
+    const first=plan.ex[i];
+    const ex=[first];
+    let j=i+1;
+    if(first.ss){
+      while(j<plan.ex.length && plan.ex[j].ss===first.ss){ ex.push(plan.ex[j]); j++; }
+    }
+    blocks.push({ index:blocks.length, id:first.ss||first.id, title:first.ssName||EXERCISES[first.id]?.name||'Exercise', ex });
+    i=j;
+  }
+  return blocks;
+}
+function blockTotalSets(block){ return block.ex.reduce((n,e)=>n+e.sets,0); }
+function blockDoneCount(block,dk){ return block.ex.reduce((n,e)=>n+Math.min(exDoneCount(dk,e.id),e.sets),0); }
+function isBlockComplete(block,dk){ return blockDoneCount(block,dk)>=blockTotalSets(block); }
+function firstOpenBlockIndex(plan){
+  const dk=dayKey(plan.week,plan.dayIndex), blocks=workoutBlocks(plan);
+  const idx=blocks.findIndex(b=>!isBlockComplete(b,dk));
+  return idx>=0 ? idx : 0;
+}
+function flowIndexFor(plan){
+  const blocks=workoutBlocks(plan); if(!blocks.length) return 0;
+  const dk=dayKey(plan.week,plan.dayIndex);
+  const saved=Number(S.flow?.[dk]);
+  if(Number.isFinite(saved)) return Math.max(0,Math.min(blocks.length-1,saved));
+  return firstOpenBlockIndex(plan);
+}
+function setFlowIndex(plan,index){
+  const blocks=workoutBlocks(plan); if(!blocks.length) return;
+  const dk=dayKey(plan.week,plan.dayIndex);
+  S.flow[dk]=Math.max(0,Math.min(blocks.length-1,index));
+  save();
+}
+function primeWorkoutFlow(week,dayIndex){
+  const plan=planFor(week,dayIndex); if(plan.type!=='workout') return;
+  const dk=dayKey(week,dayIndex);
+  S.flow[dk]=firstOpenBlockIndex(plan);
+  save();
+}
+function blockLabel(block){
+  if(block.ex.length===1) return 'Exercise';
+  return block.ex.length===2 ? 'Superset' : 'Circuit';
+}
+function blockSummary(block,dk){
+  const names=block.ex.map(e=>EXERCISES[e.id]?.name||e.id).join(' + ');
+  return `${names} · ${blockDoneCount(block,dk)}/${blockTotalSets(block)} sets`;
+}
 function proteinTarget(){ const w=lastBW(); if(!w) return '≈180 g'; const lb=S.unit==='kg'?w*2.205:w; return Math.round(lb)+' g'; }
 function lastBW(){ return S.bw.length? S.bw[S.bw.length-1].v : null; }
 
@@ -1355,7 +1427,7 @@ function renderToday(){
   </div>
 
   ${plan.type==='workout' ? `
-  <div class="card tight">${plan.ex.map(e=>exRow(e,dk)).join('')}</div>
+  ${workoutPreview(plan,dk)}
   <button class="btn primary" data-open-day="${week}.${dayIndex}">${complete?'✓ Done — review':(prog.done>0?`Continue · ${prog.done}/${prog.tot} sets`:'Start workout')}</button>
   ` : `
   <div class="card center" style="padding:26px 18px">
@@ -1388,6 +1460,17 @@ function exRow(e,dk){
     <span class="donedot"></span>
   </div>`;
 }
+function workoutPreview(plan,dk){
+  const blocks=workoutBlocks(plan);
+  const cur=flowIndexFor(plan);
+  return `<div class="card tight miniworkout">
+    ${blocks.map((block,i)=>`<div class="mwrow">
+      <div><div class="mwtitle">${i+1}. ${esc(block.title)}</div><div class="mwsub">${esc(block.ex.map(e=>EXERCISES[e.id]?.name||e.id).join(' + '))}</div></div>
+      <div class="mwcount">${blockDoneCount(block,dk)}/${blockTotalSets(block)}</div>
+    </div>`).join('')}
+    <div class="blockdots">${blocks.map((block,i)=>`<i class="${isBlockComplete(block,dk)?'done':(i===cur?'on':'')}"></i>`).join('')}</div>
+  </div>`;
+}
 
 /* ---------- DAY VIEW (workout tracker) ---------- */
 function renderDayView(){
@@ -1406,7 +1489,7 @@ function renderDayView(){
   return `${backHead(plan.title, `Week ${week} · Day ${dayIndex+1} of 7 · ${fmtDate(date)}`)}
   <div class="bar" style="margin:0 0 4px"><i style="width:${prog.pct}%"></i></div>
   <div class="small muted" style="margin-bottom:14px">${prog.done}/${prog.tot} sets · ${prog.pct}% · Phase ${plan.phase+1} ${ph.name}</div>
-  ${plan.ex.map((e,i)=>exBlock(e,dk,i,plan)).join('')}
+  ${renderWorkoutFlow(plan,dk)}
   <div class="hint" style="margin-top:0">🫀 ${plan.cardio.d}</div>
   ${rideCard(week,dayIndex)}
   ${workoutExportCard(plan, dk, prog)}
@@ -1415,7 +1498,7 @@ function renderDayView(){
 function backHead(title,sub){
   return `<div class="app-head"><div><button class="hello" data-back="1" style="display:flex;align-items:center;gap:6px">‹ Back</button><h1 style="font-size:23px">${esc(title)}</h1><div class="small muted">${esc(sub)}</div></div></div>`;
 }
-function exBlock(e,dk,idx,plan){
+function exBlock(e,dk,idx,plan,opts={}){
   const x=EXERCISES[e.id]; if(!x) return '';
   const sug=suggest(e.id,e,dk);
   const sets=setsFor(dk,e.id,e.sets, sug.weight, sug.reps);
@@ -1433,13 +1516,39 @@ function exBlock(e,dk,idx,plan){
       <div class="nm" data-ex="${e.id}"><b>${esc(x.name)}</b><div class="sub">${e.sets} × ${e.reps} · rest ${e.rest}s</div></div>
       <a class="vid" href="${videoLink(e.id,x.name)}" target="_blank" rel="noopener" title="Watch video demo">▶</a>
     </div>
-    ${e.superset?`<div class="supersettag">⚡ Superset with ${idx>0?esc((EXERCISES[plan.ex[idx-1].id]||{}).name||''):'previous'} — minimal rest</div>`:''}
+    ${e.superset&&!opts.hideSupersetTag?`<div class="supersettag">Superset: ${esc(e.ssName||'alternate with the paired move')} — minimal rest</div>`:''}
     <div class="sugg">💡 ${esc(sug.note)}</div>
     <div class="settable">
       <div class="set-hd"><div>Set</div><div>Weight (${S.unit})</div><div>Reps</div><div></div></div>
       ${rows}
     </div>
     <button class="restbtn" data-rest="${e.rest}|${esc(x.name)}">⏱ Rest ${e.rest}s</button>
+  </div>`;
+}
+function renderWorkoutFlow(plan,dk){
+  const blocks=workoutBlocks(plan);
+  const idx=flowIndexFor(plan);
+  const block=blocks[idx] || blocks[0];
+  if(!block) return '';
+  const done=blockDoneCount(block,dk), total=blockTotalSets(block);
+  const prevDisabled=idx<=0 ? 'disabled' : '';
+  const atEnd=idx>=blocks.length-1;
+  const complete=isWorkoutComplete(plan);
+  const nextAttrs=atEnd ? (complete ? 'data-back="1"' : 'disabled') : 'data-flow-step="1"';
+  const nextLabel=atEnd ? (complete ? 'Done' : 'Last block') : 'Save & Next';
+  return `<div class="flowcard">
+    <div class="flowtop">
+      <div><h2>${esc(block.title)}</h2><div class="flowsub">${esc(blockSummary(block,dk))}</div></div>
+      <div class="flowbadge">${blockLabel(block)} ${idx+1}/${blocks.length}</div>
+    </div>
+    ${block.ex.length>1?`<div class="supersettag" style="margin-bottom:8px">${blockLabel(block)}: alternate each move, then rest ${Math.max(...block.ex.map(e=>e.rest||45))}s after the round</div>`:''}
+    <div class="flowmoves">${block.ex.map((e,i)=>exBlock(e,dk,plan.ex.indexOf(e),plan,{hideSupersetTag:true})).join('')}</div>
+    <div class="flowactions">
+      <button class="btn ghost sm" data-flow-step="-1" ${prevDisabled}>Back</button>
+      <button class="btn primary sm" ${nextAttrs}>${nextLabel}</button>
+    </div>
+    <div class="blockdots">${blocks.map((b,i)=>`<i class="${isBlockComplete(b,dk)?'done':(i===idx?'on':'')}"></i>`).join('')}</div>
+    <div class="flowhint">${done>=total?'This block is saved. Move to the next one when ready.':'Tick each completed set. Your weights and reps save automatically as you type.'}</div>
   </div>`;
 }
 
@@ -2287,7 +2396,8 @@ document.addEventListener('click',(e)=>{
   if(c('[data-garmin-fit-export-all]')){ exportAllGarminFitWorkouts(); return; }
   if(c('[data-garmin-export-all]')){ exportAllGarminWorkouts(); return; }
   if(c('[data-json-export-all]')){ exportAllWorkoutJson(); return; }
-  const od=c('[data-open-day]'); if(od){ const [w,d]=od.dataset.openDay.split('.').map(Number); viewingPos={week:w,dayIndex:d}; go('day'); return; }
+  const flow=c('[data-flow-step]'); if(flow){ const plan=planFor(viewingPos.week,viewingPos.dayIndex); setFlowIndex(plan,flowIndexFor(plan)+parseInt(flow.dataset.flowStep,10)); render(); window.scrollTo({top:0}); return; }
+  const od=c('[data-open-day]'); if(od){ const [w,d]=od.dataset.openDay.split('.').map(Number); primeWorkoutFlow(w,d); viewingPos={week:w,dayIndex:d}; go('day'); return; }
   const exEl=c('[data-ex]'); if(exEl && !c('input') && !c('[data-ck]') && !c('[data-rest]')){ openSheet(exEl.dataset.ex); return; }
   const rest=c('[data-rest]'); if(rest){ const [s,n]=rest.dataset.rest.split('|'); startRest(+s,'Rest · '+n); return; }
   const adj=c('[data-adj]'); if(adj){ adjustSet(adj.dataset.adj); return; }
@@ -2299,7 +2409,7 @@ document.addEventListener('click',(e)=>{
   const un=c('[data-unit]'); if(un){ S.unit=un.dataset.unit; save(); render(); return; }
   const mu=c('[data-mu]'); if(mu){ S.measUnit=mu.dataset.mu; save(); render(); return; }
   if(c('[data-startday]')){ S.startDate=todayISO(); save(); go('today'); return; }
-  if(c('[data-restart]')){ S.startDate=todayISO(); S.logs={}; S.done={}; S.rides={}; save(); go('today'); return; }
+  if(c('[data-restart]')){ S.startDate=todayISO(); S.logs={}; S.done={}; S.rides={}; S.flow={}; save(); go('today'); return; }
   if(c('[data-reset]')){ if(confirm('Erase all logged sets, weights and body-fat history? This cannot be undone.')){ localStorage.removeItem('fitlab_v1'); S=load(); go('today'); } return; }
 });
 // date pickers
@@ -2326,6 +2436,7 @@ function toggleSet(token){
   const bar=document.querySelector('.bar > i'); if(bar) bar.style.width=p.pct+'%';
   const lbl=document.querySelector('.bar + .small'); if(lbl) lbl.textContent=`${p.done}/${p.tot} sets · ${p.pct}% · Phase ${plan.phase+1} ${PHASES[plan.phase].name}`;
   save();
+  render();
 }
 // ± stepper: adjust weight/reps in place (no re-render → keeps scroll position)
 function adjustSet(token){
