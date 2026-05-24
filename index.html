@@ -152,10 +152,17 @@ a{color:var(--accent);}
 .set-row.done .stepper{border-color:rgba(52,211,153,.45);background:rgba(52,211,153,.07);}
 .set-row .ck{width:44px;height:44px;border-radius:12px;background:var(--surface2);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:18px;color:var(--faint);}
 .set-row.done .ck{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);}
-.sugg{font-size:12.5px;color:#d7f3e8;background:rgba(52,211,153,.09);border:1px solid rgba(52,211,153,.22);border-radius:10px;padding:8px 11px;margin:8px 0;line-height:1.45;}
+.sugg{font-size:12.5px;color:#d7f3e8;background:rgba(52,211,153,.09);border:1px solid rgba(52,211,153,.22);border-radius:10px;padding:7px 10px;margin:8px 0;line-height:1.35;font-weight:750;}
 .weighthint,.alts,.evalitem{font-size:12.5px;color:var(--muted);background:rgba(255,255,255,.035);border:1px solid var(--line);border-radius:10px;padding:8px 10px;margin:8px 0;line-height:1.45;}
 .weighthint b,.alts b,.evalitem b{color:var(--text);}
 .alts span{color:#d7dce6;}
+.exextras{margin:6px 0 8px;font-size:12.5px;color:var(--muted);}
+.exextras summary{display:inline-flex;align-items:center;color:var(--accent2);font-weight:800;list-style:none;cursor:pointer;}
+.exextras summary::-webkit-details-marker{display:none;}
+.exextras summary:after{content:"+";margin-left:6px;color:var(--faint);font-weight:900;}
+.exextras[open] summary:after{content:"-";}
+.exextras .exdetails{margin-top:7px;background:rgba(255,255,255,.035);border:1px solid var(--line);border-radius:10px;padding:8px 10px;line-height:1.45;}
+.exextras .exdetails div+div{margin-top:5px;}
 .exblock .eh .vid{width:40px;height:40px;border-radius:11px;background:rgba(251,113,133,.12);border:1px solid rgba(251,113,133,.4);color:#fb7185;display:flex;align-items:center;justify-content:center;font-size:13px;text-decoration:none;flex:none;}
 .exblock .eh .vid:active{transform:scale(.94);}
 .exblock{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:15px;margin-bottom:12px;}
@@ -1368,6 +1375,11 @@ function weightHint(id,sets){
   const live=total&&meta.mult>1 ? ` Current total load: ${total} ${S.unit}.` : '';
   return `Log ${meta.label}.${example?` ${example}`:''}${live}`;
 }
+function compactSuggestion(exId,e,sug){
+  const reps=sug.reps ? `${sug.reps} reps` : e.reps;
+  if(sug.weight!=='' && sug.weight!=null) return `Suggested: ${formatEntryWeight(exId,sug.weight)} · ${reps}`;
+  return `Target: ${e.reps} · ${loadMeta(exId).label}`;
+}
 const LOAD_LINKS = {
   "Incline_Dumbbell_Press": [["Barbell_Bench_Press_-_Medium_Grip",0.5]],
   "Dumbbell_Bench_Press": [["Barbell_Bench_Press_-_Medium_Grip",0.56]],
@@ -1629,15 +1641,18 @@ function renderDayView(){
     <button class="btn ${S.done[dk]?'':'primary'}" data-restdone="${dk}">${S.done[dk]?'✓ Logged — tap to undo':'Mark day done'}</button>`;
   }
   const prog=dayProgress(plan);
+  const complete=isWorkoutComplete(plan);
   return `${backHead(plan.title, `Week ${week} · Day ${dayIndex+1} of 7 · ${fmtDate(date)}`)}
   <div class="bar" style="margin:0 0 4px"><i style="width:${prog.pct}%"></i></div>
   <div class="small muted" style="margin-bottom:14px">${prog.done}/${prog.tot} sets · ${prog.pct}% · Phase ${plan.phase+1} ${ph.name}</div>
   ${renderWorkoutFlow(plan,dk)}
-  ${workoutEvaluationCard(plan,dk)}
   <div class="hint" style="margin-top:0">🫀 ${plan.cardio.d}</div>
   ${rideCard(week,dayIndex)}
-  ${workoutExportCard(plan, dk, prog)}
-  <div class="note">Progressive overload: when you hit the top of the rep range on every set, add a little weight next time. In a deficit, just holding your numbers is a win — it means you're keeping muscle.</div>`;
+  ${complete ? `
+    ${workoutEvaluationCard(plan,dk)}
+    ${workoutExportCard(plan, dk, prog)}
+    <div class="note">Progressive overload: when you hit the top of the rep range on every set, add a little weight next time. In a deficit, just holding your numbers is a win — it means you're keeping muscle.</div>
+  ` : ''}`;
 }
 function backHead(title,sub){
   return `<div class="app-head"><div><button class="hello" data-back="1" style="display:flex;align-items:center;gap:6px">‹ Back</button><h1 style="font-size:23px">${esc(title)}</h1><div class="small muted">${esc(sub)}</div></div></div>`;
@@ -1649,6 +1664,7 @@ function exBlock(e,dk,idx,plan,opts={}){
   const inc=incFor(e);
   const weightLabel=cap(loadMeta(e.id).label);
   const alts=alternatesFor(e.id);
+  const compact=compactSuggestion(e.id,e,sug);
   const rows=sets.map((st,i)=>`
     <div class="set-row ${st.done?'done':''}" data-row="${e.id}|${i}">
       <div class="sn">${i+1}</div>
@@ -1663,9 +1679,15 @@ function exBlock(e,dk,idx,plan,opts={}){
       <a class="vid" href="${videoLink(e.id,x.name)}" target="_blank" rel="noopener" title="Watch video demo">▶</a>
     </div>
     ${e.superset&&!opts.hideSupersetTag?`<div class="supersettag">Superset: ${esc(e.ssName||'alternate with the paired move')} — minimal rest</div>`:''}
-    <div class="sugg">💡 ${esc(sug.note)}</div>
-    <div class="weighthint"><b>Weight input:</b> ${esc(weightHint(e.id,sets))}</div>
-    <div class="alts"><b>If taken:</b> <span>${alts.map(esc).join(' · ')}</span></div>
+    <div class="sugg">${esc(compact)}</div>
+    <details class="exextras">
+      <summary>Swaps</summary>
+      <div class="exdetails">
+        <div><b>Load:</b> ${esc(weightHint(e.id,sets))}</div>
+        <div><b>Swaps:</b> ${alts.map(esc).join(' · ')}</div>
+        <div><b>Why:</b> ${esc(sug.note)}</div>
+      </div>
+    </details>
     <div class="settable">
       <div class="set-hd"><div>Set</div><div>${esc(weightLabel)} (${S.unit})</div><div>Reps</div><div></div></div>
       ${rows}
@@ -1682,8 +1704,8 @@ function renderWorkoutFlow(plan,dk){
   const prevDisabled=idx<=0 ? 'disabled' : '';
   const atEnd=idx>=blocks.length-1;
   const complete=isWorkoutComplete(plan);
-  const nextAttrs=atEnd ? (complete ? 'data-back="1"' : 'disabled') : 'data-flow-step="1"';
-  const nextLabel=atEnd ? (complete ? 'Done' : 'Last block') : 'Save & Next';
+  const nextAttrs=atEnd ? (complete ? 'data-review-jump="1"' : 'disabled') : 'data-flow-step="1"';
+  const nextLabel=atEnd ? (complete ? 'Review' : 'Last block') : 'Save & Next';
   return `<div class="flowcard">
     <div class="flowtop">
       <div><h2>${esc(block.title)}</h2><div class="flowsub">${esc(blockSummary(block,dk))}</div></div>
@@ -1696,10 +1718,11 @@ function renderWorkoutFlow(plan,dk){
       <button class="btn primary sm" ${nextAttrs}>${nextLabel}</button>
     </div>
     <div class="blockdots">${blocks.map((b,i)=>`<i class="${isBlockComplete(b,dk)?'done':(i===idx?'on':'')}"></i>`).join('')}</div>
-    <div class="flowhint">${done>=total?'This block is saved. Move to the next one when ready.':'Tick each completed set. Your weights and reps save automatically as you type.'}</div>
+    <div class="flowhint">${done>=total?'Saved. Move to the next block when ready.':'Weights and reps save as you type.'}</div>
   </div>`;
 }
 function workoutEvaluationCard(plan,dk){
+  if(!isWorkoutComplete(plan)) return '';
   let planned=0, done=0, volume=0, top=null;
   const misses=[], next=[];
   for(const e of plan.ex){
@@ -2593,6 +2616,7 @@ document.addEventListener('click',(e)=>{
   if(c('[data-garmin-fit-export-all]')){ exportAllGarminFitWorkouts(); return; }
   if(c('[data-garmin-export-all]')){ exportAllGarminWorkouts(); return; }
   if(c('[data-json-export-all]')){ exportAllWorkoutJson(); return; }
+  if(c('[data-review-jump]')){ document.querySelector('.reviewcard')?.scrollIntoView({behavior:'smooth',block:'start'}); return; }
   const flow=c('[data-flow-step]'); if(flow){ const plan=planFor(viewingPos.week,viewingPos.dayIndex); setFlowIndex(plan,flowIndexFor(plan)+parseInt(flow.dataset.flowStep,10)); render(); window.scrollTo({top:0}); return; }
   const od=c('[data-open-day]'); if(od){ const [w,d]=od.dataset.openDay.split('.').map(Number); primeWorkoutFlow(w,d); viewingPos={week:w,dayIndex:d}; go('day'); return; }
   const exEl=c('[data-ex]'); if(exEl && !c('input') && !c('[data-ck]') && !c('[data-rest]')){ openSheet(exEl.dataset.ex); return; }
