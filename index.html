@@ -1824,7 +1824,7 @@ function workoutExportCard(plan, dk, prog){
   return `<div class="card exportcard">
     <div class="card-h"><h3>↥ Garmin export</h3><span class="tiny faint">manual upload</span></div>
     <div class="small muted">${hasSets
-      ? `Create a Garmin Connect upload from the ${prog.done} logged set${prog.done===1?'':'s'} in this FitLab workout. TCX is the safest manual-upload format; mapped FIT is available as a beta for Garmin strength sets.`
+      ? `Download an activity FIT from the ${prog.done} logged set${prog.done===1?'':'s'}, then upload it on Garmin Connect Web. Opening the file in the Garmin mobile app can create a course instead.`
       : 'Log at least one set, then export this workout for Garmin Connect manual upload.'}</div>
     ${hasSets ? `
     <div class="exportmeta">
@@ -1833,8 +1833,9 @@ function workoutExportCard(plan, dk, prog){
       <span>≈ ${Math.round(detail.summary.durationSeconds/60)} min</span>
     </div>` : ''}
     <div class="exportactions">
-      <button class="btn primary sm" data-garmin-export="${plan.week}.${plan.dayIndex}">Export Garmin TCX</button>
-      <button class="btn ghost sm" data-garmin-fit-export="${plan.week}.${plan.dayIndex}">Mapped FIT beta</button>
+      <button class="btn primary sm" data-garmin-fit-export="${plan.week}.${plan.dayIndex}">Export activity FIT</button>
+      <button class="btn ghost sm" data-garmin-export="${plan.week}.${plan.dayIndex}">TCX backup</button>
+      <button class="btn ghost sm" data-garmin-upload="1">Open Garmin upload</button>
       <button class="btn ghost sm" data-json-export="${plan.week}.${plan.dayIndex}">Details JSON</button>
     </div>
   </div>`;
@@ -2374,6 +2375,12 @@ function buildGarminFit(detail){
   return writer.close();
 }
 
+const GARMIN_ACTIVITY_IMPORT_URL = 'https://connect.garmin.com/modern/import-data';
+
+function openGarminActivityImport(){
+  window.open(GARMIN_ACTIVITY_IMPORT_URL,'_blank','noopener');
+}
+
 function downloadBytes(filename,bytes,mime){
   const blob=new Blob([bytes],{type:mime});
   const url=URL.createObjectURL(blob);
@@ -2402,13 +2409,15 @@ function exportGarminWorkout(week,dayIndex){
   const detail=workoutExportDetail(week,dayIndex);
   if(!detail.summary.doneSets){ alert('Log at least one set before exporting to Garmin.'); return; }
   const name=`fitlab-garmin-${detail.workout.date}-${cleanFilePart(detail.workout.title)}.tcx`;
-  downloadText(name,buildGarminTcx(detail),'application/vnd.garmin.tcx+xml;charset=utf-8');
+  downloadText(name,buildGarminTcx(detail),'application/octet-stream');
+  openGarminActivityImport();
 }
 
 function exportGarminFitWorkout(week,dayIndex){
   const detail=workoutExportDetail(week,dayIndex);
   if(!detail.summary.doneSets){ alert('Log at least one set before exporting to Garmin.'); return; }
-  downloadBytes(fitWorkoutFilename(detail),buildGarminFit(detail),'application/vnd.garmin.fit');
+  downloadBytes(fitWorkoutFilename(detail),buildGarminFit(detail),'application/octet-stream');
+  openGarminActivityImport();
 }
 
 function exportWorkoutJson(week,dayIndex){
@@ -2429,13 +2438,15 @@ function exportedWorkoutDetails(){
 function exportAllGarminWorkouts(){
   const details=exportedWorkoutDetails();
   if(!details.length){ alert('No logged workouts to export yet.'); return; }
-  downloadText('fitlab-garmin-all-workouts.tcx',buildGarminTcx(details),'application/vnd.garmin.tcx+xml;charset=utf-8');
+  downloadText('fitlab-garmin-all-workouts.tcx',buildGarminTcx(details),'application/octet-stream');
+  openGarminActivityImport();
 }
 
 function exportAllGarminFitWorkouts(){
   const details=exportedWorkoutDetails();
   if(!details.length){ alert('No logged workouts to export yet.'); return; }
-  details.forEach(detail=>downloadBytes(fitWorkoutFilename(detail),buildGarminFit(detail),'application/vnd.garmin.fit'));
+  details.forEach(detail=>downloadBytes(fitWorkoutFilename(detail),buildGarminFit(detail),'application/octet-stream'));
+  openGarminActivityImport();
 }
 
 function exportAllWorkoutJson(){
@@ -2463,10 +2474,11 @@ function renderStats(){
   ${history.length ? `
   <div class="card exportcard">
     <div class="card-h"><h3>↥ Garmin export</h3><span class="tiny faint">${history.length} workout${history.length===1?'':'s'}</span></div>
-    <div class="small muted">Downloads Garmin Connect manual-upload files from your logged FitLab sets. TCX is the safest upload format; mapped FIT is a beta option for Garmin strength sets.</div>
+    <div class="small muted">Downloads activity FIT files, then opens Garmin Connect Web upload. Do not open these from the Garmin mobile app course screen.</div>
     <div class="exportactions">
-      <button class="btn primary sm" data-garmin-export-all="1">Export all TCX</button>
-      <button class="btn ghost sm" data-garmin-fit-export-all="1">Export all FIT beta</button>
+      <button class="btn primary sm" data-garmin-fit-export-all="1">Export all FIT</button>
+      <button class="btn ghost sm" data-garmin-export-all="1">TCX backup</button>
+      <button class="btn ghost sm" data-garmin-upload="1">Open Garmin upload</button>
       <button class="btn ghost sm" data-json-export-all="1">Full details JSON</button>
     </div>
   </div>` : ''}
@@ -2480,7 +2492,7 @@ function renderStats(){
         <div class="hr"><span class="hsets">${it.done} sets</span>${it.top&&it.top.w?`<span class="tiny faint">top ${it.top.w}${S.unit}×${it.top.r||'?'}</span>`:''}</div>
         <span class="go">›</span>
       </button>
-      <button class="histexport" data-garmin-export="${it.w}.${it.d}">TCX</button>
+      <button class="histexport" data-garmin-fit-export="${it.w}.${it.d}">FIT</button>
     </div>`).join('')}
   </div>` : ''}
 
@@ -2615,6 +2627,7 @@ document.addEventListener('click',(e)=>{
   const jx=c('[data-json-export]'); if(jx){ const [w,d]=jx.dataset.jsonExport.split('.').map(Number); exportWorkoutJson(w,d); return; }
   if(c('[data-garmin-fit-export-all]')){ exportAllGarminFitWorkouts(); return; }
   if(c('[data-garmin-export-all]')){ exportAllGarminWorkouts(); return; }
+  if(c('[data-garmin-upload]')){ openGarminActivityImport(); return; }
   if(c('[data-json-export-all]')){ exportAllWorkoutJson(); return; }
   if(c('[data-review-jump]')){ document.querySelector('.reviewcard')?.scrollIntoView({behavior:'smooth',block:'start'}); return; }
   const flow=c('[data-flow-step]'); if(flow){ const plan=planFor(viewingPos.week,viewingPos.dayIndex); setFlowIndex(plan,flowIndexFor(plan)+parseInt(flow.dataset.flowStep,10)); render(); window.scrollTo({top:0}); return; }

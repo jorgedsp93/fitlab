@@ -1,5 +1,5 @@
 /* FitLab service worker — offline app shell + opportunistic exercise-image cache */
-const SHELL = 'fitlab-shell-v8';
+const SHELL = 'fitlab-shell-v9';
 const IMG = 'fitlab-img-v1';
 const SHELL_FILES = [
   './',
