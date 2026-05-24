@@ -1801,8 +1801,8 @@ function workoutExportCard(plan, dk, prog){
   return `<div class="card exportcard">
     <div class="card-h"><h3>↥ Garmin export</h3><span class="tiny faint">manual upload</span></div>
     <div class="small muted">${hasSets
-      ? `Create a Garmin FIT strength activity from the ${prog.done} logged set${prog.done===1?'':'s'} in this FitLab workout. FIT maps your exercises to Garmin strength categories; TCX remains available as a fallback.`
-      : 'Log at least one set, then export this workout as a mapped Garmin strength file.'}</div>
+      ? `Create a Garmin Connect upload from the ${prog.done} logged set${prog.done===1?'':'s'} in this FitLab workout. TCX is the safest manual-upload format; mapped FIT is available as a beta for Garmin strength sets.`
+      : 'Log at least one set, then export this workout for Garmin Connect manual upload.'}</div>
     ${hasSets ? `
     <div class="exportmeta">
       <span>${detail.summary.doneExercises} exercises</span>
@@ -1810,8 +1810,8 @@ function workoutExportCard(plan, dk, prog){
       <span>≈ ${Math.round(detail.summary.durationSeconds/60)} min</span>
     </div>` : ''}
     <div class="exportactions">
-      <button class="btn primary sm" data-garmin-fit-export="${plan.week}.${plan.dayIndex}">Export mapped FIT</button>
-      <button class="btn ghost sm" data-garmin-export="${plan.week}.${plan.dayIndex}">Fallback TCX</button>
+      <button class="btn primary sm" data-garmin-export="${plan.week}.${plan.dayIndex}">Export Garmin TCX</button>
+      <button class="btn ghost sm" data-garmin-fit-export="${plan.week}.${plan.dayIndex}">Mapped FIT beta</button>
       <button class="btn ghost sm" data-json-export="${plan.week}.${plan.dayIndex}">Details JSON</button>
     </div>
   </div>`;
@@ -2094,6 +2094,7 @@ const FIT_FIELDS = {
     {key:'weightDisplayUnit',num:9,size:2,type:FIT_TYPES.UINT16},
   ],
   lap: [
+    {key:'messageIndex',num:254,size:2,type:FIT_TYPES.UINT16},
     {key:'timestamp',num:253,size:4,type:FIT_TYPES.UINT32},
     {key:'event',num:0,size:1,type:FIT_TYPES.ENUM},
     {key:'eventType',num:1,size:1,type:FIT_TYPES.ENUM},
@@ -2108,6 +2109,7 @@ const FIT_FIELDS = {
     {key:'lapTrigger',num:24,size:1,type:FIT_TYPES.ENUM},
   ],
   session: [
+    {key:'messageIndex',num:254,size:2,type:FIT_TYPES.UINT16},
     {key:'timestamp',num:253,size:4,type:FIT_TYPES.UINT32},
     {key:'event',num:0,size:1,type:FIT_TYPES.ENUM},
     {key:'eventType',num:1,size:1,type:FIT_TYPES.ENUM},
@@ -2136,6 +2138,11 @@ const FIT_FIELDS = {
 
 function fitTimestamp(date){
   return Math.max(0,Math.round((new Date(date).getTime()-FIT_EPOCH_MS)/1000));
+}
+
+function fitLocalTimestamp(date){
+  const d=new Date(date);
+  return Math.max(0,Math.round((d.getTime()-FIT_EPOCH_MS-(d.getTimezoneOffset()*60000))/1000));
 }
 
 function fitCrc(bytes,start=0,end=bytes.length){
@@ -2252,15 +2259,15 @@ function buildGarminFit(detail){
   writer.message(0,FIT_FIELDS.fileId,{
     type:4,
     manufacturer:255,
-    product:1,
-    serialNumber:0xf17ab001,
+    product:0,
+    serialNumber:1234,
     timeCreated:fitTimestamp(detail.exportedAt),
   });
   writer.message(1,FIT_FIELDS.deviceInfo,{
     timestamp:startFit,
     deviceIndex:0,
     manufacturer:255,
-    product:1,
+    product:0,
     softwareVersion:100,
     productName,
   });
@@ -2300,6 +2307,7 @@ function buildGarminFit(detail){
 
   writer.message(3,FIT_FIELDS.record,{ timestamp:endFit, distance:0 });
   writer.message(6,FIT_FIELDS.lap,{
+    messageIndex:0,
     timestamp:endFit,
     event:0,
     eventType:1,
@@ -2314,6 +2322,7 @@ function buildGarminFit(detail){
     lapTrigger:0,
   });
   writer.message(7,FIT_FIELDS.session,{
+    messageIndex:0,
     timestamp:endFit,
     event:0,
     eventType:1,
@@ -2337,7 +2346,7 @@ function buildGarminFit(detail){
     type:0,
     event:26,
     eventType:1,
-    localTimestamp:endFit,
+    localTimestamp:fitLocalTimestamp(detail.timing.endTime),
   });
   return writer.close();
 }
@@ -2431,10 +2440,10 @@ function renderStats(){
   ${history.length ? `
   <div class="card exportcard">
     <div class="card-h"><h3>↥ Garmin export</h3><span class="tiny faint">${history.length} workout${history.length===1?'':'s'}</span></div>
-    <div class="small muted">Downloads mapped Garmin FIT strength files from your logged FitLab sets. TCX remains available as a broad fallback.</div>
+    <div class="small muted">Downloads Garmin Connect manual-upload files from your logged FitLab sets. TCX is the safest upload format; mapped FIT is a beta option for Garmin strength sets.</div>
     <div class="exportactions">
-      <button class="btn primary sm" data-garmin-fit-export-all="1">Export all FIT files</button>
-      <button class="btn ghost sm" data-garmin-export-all="1">Export all TCX</button>
+      <button class="btn primary sm" data-garmin-export-all="1">Export all TCX</button>
+      <button class="btn ghost sm" data-garmin-fit-export-all="1">Export all FIT beta</button>
       <button class="btn ghost sm" data-json-export-all="1">Full details JSON</button>
     </div>
   </div>` : ''}
@@ -2448,7 +2457,7 @@ function renderStats(){
         <div class="hr"><span class="hsets">${it.done} sets</span>${it.top&&it.top.w?`<span class="tiny faint">top ${it.top.w}${S.unit}×${it.top.r||'?'}</span>`:''}</div>
         <span class="go">›</span>
       </button>
-      <button class="histexport" data-garmin-fit-export="${it.w}.${it.d}">FIT</button>
+      <button class="histexport" data-garmin-export="${it.w}.${it.d}">TCX</button>
     </div>`).join('')}
   </div>` : ''}
 

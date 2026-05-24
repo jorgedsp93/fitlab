@@ -9,21 +9,21 @@ A mobile-first web app to run a 12-week, 5-day gym program aimed at getting back
 - **Workout flow** — one exercise or superset at a time with automatic local saving as each set is logged.
 - **Smarter lifting guidance** — per-dumbbell vs total-load labels, logged-weight recommendations, equipment alternatives, and workout reviews.
 - **Stats** — bodyweight log, U.S. Navy body-fat estimator (height fixed at 6'1"), workout/streak counts.
-- **Garmin export** — download Garmin Connect manual-upload `.fit` strength files with mapped exercises/sets, fallback `.tcx` files, plus full FitLab JSON details.
+- **Garmin export** — download Garmin Connect manual-upload `.tcx` files, mapped `.fit` strength beta files, plus full FitLab JSON details.
 - **Fat-Loss Playbook** — the nutrition + lifestyle side (the part that actually gets you sub-10%).
 
 All progress (sets, weights, reps, bodyweight, body fat) is saved locally on the device via `localStorage`.
 
 ## Garmin upload
-FitLab can export logged workouts as Garmin FIT strength files for Garmin Connect manual upload. The FIT export maps every FitLab exercise to Garmin's strength exercise category/subtype where the FIT profile provides one.
+FitLab can export logged workouts for Garmin Connect manual upload. Use TCX first because it is the most reliable manual-upload format in Garmin Connect. A mapped FIT beta export is also available for testing Garmin strength set/category mapping, but Garmin Connect may reject custom strength FIT files even when the file validates.
 
 1. Log at least one set in a workout.
 2. Open that workout or go to **Stats**.
-3. Tap **Export mapped FIT** or **Export all FIT files**.
-4. In Garmin Connect Web, use manual activity upload and choose the downloaded `.fit` file.
-5. Use **Fallback TCX** only if Garmin rejects the FIT import.
+3. Tap **Export Garmin TCX** or **Export all TCX**.
+4. In Garmin Connect Web, use manual activity upload and choose the downloaded `.tcx` file.
+5. Use **Mapped FIT beta** only when you want to test Garmin's strength set mapping.
 
-The FIT export includes completed set messages with Garmin exercise category/subtype IDs, reps, weights, start times, and workout duration. The TCX fallback includes a notes block with the exercises, weights, reps, and sets. Use the JSON export when you want the full FitLab-native detail exactly as stored in the app.
+The TCX export includes a notes block with the exercises, weights, reps, and sets. The FIT beta export includes completed set messages with Garmin exercise category/subtype IDs, reps, weights, start times, and workout duration. Use the JSON export when you want the full FitLab-native detail exactly as stored in the app.
 
 ## Run it
 From this folder:
