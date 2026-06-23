@@ -154,6 +154,7 @@ a{color:var(--accent);}
 .set-row.done .ck{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);}
 .sugg{font-size:12.5px;color:#d7f3e8;background:rgba(52,211,153,.09);border:1px solid rgba(52,211,153,.22);border-radius:10px;padding:7px 10px;margin:8px 0;line-height:1.35;font-weight:750;}
 .weighthint,.alts,.evalitem{font-size:12.5px;color:var(--muted);background:rgba(255,255,255,.035);border:1px solid var(--line);border-radius:10px;padding:8px 10px;margin:8px 0;line-height:1.45;}
+.weighthint{color:#d7f3e8;background:rgba(52,211,153,.08);border-color:rgba(52,211,153,.22);font-weight:700;}
 .weighthint b,.alts b,.evalitem b{color:var(--text);}
 .alts span{color:#d7dce6;}
 .exextras{margin:6px 0 8px;font-size:12.5px;color:var(--muted);}
@@ -189,6 +190,14 @@ a{color:var(--accent);}
 .evalitem{margin:0;}
 .evalitem .v{font-size:18px;font-weight:850;color:var(--text);}
 .evalitem .k{font-size:11px;text-transform:uppercase;letter-spacing:.6px;color:var(--faint);font-weight:800;}
+.reviewrows{display:flex;flex-direction:column;gap:8px;margin-top:10px;}
+.reviewrow{background:rgba(255,255,255,.035);border:1px solid var(--line);border-radius:10px;padding:9px 10px;}
+.reviewrow .rvtop{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;}
+.reviewrow b{font-size:13px;}
+.reviewrow .rvstatus{font-size:10.5px;font-weight:900;text-transform:uppercase;letter-spacing:.5px;white-space:nowrap;color:var(--warn);}
+.reviewrow.ok .rvstatus{color:var(--accent);}
+.reviewrow.miss .rvstatus{color:var(--hot);}
+.reviewrow .rvsub{font-size:12px;color:var(--muted);margin-top:4px;line-height:1.4;}
 .sheettop{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px;}
 .sheetclose{border:1px solid var(--line);background:var(--surface2);border-radius:11px;padding:8px 11px;font-size:13px;font-weight:800;color:var(--text);}
 
@@ -202,6 +211,7 @@ a{color:var(--accent);}
 @keyframes up{from{transform:translateY(100%)}to{transform:none}}
 .grab{width:40px;height:5px;border-radius:999px;background:var(--surface3);margin:6px auto 14px;}
 .sheet h2{margin:0 0 2px;font-size:22px;font-weight:800;letter-spacing:-.4px;}
+.sheet .sheettop{position:sticky;top:0;z-index:2;background:linear-gradient(180deg,var(--bg) 0%,var(--bg) 78%,rgba(11,13,18,0) 100%);padding:8px 0 12px;margin:-4px 0 8px;}
 
 /* image carousel */
 .carousel{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;margin:14px -16px;padding:0 16px;scrollbar-width:none;}
@@ -1295,12 +1305,13 @@ function muscleMap(primary, secondary){
 /* ---------- state ---------- */
 const todayISO = ()=> new Date().toISOString().slice(0,10);
 // The 7-day cycle counts forward from a user-chosen start date: Day 1 = startDate.
-const DEFAULT = { startDate:todayISO(), unit:'lb', logs:{}, done:{}, lastW:{}, bw:[], bf:[], heightCm:185.4, rides:{}, flow:{} };
+const DEFAULT = { startDate:todayISO(), unit:'lb', logs:{}, done:{}, reviewed:{}, lastW:{}, bw:[], bf:[], heightCm:185.4, rides:{}, flow:{} };
 let S = load();
 function load(){ try{ const s=Object.assign({}, DEFAULT, JSON.parse(localStorage.getItem('fitlab_v1')||'{}'));
   if(!s.startDate) s.startDate=todayISO();   // upgrades from older versions begin today
   if(!s.rides) s.rides=s.commute||{};
   if(!s.flow) s.flow={};
+  if(!s.reviewed) s.reviewed={};
   return s; }catch(e){ return Object.assign({},DEFAULT);} }
 let saveT; function save(){ clearTimeout(saveT); saveT=setTimeout(()=>localStorage.setItem('fitlab_v1', JSON.stringify(S)),120); }
 
@@ -1317,7 +1328,21 @@ const cap=(t)=>t.replace(/\b\w/g,c=>c.toUpperCase());
 const fmtDate=(d)=>d.toLocaleDateString(undefined,{weekday:'long',month:'short',day:'numeric'});
 const ymd=(d)=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
 const DOW=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
-function setsFor(dk,id,count,defW,defR){ S.logs[dk]=S.logs[dk]||{}; const a=S.logs[dk][id]; if(a&&a.length===count) return a; const n=Array.from({length:count},(_,i)=>(a&&a[i])||{w:(defW!=null?String(defW):''),r:(defR!=null?String(defR):''),done:false}); S.logs[dk][id]=n; return n; }
+function blank(v){ return v==='' || v==null; }
+function setsFor(dk,id,count,defW,defR){
+  S.logs[dk]=S.logs[dk]||{};
+  const a=S.logs[dk][id];
+  if(a&&a.length===count){
+    if(!a.some(s=>s.done)){
+      if(!blank(defW) && a.every(s=>blank(s.w))) a.forEach(s=>{ s.w=String(defW); });
+      if(!blank(defR) && a.every(s=>blank(s.r))) a.forEach(s=>{ s.r=String(defR); });
+    }
+    return a;
+  }
+  const n=Array.from({length:count},(_,i)=>(a&&a[i])||{w:(!blank(defW)?String(defW):''),r:(!blank(defR)?String(defR):''),done:false});
+  S.logs[dk][id]=n;
+  return n;
+}
 function exDoneCount(dk,id){ const a=(S.logs[dk]||{})[id]||[]; return a.filter(x=>x.done).length; }
 
 /* ---------- auto-progression engine ---------- */
@@ -1371,13 +1396,26 @@ function weightHint(id,sets){
   const meta=loadMeta(id);
   const first=(sets||[]).find(s=>s.w!==''&&s.w!=null);
   const total=first ? totalLoadForExercise(id,first.w) : 0;
-  const example=meta.mult>1 ? `Example: entering 35 means two 35 ${S.unit} dumbbells, 70 ${S.unit} total.` : '';
+  const example=meta.mult>1 ? `Enter the number on one dumbbell. Example: if you use two 35 ${S.unit} dumbbells, type 35; FitLab counts 70 ${S.unit} total.` : '';
   const live=total&&meta.mult>1 ? ` Current total load: ${total} ${S.unit}.` : '';
-  return `Log ${meta.label}.${example?` ${example}`:''}${live}`;
+  if(meta.mult>1) return `${example}${live}`;
+  if(meta.label==='machine setting') return `Enter the machine setting shown on the pin/stack. Treat a different machine as its own feel, even if the number matches.`;
+  if(meta.label==='stack weight') return `Enter the stack number shown on the cable machine.`;
+  return `Log ${meta.label}.`;
+}
+function visibleLoadHint(id,sets){
+  const meta=loadMeta(id);
+  const first=(sets||[]).find(s=>!blank(s.w));
+  if(meta.mult>1){
+    if(first) return `Dumbbell entry is per hand: ${formatSetLoad(id,first.w)}.`;
+    return `Dumbbell entry is per hand: type 35 for two 35 ${S.unit} dumbbells, not 70.`;
+  }
+  if(first) return `Logged load type: ${formatSetLoad(id,first.w)}.`;
+  return weightHint(id,sets);
 }
 function compactSuggestion(exId,e,sug){
   const reps=sug.reps ? `${sug.reps} reps` : e.reps;
-  if(sug.weight!=='' && sug.weight!=null) return `Suggested: ${formatEntryWeight(exId,sug.weight)} · ${reps}`;
+  if(sug.weight!=='' && sug.weight!=null) return `Suggested: ${formatSetLoad(exId,sug.weight)} · ${reps}`;
   return `Target: ${e.reps} · ${loadMeta(exId).label}`;
 }
 const LOAD_LINKS = {
@@ -1437,6 +1475,14 @@ const ALTERNATES = {
   "Russian_Twist": ['Cable Woodchop','Pallof Press','Bicycle Crunch'],
 };
 function alternatesFor(id){ return ALTERNATES[id] || ['Closest free machine pattern','Dumbbell version','Cable version']; }
+function swapPrompt(id){
+  const eq=(EXERCISES[id]?.equipment||'').toLowerCase();
+  if(eq.includes('machine')) return 'Machine busy?';
+  if(eq.includes('cable')) return 'Cable station busy?';
+  if(eq.includes('barbell')) return 'Rack or bar busy?';
+  if(eq.includes('dumbbell')) return 'Dumbbells taken?';
+  return 'Need a substitute?';
+}
 function dayNum(dk){ const m=String(dk).match(/^w(\d+)d(\d+)$/); return m?(+m[1]-1)*7+(+m[2]):-1; }
 // most recent earlier session that logged this exercise (done sets) → array of {w,r}
 function lastPerf(exId,curDk){ const cur=dayNum(curDk); let best=-1,res=null; for(const dk in S.logs){ if(dk===curDk) continue; const n=dayNum(dk); if(n<0||n>=cur) continue; const arr=S.logs[dk][exId]; if(!arr) continue; const done=arr.filter(s=>s.done&&s.w!==''); if(!done.length) continue; if(n>best){best=n;res=done;} } return res; }
@@ -1567,6 +1613,7 @@ function renderToday(){
   const dk=dayKey(week,dayIndex);
   const prog=dayProgress(plan);
   const complete=isWorkoutComplete(plan);
+  const reviewed=!!S.reviewed[dk];
   const date=dateForPos(week,dayIndex);
   return `
   <div class="app-head daypager">
@@ -1583,7 +1630,7 @@ function renderToday(){
 
   ${plan.type==='workout' ? `
   ${workoutPreview(plan,dk)}
-  <button class="btn primary" data-open-day="${week}.${dayIndex}">${complete?'✓ Done — review':(prog.done>0?`Continue · ${prog.done}/${prog.tot} sets`:'Start workout')}</button>
+  <button class="btn primary" data-open-day="${week}.${dayIndex}">${reviewed?'Reviewed — open':(complete?'✓ Done — review':(prog.done>0?`Continue · ${prog.done}/${prog.tot} sets`:'Start workout'))}</button>
   ` : `
   <div class="card center" style="padding:26px 18px">
     <div style="font-size:40px;line-height:1">${plan.key==='recovery'?'🚶':'🛌'}</div>
@@ -1642,13 +1689,14 @@ function renderDayView(){
   }
   const prog=dayProgress(plan);
   const complete=isWorkoutComplete(plan);
+  const reviewed=!!S.reviewed[dk];
   return `${backHead(plan.title, `Week ${week} · Day ${dayIndex+1} of 7 · ${fmtDate(date)}`)}
   <div class="bar" style="margin:0 0 4px"><i style="width:${prog.pct}%"></i></div>
   <div class="small muted" style="margin-bottom:14px">${prog.done}/${prog.tot} sets · ${prog.pct}% · Phase ${plan.phase+1} ${ph.name}</div>
   ${renderWorkoutFlow(plan,dk)}
   <div class="hint" style="margin-top:0">🫀 ${plan.cardio.d}</div>
   ${rideCard(week,dayIndex)}
-  ${complete ? `
+  ${(complete || reviewed) ? `
     ${workoutEvaluationCard(plan,dk)}
     ${workoutExportCard(plan, dk, prog)}
     <div class="note">Progressive overload: when you hit the top of the rep range on every set, add a little weight next time. In a deficit, just holding your numbers is a win — it means you're keeping muscle.</div>
@@ -1663,12 +1711,13 @@ function exBlock(e,dk,idx,plan,opts={}){
   const sets=setsFor(dk,e.id,e.sets, sug.weight, sug.reps);
   const inc=incFor(e);
   const weightLabel=cap(loadMeta(e.id).label);
+  const weightPlaceholder=loadMeta(e.id).mult>1?'each':S.unit;
   const alts=alternatesFor(e.id);
   const compact=compactSuggestion(e.id,e,sug);
   const rows=sets.map((st,i)=>`
     <div class="set-row ${st.done?'done':''}" data-row="${e.id}|${i}">
       <div class="sn">${i+1}</div>
-      <div class="stepper"><button class="stp" data-adj="${e.id}|${i}|w|${-inc}">−</button><input inputmode="decimal" data-field="w" data-ex="${e.id}" data-i="${i}" value="${st.w}" placeholder="${S.unit}"/><button class="stp" data-adj="${e.id}|${i}|w|${inc}">+</button></div>
+      <div class="stepper"><button class="stp" data-adj="${e.id}|${i}|w|${-inc}">−</button><input inputmode="decimal" data-field="w" data-ex="${e.id}" data-i="${i}" value="${st.w}" placeholder="${weightPlaceholder}"/><button class="stp" data-adj="${e.id}|${i}|w|${inc}">+</button></div>
       <div class="stepper"><button class="stp" data-adj="${e.id}|${i}|r|-1">−</button><input inputmode="numeric" data-field="r" data-ex="${e.id}" data-i="${i}" value="${st.r}" placeholder="${e.reps}"/><button class="stp" data-adj="${e.id}|${i}|r|1">+</button></div>
       <button class="ck" data-ck="${e.id}|${i}|${e.rest}">✓</button>
     </div>`).join('');
@@ -1680,8 +1729,10 @@ function exBlock(e,dk,idx,plan,opts={}){
     </div>
     ${e.superset&&!opts.hideSupersetTag?`<div class="supersettag">Superset: ${esc(e.ssName||'alternate with the paired move')} — minimal rest</div>`:''}
     <div class="sugg">${esc(compact)}</div>
+    <div class="weighthint" data-load-hint="${e.id}">${esc(visibleLoadHint(e.id,sets))}</div>
+    <div class="alts"><b>${esc(swapPrompt(e.id))}</b> <span>${alts.map(esc).join(' · ')}</span></div>
     <details class="exextras">
-      <summary>Swaps</summary>
+      <summary>More guidance</summary>
       <div class="exdetails">
         <div><b>Load:</b> ${esc(weightHint(e.id,sets))}</div>
         <div><b>Swaps:</b> ${alts.map(esc).join(' · ')}</div>
@@ -1701,11 +1752,12 @@ function renderWorkoutFlow(plan,dk){
   const block=blocks[idx] || blocks[0];
   if(!block) return '';
   const done=blockDoneCount(block,dk), total=blockTotalSets(block);
+  const prog=dayProgress(plan);
+  const reviewed=!!S.reviewed[dk];
   const prevDisabled=idx<=0 ? 'disabled' : '';
   const atEnd=idx>=blocks.length-1;
-  const complete=isWorkoutComplete(plan);
-  const nextAttrs=atEnd ? (complete ? 'data-review-jump="1"' : 'disabled') : 'data-flow-step="1"';
-  const nextLabel=atEnd ? (complete ? 'Review' : 'Last block') : 'Save & Next';
+  const nextAttrs=atEnd ? (prog.done ? 'data-finish-workout="1"' : 'disabled') : 'data-flow-step="1"';
+  const nextLabel=atEnd ? (reviewed ? 'Review Again' : 'Finish & Review') : 'Save & Next';
   return `<div class="flowcard">
     <div class="flowtop">
       <div><h2>${esc(block.title)}</h2><div class="flowsub">${esc(blockSummary(block,dk))}</div></div>
@@ -1722,9 +1774,8 @@ function renderWorkoutFlow(plan,dk){
   </div>`;
 }
 function workoutEvaluationCard(plan,dk){
-  if(!isWorkoutComplete(plan)) return '';
   let planned=0, done=0, volume=0, top=null;
-  const misses=[], next=[];
+  const misses=[], next=[], rows=[];
   for(const e of plan.ex){
     planned+=e.sets;
     const arr=(S.logs[dk]||{})[e.id]||[];
@@ -1734,26 +1785,57 @@ function workoutEvaluationCard(plan,dk){
     if(sets.length<e.sets) misses.push(`${EXERCISES[e.id]?.name||e.id}: ${sets.length}/${e.sets}`);
     const reps=sets.map(s=>parseInt(s.r,10)||0);
     const weights=sets.map(s=>Number(s.w)||0);
+    const best=sets.reduce((m,s)=>{
+      const total=totalLoadForExercise(e.id,s.w);
+      return total>(m?.total||0) ? {total,entry:s.w,reps:s.r} : m;
+    }, null);
     sets.forEach(s=>{
       const reps=Number(s.r)||0, total=totalLoadForExercise(e.id,s.w);
       volume+=total*reps;
       if(total>0 && (!top || total>top.total)) top={name:EXERCISES[e.id]?.name||e.id,total,entry:s.w,reps:s.r,id:e.id};
     });
+    const underTarget=!rng.amrap && reps.length && reps.some(r=>r<rng.min);
+    const ok=sets.length>=e.sets && !underTarget;
+    const status=!sets.length?'Missed':(ok?'On plan':(sets.length<e.sets?'Short':'Under reps'));
+    const actual=sets.length
+      ? `${sets.length}/${e.sets} sets · reps ${reps.map(r=>r||'?').join(', ')}${best?.total?` · best ${formatSetLoad(e.id,best.entry)}`:''}`
+      : 'No logged sets';
+    rows.push({
+      cls:ok?'ok':(!sets.length?'miss':''),
+      name:EXERCISES[e.id]?.name||e.id,
+      target:`Plan: ${e.sets} × ${e.reps}`,
+      actual,
+      status
+    });
     if(!rng.amrap && sets.length>=e.sets && reps.every(r=>r>=rng.max) && weights.some(Boolean)){
       const inc=incFor(e);
-      next.push(`${EXERCISES[e.id]?.name||e.id}: try ${formatEntryWeight(e.id,Math.round(((weights[0]||0)+inc)*10)/10)}`);
+      next.push(`${EXERCISES[e.id]?.name||e.id}: try ${formatSetLoad(e.id,Math.round(((weights[0]||0)+inc)*10)/10)}`);
+    }else if(sets.length && underTarget && weights.some(Boolean)){
+      next.push(`${EXERCISES[e.id]?.name||e.id}: hold ${formatSetLoad(e.id,weights[0])} until every set reaches ${rng.min}+ reps`);
+    }else if(sets.length && sets.length<e.sets){
+      next.push(`${EXERCISES[e.id]?.name||e.id}: finish all ${e.sets} planned sets before adding load`);
     }
   }
   if(!done) return '';
-  const quality=misses.length?'Partial':'Complete';
+  const quality=done>=planned?'Complete':'Partial';
+  const matchPct=planned?Math.round(done/planned*100):0;
   const topText=top?`${top.name}: ${formatSetLoad(top.id,top.entry)} x ${top.reps}`:'No loaded sets';
   return `<div class="card reviewcard">
     <div class="card-h"><h3>Workout review</h3><span class="tiny faint">${quality}</span></div>
     <div class="evalgrid">
       <div class="evalitem"><div class="v">${done}/${planned}</div><div class="k">sets done</div></div>
       <div class="evalitem"><div class="v">${Math.round(volume).toLocaleString()}</div><div class="k">est. volume</div></div>
+      <div class="evalitem"><div class="v">${matchPct}%</div><div class="k">plan matched</div></div>
+      <div class="evalitem"><div class="v">${misses.length}</div><div class="k">moves short</div></div>
     </div>
     <div class="evalitem" style="margin-top:8px"><b>Top set:</b> ${esc(topText)}</div>
+    ${misses.length?`<div class="evalitem" style="margin-top:8px"><b>What was short:</b> ${esc(misses.slice(0,5).join(' · '))}${misses.length>5?'…':''}</div>`:''}
+    <div class="reviewrows">
+      ${rows.map(r=>`<div class="reviewrow ${r.cls}">
+        <div class="rvtop"><b>${esc(r.name)}</b><span class="rvstatus">${esc(r.status)}</span></div>
+        <div class="rvsub">${esc(r.target)}<br>${esc(r.actual)}</div>
+      </div>`).join('')}
+    </div>
     <div class="evalitem" style="margin-top:8px"><b>Next time:</b> ${next.length?esc(next.slice(0,3).join(' · ')):'Repeat these loads and add reps where you can.'}</div>
   </div>`;
 }
@@ -2571,8 +2653,10 @@ function renderGuide(){
 }
 
 /* ---------- EXERCISE DETAIL SHEET ---------- */
+let sheetHistoryOpen=false;
 function openSheet(id){
   const x=EXERCISES[id]; if(!x) return;
+  const closeLabel=view==='day'?'Back to workout':'Back';
   const slides=[
     {img:x.images[0], cap:'Start position'},
     {img:x.images[1], cap:'End position'},
@@ -2582,7 +2666,7 @@ function openSheet(id){
     <div class="sheettop">
       <div><h2>${esc(x.name)}</h2>
       <div class="small muted">${esc(cap(x.primary.join(', ')))}${x.secondary.length?` · <span class="faint">${esc(cap(x.secondary.join(', ')))}</span>`:''}</div></div>
-      <button class="sheetclose" data-close="1">Back</button>
+      <button class="sheetclose" data-close="1">${esc(closeLabel)}</button>
     </div>
     <div class="carousel" id="carousel">
       ${slides.map((s,i)=>`<div class="slide">${s.map?muscleMap(x.primary,x.secondary):`<img loading="lazy" src="${s.img}" alt="${esc(x.name)} ${s.cap}"/>`}<div class="cap"><span>${s.cap}</span><span class="faint">${i+1}/${slides.length}</span></div></div>`).join('')}
@@ -2598,10 +2682,30 @@ function openSheet(id){
     <h3 style="margin:18px 0 2px;font-size:15px">How to perform</h3>
     <ol class="steps">${x.instructions.map(s=>`<li>${esc(s)}</li>`).join('')}</ol>`;
   $('#sheetWrap').classList.add('open');
+  try{
+    if(sheetHistoryOpen) history.replaceState({fitlabSheet:id},'',location.href);
+    else{ history.pushState({fitlabSheet:id},'',location.href); sheetHistoryOpen=true; }
+  }catch(e){}
   const car=$('#carousel');
   car.onscroll=()=>{ const i=Math.round(car.scrollLeft/(car.scrollWidth/3)); $('#dots').querySelectorAll('i').forEach((d,di)=>d.classList.toggle('on',di===i)); };
 }
-function closeSheet(){ $('#sheetWrap').classList.remove('open'); }
+function closeSheet(opts={}){
+  const wrap=$('#sheetWrap');
+  const wasOpen=wrap.classList.contains('open');
+  wrap.classList.remove('open');
+  if(opts.fromPop){ sheetHistoryOpen=false; return; }
+  if(wasOpen && sheetHistoryOpen){
+    sheetHistoryOpen=false;
+    try{ history.back(); }catch(e){}
+  }
+}
+window.addEventListener('popstate',()=>{
+  if($('#sheetWrap').classList.contains('open')) closeSheet({fromPop:true});
+  else sheetHistoryOpen=false;
+});
+document.addEventListener('keydown',(e)=>{
+  if(e.key==='Escape' && $('#sheetWrap').classList.contains('open')) closeSheet();
+});
 
 /* ---------- rest timer ---------- */
 let rtInt=null;
@@ -2630,6 +2734,14 @@ document.addEventListener('click',(e)=>{
   if(c('[data-garmin-upload]')){ openGarminActivityImport(); return; }
   if(c('[data-json-export-all]')){ exportAllWorkoutJson(); return; }
   if(c('[data-review-jump]')){ document.querySelector('.reviewcard')?.scrollIntoView({behavior:'smooth',block:'start'}); return; }
+  if(c('[data-finish-workout]')){
+    const dk=dayKey(viewingPos.week,viewingPos.dayIndex);
+    S.reviewed[dk]=true;
+    save();
+    render();
+    requestAnimationFrame(()=>document.querySelector('.reviewcard')?.scrollIntoView({behavior:'smooth',block:'start'}));
+    return;
+  }
   const flow=c('[data-flow-step]'); if(flow){ const plan=planFor(viewingPos.week,viewingPos.dayIndex); setFlowIndex(plan,flowIndexFor(plan)+parseInt(flow.dataset.flowStep,10)); render(); window.scrollTo({top:0}); return; }
   const od=c('[data-open-day]'); if(od){ const [w,d]=od.dataset.openDay.split('.').map(Number); primeWorkoutFlow(w,d); viewingPos={week:w,dayIndex:d}; go('day'); return; }
   const exEl=c('[data-ex]'); if(exEl && !c('input') && !c('[data-ck]') && !c('[data-rest]')){ openSheet(exEl.dataset.ex); return; }
@@ -2643,7 +2755,7 @@ document.addEventListener('click',(e)=>{
   const un=c('[data-unit]'); if(un){ S.unit=un.dataset.unit; save(); render(); return; }
   const mu=c('[data-mu]'); if(mu){ S.measUnit=mu.dataset.mu; save(); render(); return; }
   if(c('[data-startday]')){ S.startDate=todayISO(); save(); go('today'); return; }
-  if(c('[data-restart]')){ S.startDate=todayISO(); S.logs={}; S.done={}; S.rides={}; S.flow={}; save(); go('today'); return; }
+  if(c('[data-restart]')){ S.startDate=todayISO(); S.logs={}; S.done={}; S.reviewed={}; S.rides={}; S.flow={}; save(); go('today'); return; }
   if(c('[data-reset]')){ if(confirm('Erase all logged sets, weights and body-fat history? This cannot be undone.')){ localStorage.removeItem('fitlab_v1'); S=load(); go('today'); } return; }
 });
 // date pickers
@@ -2658,8 +2770,16 @@ document.addEventListener('input',(e)=>{
   const {field,ex,i}=inp.dataset; const dk=dayKey(viewingPos.week,viewingPos.dayIndex);
   const arr=S.logs[dk][ex]; arr[i][field]=inp.value;
   if(field==='w'&&inp.value) S.lastW[ex]=inp.value;
+  if(field==='w') refreshLoadHint(ex);
   save();
 });
+function refreshLoadHint(ex){
+  if(!viewingPos) return;
+  const dk=dayKey(viewingPos.week,viewingPos.dayIndex);
+  document.querySelectorAll('[data-load-hint]').forEach(el=>{
+    if(el.dataset.loadHint===ex) el.textContent=visibleLoadHint(ex,(S.logs[dk]||{})[ex]||[]);
+  });
+}
 function toggleSet(token){
   const [ex,i,rest]=token.split('|'); const dk=dayKey(viewingPos.week,viewingPos.dayIndex);
   const arr=S.logs[dk][ex]; const st=arr[+i]; st.done=!st.done;
@@ -2683,6 +2803,7 @@ function adjustSet(token){
   if(field==='w'&&v) S.lastW[ex]=String(v);
   const row=document.querySelector(`[data-row="${ex}|${i}"]`);
   if(row){ const inp=row.querySelector(`input[data-field="${field}"]`); if(inp) inp.value=st[field]; }
+  if(field==='w') refreshLoadHint(ex);
   if(navigator.vibrate)navigator.vibrate(8);
   save();
 }
