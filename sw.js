@@ -1,14 +1,15 @@
 /* FitLab service worker — offline app shell + opportunistic exercise-image cache */
-const SHELL = 'fitlab-shell-v10';
+const SHELL = 'fitlab-shell-v11';
 const IMG = 'fitlab-img-v1';
 const SHELL_FILES = [
   './',
   './index.html',
   './manifest.webmanifest',
-  './icon-192.png',
-  './icon-512.png',
-  './apple-touch-icon.png',
-  './assets/fitlab-logo.png',
+  './app-icon-192-v3.png',
+  './app-icon-512-v3.png',
+  './apple-touch-icon-v3.png',
+  './favicon-32-v3.png',
+  './assets/fitlab-logo-v3.png',
   './assets/day-push.png',
   './assets/day-pull.png',
   './assets/day-legs.png',

@@ -10,7 +10,9 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 <meta name="apple-mobile-web-app-title" content="FitLab" />
 <link rel="manifest" href="manifest.webmanifest" />
-<link rel="apple-touch-icon" href="apple-touch-icon.png" />
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon-v3.png" />
+<link rel="apple-touch-icon-precomposed" sizes="180x180" href="apple-touch-icon-v3.png" />
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32-v3.png" />
 <style>
 :root{
   --bg:#0b0d12; --surface:#14171f; --surface2:#1b1f2a; --surface3:#232838;
@@ -53,8 +55,8 @@ a{color:var(--accent);}
 .center{text-align:center;}
 .brandtitle{display:flex;align-items:center;gap:11px;}
 .brandmark{width:42px;height:42px;border-radius:12px;object-fit:cover;box-shadow:0 8px 24px rgba(0,0,0,.28);}
-.brandbar{display:inline-flex;align-items:center;justify-content:center;gap:6px;margin-bottom:3px;color:var(--muted);font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.7px;}
-.brandbar img{width:20px;height:20px;border-radius:6px;object-fit:cover;}
+.brandbar{display:inline-flex;align-items:center;justify-content:center;gap:8px;color:var(--muted);font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.7px;}
+.brandbar img{width:24px;height:24px;border-radius:7px;object-fit:cover;}
 
 /* hero / phase banner */
 .hero{position:relative;overflow:hidden;border-radius:var(--radius);padding:18px;margin-bottom:14px;
@@ -275,8 +277,9 @@ a{color:var(--accent);}
 nav{position:fixed;bottom:0;left:0;right:0;z-index:30;background:rgba(11,13,18,.85);backdrop-filter:blur(18px);
   border-top:1px solid var(--line);padding-bottom:var(--safe-bot);}
 nav .inner{max-width:560px;margin:0 auto;display:flex;height:var(--nav-h);}
-nav button{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:var(--faint);font-size:10px;font-weight:700;}
-nav button .ni{font-size:21px;line-height:1;}
+nav button{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:var(--faint);font-size:10px;font-weight:800;letter-spacing:.2px;}
+nav button .ni{width:22px;height:22px;display:flex;align-items:center;justify-content:center;}
+nav button .ni svg{width:22px;height:22px;stroke:currentColor;stroke-width:2.15;fill:none;stroke-linecap:round;stroke-linejoin:round;}
 nav button.on{color:var(--accent);}
 
 .empty{text-align:center;color:var(--muted);padding:40px 20px;}
@@ -320,8 +323,12 @@ nav button.on{color:var(--accent);}
 .hint a{color:var(--accent);font-weight:700;}
 .startline{display:flex;align-items:center;justify-content:center;gap:8px;font-size:12.5px;color:var(--faint);margin:22px 0 4px;}
 .startline input{background:var(--surface2);border:1px solid var(--line);color:var(--text);border-radius:9px;padding:7px 10px;font-size:13px;font-family:inherit;color-scheme:dark;}
-.setupcard{background:linear-gradient(135deg,rgba(34,211,238,.08),rgba(52,211,153,.05));border-color:rgba(34,211,238,.22);}
-.setstart{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;}
+.setupcard{background:rgba(15,19,27,.96);border-color:rgba(65,76,98,.62);box-shadow:0 14px 34px rgba(0,0,0,.18);}
+.setuphead{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px;}
+.setuphead .tiny{font-weight:800;text-transform:uppercase;letter-spacing:.6px;}
+.setstart{display:block;}
+.setupactions{display:grid;grid-template-columns:.8fr 1.2fr;gap:8px;margin-top:9px;}
+.setupactions .btn{width:100%;}
 .dateinput,.loginput{width:100%;background:var(--surface2);border:1px solid var(--line);border-radius:11px;padding:12px;color:var(--text);font-size:15px;font-weight:800;color-scheme:dark;}
 .setupnote{font-size:12px;color:var(--muted);line-height:1.45;margin-top:9px;}
 .restheroicon{width:86px;height:86px;border-radius:22px;object-fit:cover;box-shadow:0 12px 32px rgba(0,0,0,.34);}
@@ -1361,7 +1368,7 @@ const DAY_ICONS = {
 function dayIconSrc(key){ return DAY_ICONS[key] || DAY_ICONS.push; }
 function dayIconImg(key,cls='dayicon'){ return `<img class="${cls}" src="${dayIconSrc(key)}" alt=""/>`; }
 function brandTitle(kicker,title){
-  return `<div class="brandtitle"><img class="brandmark" src="assets/fitlab-logo.png" alt=""/><div><div class="hello">${esc(kicker)}</div><h1>${esc(title)}</h1></div></div>`;
+  return `<div class="brandtitle"><img class="brandmark" src="assets/fitlab-logo-v3.png" alt=""/><div><div class="hello">${esc(kicker)}</div><h1>${esc(title)}</h1></div></div>`;
 }
 function blank(v){ return v==='' || v==null; }
 function setsFor(dk,id,count,defW,defR){
@@ -1622,13 +1629,19 @@ function dailyFor(dateKey){
 }
 function scheduleCard(){
   return `<div class="card setupcard">
-    <div class="brandbar"><img src="assets/fitlab-logo.png" alt=""/>FitLab</div>
-    <div class="card-h"><h3>Start date</h3><button class="btn ghost sm" data-start-today="1">Use today</button></div>
+    <div class="setuphead">
+      <div class="brandbar"><img src="assets/fitlab-logo-v3.png" alt=""/>FitLab</div>
+      <div class="tiny faint">Program start</div>
+    </div>
+    <div class="card-h"><h3>Start date</h3></div>
     <div class="setstart">
       <input class="dateinput" type="date" id="startIn" value="${S.startDate}" aria-label="Program start date"/>
-      <button class="btn primary sm" data-restart-schedule="1">Restart</button>
     </div>
-    <div class="setupnote">Day 1 starts on the date you select. The 7-day pattern stays Push, Pull, Legs, Recovery, Upper, Lower+Core, Rest.</div>
+    <div class="setupactions">
+      <button class="btn ghost sm" data-start-today="1">Use today</button>
+      <button class="btn primary sm" data-restart-schedule="1">Restart schedule</button>
+    </div>
+    <div class="setupnote">Pick any date for Day 1. Restart only clears schedule logs; bodyweight and body-fat history stay saved.</div>
   </div>`;
 }
 function dailyLogCard(date,w,d,plan){
@@ -1665,7 +1678,12 @@ function dailyLogCard(date,w,d,plan){
 
 /* ---------- router ---------- */
 let view='today';
-const TABS=[['today','Today','◆'],['plan','Plan','▦'],['stats','Stats','◷']];
+const TABS=[['today','Today'],['plan','Plan'],['stats','Stats']];
+const NAV_ICONS = {
+  today:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 2v3"/><path d="M16 2v3"/><rect x="4" y="5" width="16" height="16" rx="3"/><path d="M4 10h16"/><path d="m9 15 2 2 4-5"/></svg>',
+  plan:'<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M8 8h.01"/><path d="M12 8h.01"/><path d="M16 8h.01"/><path d="M8 12h.01"/><path d="M12 12h.01"/><path d="M16 12h.01"/><path d="M8 16h.01"/><path d="M12 16h.01"/><path d="M16 16h.01"/></svg>',
+  stats:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19V5"/><path d="M4 19h16"/><path d="m7 15 4-4 3 3 5-7"/><path d="M17 7h2v2"/></svg>'
+};
 function go(v){ view=v; dayOffset=0; render(); window.scrollTo({top:0}); }
 function render(){
   const r = {today:renderToday, plan:renderPlan, library:renderLibrary, stats:renderStats, guide:renderGuide, day:renderDayView}[view];
@@ -1673,7 +1691,7 @@ function render(){
   renderNav();
 }
 function renderNav(){
-  $('#nav').innerHTML = TABS.map(([v,l,i])=>`<button data-go="${v}" class="${view===v?'on':''}"><span class="ni">${i}</span>${l}</button>`).join('');
+  $('#nav').innerHTML = TABS.map(([v,l])=>`<button data-go="${v}" class="${view===v?'on':''}"><span class="ni">${NAV_ICONS[v]}</span>${l}</button>`).join('');
 }
 
 /* ---------- TODAY ---------- */

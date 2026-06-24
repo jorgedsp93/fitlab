@@ -49,4 +49,4 @@ Exercise photos + instructions: [yuhonas/free-exercise-db](https://github.com/yu
 - `assets/` — generated FitLab logo and workout day icons
 - `sw.js` — service worker (offline app shell + image cache)
 - `manifest.webmanifest` — PWA manifest
-- `icon-*.png`, `apple-touch-icon.png` — app icons
+- `app-icon-*-v3.png`, `apple-touch-icon-v3.png` — installable app icons
