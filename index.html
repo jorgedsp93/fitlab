@@ -51,6 +51,10 @@ a{color:var(--accent);}
 .card-h h3{margin:0;font-size:15px;font-weight:700;letter-spacing:.2px;}
 .muted{color:var(--muted);} .faint{color:var(--faint);} .small{font-size:13px;} .tiny{font-size:11.5px;}
 .center{text-align:center;}
+.brandtitle{display:flex;align-items:center;gap:11px;}
+.brandmark{width:42px;height:42px;border-radius:12px;object-fit:cover;box-shadow:0 8px 24px rgba(0,0,0,.28);}
+.brandbar{display:inline-flex;align-items:center;justify-content:center;gap:6px;margin-bottom:3px;color:var(--muted);font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.7px;}
+.brandbar img{width:20px;height:20px;border-radius:6px;object-fit:cover;}
 
 /* hero / phase banner */
 .hero{position:relative;overflow:hidden;border-radius:var(--radius);padding:18px;margin-bottom:14px;
@@ -122,7 +126,8 @@ a{color:var(--accent);}
 .day .dnum{font-size:9px;color:var(--faint);font-weight:700;opacity:.8;}
 .day.today .dnum,.day.today .dn{color:var(--accent2);}
 .day.done .dnum{color:var(--accent);}
-.day .ic{font-size:16px;}
+.day .ic{display:flex;align-items:center;justify-content:center;}
+.dayicon{width:32px;height:32px;border-radius:9px;object-fit:cover;display:block;box-shadow:0 5px 12px rgba(0,0,0,.28);}
 .day.rest{opacity:.6;}
 .day.done{border-color:var(--accent);background:rgba(52,211,153,.08);}
 .day.today{outline:2px solid var(--accent2);outline-offset:1px;}
@@ -315,6 +320,21 @@ nav button.on{color:var(--accent);}
 .hint a{color:var(--accent);font-weight:700;}
 .startline{display:flex;align-items:center;justify-content:center;gap:8px;font-size:12.5px;color:var(--faint);margin:22px 0 4px;}
 .startline input{background:var(--surface2);border:1px solid var(--line);color:var(--text);border-radius:9px;padding:7px 10px;font-size:13px;font-family:inherit;color-scheme:dark;}
+.setupcard{background:linear-gradient(135deg,rgba(34,211,238,.08),rgba(52,211,153,.05));border-color:rgba(34,211,238,.22);}
+.setstart{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;}
+.dateinput,.loginput{width:100%;background:var(--surface2);border:1px solid var(--line);border-radius:11px;padding:12px;color:var(--text);font-size:15px;font-weight:800;color-scheme:dark;}
+.setupnote{font-size:12px;color:var(--muted);line-height:1.45;margin-top:9px;}
+.restheroicon{width:86px;height:86px;border-radius:22px;object-fit:cover;box-shadow:0 12px 32px rgba(0,0,0,.34);}
+.dailygrid{display:grid;grid-template-columns:1fr 1fr;gap:9px;}
+.logmetric{background:rgba(255,255,255,.035);border:1px solid var(--line);border-radius:13px;padding:10px;min-width:0;}
+.logtap{width:100%;display:flex;align-items:center;gap:9px;text-align:left;margin-bottom:8px;}
+.logtap .dot{width:24px;height:24px;border-radius:8px;background:var(--surface2);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;color:var(--faint);font-weight:900;flex:none;}
+.logtap.on .dot{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);}
+.logtap b{display:block;font-size:13px;line-height:1.2;}
+.logtap span{display:block;font-size:11.5px;color:var(--muted);line-height:1.25;margin-top:2px;}
+.logsave{width:100%;margin-top:8px;}
+.dailygrid .wide{grid-column:1/-1;}
+.chip img{width:18px;height:18px;border-radius:5px;object-fit:cover;margin-right:5px;vertical-align:-4px;}
 .ride{display:flex;align-items:center;gap:12px;width:100%;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin-bottom:4px;}
 .ride:active{transform:scale(.99);}
 .ride.on{border-color:rgba(52,211,153,.45);background:rgba(52,211,153,.07);}
@@ -1305,13 +1325,14 @@ function muscleMap(primary, secondary){
 /* ---------- state ---------- */
 const todayISO = ()=> new Date().toISOString().slice(0,10);
 // The 7-day cycle counts forward from a user-chosen start date: Day 1 = startDate.
-const DEFAULT = { startDate:todayISO(), unit:'lb', logs:{}, done:{}, reviewed:{}, lastW:{}, bw:[], bf:[], heightCm:185.4, rides:{}, flow:{} };
+const DEFAULT = { startDate:todayISO(), unit:'lb', logs:{}, done:{}, reviewed:{}, lastW:{}, bw:[], bf:[], heightCm:185.4, rides:{}, flow:{}, daily:{} };
 let S = load();
 function load(){ try{ const s=Object.assign({}, DEFAULT, JSON.parse(localStorage.getItem('fitlab_v1')||'{}'));
   if(!s.startDate) s.startDate=todayISO();   // upgrades from older versions begin today
   if(!s.rides) s.rides=s.commute||{};
   if(!s.flow) s.flow={};
   if(!s.reviewed) s.reviewed={};
+  if(!s.daily) s.daily={};
   return s; }catch(e){ return Object.assign({},DEFAULT);} }
 let saveT; function save(){ clearTimeout(saveT); saveT=setTimeout(()=>localStorage.setItem('fitlab_v1', JSON.stringify(S)),120); }
 
@@ -1328,6 +1349,20 @@ const cap=(t)=>t.replace(/\b\w/g,c=>c.toUpperCase());
 const fmtDate=(d)=>d.toLocaleDateString(undefined,{weekday:'long',month:'short',day:'numeric'});
 const ymd=(d)=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
 const DOW=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+const DAY_ICONS = {
+  push:'assets/day-push.png',
+  pull:'assets/day-pull.png',
+  legs:'assets/day-legs.png',
+  recovery:'assets/day-recovery.png',
+  upper:'assets/day-upper.png',
+  lower:'assets/day-lower-v2.png',
+  rest:'assets/day-rest.png'
+};
+function dayIconSrc(key){ return DAY_ICONS[key] || DAY_ICONS.push; }
+function dayIconImg(key,cls='dayicon'){ return `<img class="${cls}" src="${dayIconSrc(key)}" alt=""/>`; }
+function brandTitle(kicker,title){
+  return `<div class="brandtitle"><img class="brandmark" src="assets/fitlab-logo.png" alt=""/><div><div class="hello">${esc(kicker)}</div><h1>${esc(title)}</h1></div></div>`;
+}
 function blank(v){ return v==='' || v==null; }
 function setsFor(dk,id,count,defW,defR){
   S.logs[dk]=S.logs[dk]||{};
@@ -1581,6 +1616,52 @@ function blockSummary(block,dk){
 }
 function proteinTarget(){ const w=lastBW(); if(!w) return '≈180 g'; const lb=S.unit==='kg'?w*2.205:w; return Math.round(lb)+' g'; }
 function lastBW(){ return S.bw.length? S.bw[S.bw.length-1].v : null; }
+function dailyFor(dateKey){
+  S.daily[dateKey]=S.daily[dateKey]||{};
+  return S.daily[dateKey];
+}
+function scheduleCard(){
+  return `<div class="card setupcard">
+    <div class="brandbar"><img src="assets/fitlab-logo.png" alt=""/>FitLab</div>
+    <div class="card-h"><h3>Start date</h3><button class="btn ghost sm" data-start-today="1">Use today</button></div>
+    <div class="setstart">
+      <input class="dateinput" type="date" id="startIn" value="${S.startDate}" aria-label="Program start date"/>
+      <button class="btn primary sm" data-restart-schedule="1">Restart</button>
+    </div>
+    <div class="setupnote">Day 1 starts on the date you select. The 7-day pattern stays Push, Pull, Legs, Recovery, Upper, Lower+Core, Rest.</div>
+  </div>`;
+}
+function dailyLogCard(date,w,d,plan){
+  const dateKey=ymd(date);
+  const daily=S.daily[dateKey]||{};
+  const ride=rideOn(w,d);
+  const stepsTarget=PHASES[plan.phase].steps.toLocaleString();
+  return `<div class="card tight">
+    <div class="card-h"><h3>Log today</h3><span class="tiny faint">${esc(fmtDate(date))}</span></div>
+    <div class="dailygrid">
+      <div class="logmetric">
+        <button class="logtap ${ride?'on':''}" data-ride="${dayKey(w,d)}">
+          <span class="dot">${ride?'✓':'+'}</span><span><b>Bike ride</b><span>${ride?'Logged':'Tap when done'}</span></span>
+        </button>
+      </div>
+      <div class="logmetric">
+        <button class="logtap ${daily.steps?'on':''}" data-daily-toggle="${dateKey}|steps">
+          <span class="dot">${daily.steps?'✓':'+'}</span><span><b>Steps</b><span>${daily.steps?'Hit goal':stepsTarget+' target'}</span></span>
+        </button>
+      </div>
+      <div class="logmetric">
+        <button class="logtap ${daily.protein?'on':''}" data-daily-toggle="${dateKey}|protein">
+          <span class="dot">${daily.protein?'✓':'+'}</span><span><b>Protein</b><span>${daily.protein?'Logged':proteinTarget()+' target'}</span></span>
+        </button>
+      </div>
+      <div class="logmetric">
+        <b class="small">Bodyweight</b>
+        <input class="loginput" id="dailyBwIn" inputmode="decimal" placeholder="${S.unit}" aria-label="Bodyweight"/>
+        <button class="btn primary sm logsave" data-log-daily-bw="${dateKey}">Log</button>
+      </div>
+    </div>
+  </div>`;
+}
 
 /* ---------- router ---------- */
 let view='today';
@@ -1601,47 +1682,50 @@ let dayOffset=0;     // days away from today, for the ‹ › pager on the Today
 function renderToday(){
   const baseNum=daysSinceStart();
   if(baseNum>83 && dayOffset===0){
-    return `<div class="app-head"><div><div class="hello">FitLab</div><h1>Program complete 🎉</h1></div></div>
+    return `<div class="app-head"><div>${brandTitle('FitLab','Program complete')}</div></div>
     <div class="card center"><p class="muted">You finished all 12 weeks. Reassess your body fat, take photos, and either run it back or start a maintenance block.</p>
-    <button class="btn primary" data-restart="1">Start a new 12 weeks</button></div>`;
+    <button class="btn primary" data-restart-schedule="1">Start a new 12 weeks</button></div>
+    ${scheduleCard()}`;
   }
   const base=Math.max(0,baseNum);
   const num=Math.min(83,Math.max(0,base+dayOffset));
   const week=Math.floor(num/7)+1, dayIndex=num%7;
-  const isToday=(dayOffset===0);
   const plan=planFor(week,dayIndex);
   const dk=dayKey(week,dayIndex);
   const prog=dayProgress(plan);
   const complete=isWorkoutComplete(plan);
   const reviewed=!!S.reviewed[dk];
   const date=dateForPos(week,dayIndex);
+  const isToday=ymd(date)===todayISO();
+  const dateLabel=baseNum<0 && dayOffset===0 ? 'Starts' : (isToday ? 'Today' : '');
+  const returnLink=isToday || (baseNum<0 && dayOffset===0) ? '' : ` · <a data-day-today="1">${baseNum<0?'back to start':'back to today'}</a>`;
   return `
+  ${scheduleCard()}
+
   <div class="app-head daypager">
     <button class="pgbtn" data-day-step="-1" ${num<=0?'disabled':''} aria-label="Previous day">‹</button>
     <div class="pgmid">
-      <label class="jumpwrap hello">📅 ${isToday?'Today · ':''}${fmtDate(date)}
+      <label class="jumpwrap hello">${dateLabel?dateLabel+' · ':''}${fmtDate(date)}
         <input type="date" id="jumpIn" value="${ymd(date)}" min="${S.startDate}" max="${ymd(dateForPos(12,6))}">
       </label>
       <h1>${plan.title}</h1>
-      <div class="small muted" style="margin-top:2px">Week ${week} · Day ${dayIndex+1} of 7${isToday?'':' · <a data-day-today="1">back to today</a>'}</div>
+      <div class="small muted" style="margin-top:2px">Week ${week} · Day ${dayIndex+1} of 7${returnLink}</div>
     </div>
     <button class="pgbtn" data-day-step="1" ${num>=83?'disabled':''} aria-label="Next day">›</button>
   </div>
+
+  ${dailyLogCard(date,week,dayIndex,plan)}
 
   ${plan.type==='workout' ? `
   ${workoutPreview(plan,dk)}
   <button class="btn primary" data-open-day="${week}.${dayIndex}">${reviewed?'Reviewed — open':(complete?'✓ Done — review':(prog.done>0?`Continue · ${prog.done}/${prog.tot} sets`:'Start workout'))}</button>
   ` : `
   <div class="card center" style="padding:26px 18px">
-    <div style="font-size:40px;line-height:1">${plan.key==='recovery'?'🚶':'🛌'}</div>
+    ${dayIconImg(plan.key,'restheroicon')}
     <p class="muted" style="margin:10px 0 0">${plan.cardio.d}</p>
   </div>`}
 
-  ${rideCard(week,dayIndex)}
-
   <div class="hint">${plan.type==='workout'?`🫀 ${plan.cardio.d}<br>`:''}👟 ${PHASES[plan.phase].steps.toLocaleString()} steps · 🥩 ${proteinTarget()} protein · <a data-go="guide">tips</a></div>
-
-  ${isToday?`<div class="startline">🗓 Cycle started <input type="date" id="startIn" value="${S.startDate}"></div>`:''}
   `;
 }
 // One-tap bike-ride logger — available any day (commute or a long ride)
@@ -1683,8 +1767,8 @@ function renderDayView(){
   const date=dateForPos(week,dayIndex);
   if(plan.type==='rest'){
     return `${backHead(plan.title, `Week ${week} · Day ${dayIndex+1} of 7 · ${fmtDate(date)}`)}
-    <div class="card center" style="padding:24px 18px"><div style="font-size:38px;line-height:1">${plan.key==='recovery'?'🚶':'🛌'}</div><p class="muted" style="margin:10px 0 0">${plan.cardio.d}</p></div>
-    ${rideCard(week,dayIndex)}
+    <div class="card center" style="padding:24px 18px">${dayIconImg(plan.key,'restheroicon')}<p class="muted" style="margin:10px 0 0">${plan.cardio.d}</p></div>
+    ${dailyLogCard(date,week,dayIndex,plan)}
     <button class="btn ${S.done[dk]?'':'primary'}" data-restdone="${dk}">${S.done[dk]?'✓ Logged — tap to undo':'Mark day done'}</button>`;
   }
   const prog=dayProgress(plan);
@@ -1695,7 +1779,7 @@ function renderDayView(){
   <div class="small muted" style="margin-bottom:14px">${prog.done}/${prog.tot} sets · ${prog.pct}% · Phase ${plan.phase+1} ${ph.name}</div>
   ${renderWorkoutFlow(plan,dk)}
   <div class="hint" style="margin-top:0">🫀 ${plan.cardio.d}</div>
-  ${rideCard(week,dayIndex)}
+  ${dailyLogCard(date,week,dayIndex,plan)}
   ${(complete || reviewed) ? `
     ${workoutEvaluationCard(plan,dk)}
     ${workoutExportCard(plan, dk, prog)}
@@ -1843,7 +1927,7 @@ function workoutEvaluationCard(plan,dk){
 /* ---------- PLAN (12-week calendar) ---------- */
 function renderPlan(){
   const pos=todayPos();
-  let html=`<div class="app-head"><div><div class="hello">12-Week Plan</div><h1>Your Calendar</h1></div></div>`;
+  let html=`<div class="app-head"><div>${brandTitle('12-Week Plan','Your Calendar')}</div></div>${scheduleCard()}`;
   const shortDate=(dt)=>dt.toLocaleDateString(undefined,{month:'short',day:'numeric'});
   for(let w=1;w<=12;w++){
     const ph=PHASES[phaseOf(w)];
@@ -1858,15 +1942,22 @@ function renderPlan(){
         const plan=planFor(w,di);
         const done=isWorkoutComplete(plan);
         const isToday=cur && di===pos.dayIndex;
-        const ic = d.type==='rest' ? (d.key==='recovery'?'🚶':'🛌') : ({push:'🟧',pull:'🟦',legs:'🟩',upper:'🟪',lower:'🟨'}[d.key]||'💪');
         return `<button class="day ${d.type==='rest'?'rest':''} ${done?'done':''} ${isToday?'today':''}" data-open-day="${w}.${di}">
-          <span class="dn">D${di+1}</span><span class="ic">${ic}</span><span class="dnum">${dateForPos(w,di).getDate()}</span>${done?'<span class="check">✓</span>':''}
+          <span class="dn">D${di+1}</span><span class="ic">${dayIconImg(d.key)}</span><span class="dnum">${dateForPos(w,di).getDate()}</span>${done?'<span class="check">✓</span>':''}
         </button>`;
       }).join('')}</div>
     </div>`;
   }
   html+=`<div class="card" style="margin-top:6px"><div class="card-h"><h3>Legend</h3></div>
-    <div class="chips"><span class="chip">🟧 Push</span><span class="chip">🟦 Pull</span><span class="chip">🟩 Legs</span><span class="chip">🟪 Upper</span><span class="chip">🟨 Lower+Core</span><span class="chip">🚶 Recovery</span><span class="chip">🛌 Rest</span></div></div>`;
+    <div class="chips">
+      <span class="chip"><img src="${dayIconSrc('push')}" alt=""/>Push</span>
+      <span class="chip"><img src="${dayIconSrc('pull')}" alt=""/>Pull</span>
+      <span class="chip"><img src="${dayIconSrc('legs')}" alt=""/>Legs</span>
+      <span class="chip"><img src="${dayIconSrc('upper')}" alt=""/>Upper</span>
+      <span class="chip"><img src="${dayIconSrc('lower')}" alt=""/>Lower+Core</span>
+      <span class="chip"><img src="${dayIconSrc('recovery')}" alt=""/>Recovery</span>
+      <span class="chip"><img src="${dayIconSrc('rest')}" alt=""/>Rest</span>
+    </div></div>`;
   return html;
 }
 
@@ -2545,7 +2636,7 @@ function renderStats(){
   const bwSeries=S.bw.slice(-14).map(x=>x.v);
   let rides=0; for(const k in S.rides) if(S.rides[k]) rides++;
   const history=workoutHistory();
-  return `<div class="app-head"><div><div class="hello">Progress</div><h1>Your Stats</h1></div></div>
+  return `<div class="app-head"><div>${brandTitle('Progress','Your Stats')}</div></div>
   <div class="statgrid">
     <div class="stat"><div class="v">${completedWorkouts}</div><div class="k">✅ Workouts done</div></div>
     <div class="stat"><div class="v">${pos.done?12:pos.week}<small>/12</small></div><div class="k">📅 Current week</div></div>
@@ -2598,16 +2689,47 @@ function renderStats(){
     <div id="bfOut" class="center" style="margin-top:10px"></div>
   </div>
 
-  <div class="card">
-    <div class="card-h"><h3>📆 Start date</h3></div>
-    <div class="small muted" style="margin-bottom:8px">Day 1 of the cycle. Change it any time — the 7-day pattern (Push · Pull · Legs · Recovery · Upper · Lower+Core · Rest) counts forward from here.</div>
-    <div class="inlineform"><input type="date" id="startIn2" value="${S.startDate}" style="flex:1;background:var(--surface2);border:1px solid var(--line);border-radius:11px;padding:12px;color:var(--text);font-weight:700;color-scheme:dark"/><button class="btn primary sm" data-startday="1">Start today</button></div>
-  </div>
+  ${scheduleCard()}
 
   <button class="btn ghost" data-go="guide">🔥 Open the Fat-Loss Playbook</button>
   <button class="btn ghost" data-reset="1" style="color:var(--hot);margin-top:10px">Reset all data</button>`;
 }
 function sparkBars(arr){ const mn=Math.min(...arr),mx=Math.max(...arr),rng=(mx-mn)||1; return arr.map(v=>`<i style="height:${10+((v-mn)/rng)*50}px"></i>`).join(''); }
+function setStartDate(value){
+  if(!value) return;
+  S.startDate=value;
+  dayOffset=0;
+  save();
+  render();
+  window.scrollTo({top:0});
+}
+function restartSchedule(){
+  const selected=$('#startIn')?.value || S.startDate || todayISO();
+  if(!confirm(`Restart the 12-week schedule from ${selected}? This clears workout sets, rides, steps/protein checkoffs, and workout reviews. Bodyweight and body-fat history stay saved.`)) return;
+  S.startDate=selected;
+  S.logs={};
+  S.done={};
+  S.reviewed={};
+  S.rides={};
+  S.flow={};
+  S.daily={};
+  save();
+  go('today');
+}
+function toggleDaily(token){
+  const [dateKey,field]=token.split('|');
+  const daily=dailyFor(dateKey);
+  daily[field]=!daily[field];
+  save();
+  render();
+}
+function logDailyBW(dateKey){
+  const v=parseFloat($('#dailyBwIn')?.value);
+  if(!v||v<=0) return;
+  S.bw.push({d:dateKey,v:Math.round(v*10)/10});
+  save();
+  render();
+}
 
 /* ---------- GUIDE ---------- */
 function renderGuide(){
@@ -2750,18 +2872,20 @@ document.addEventListener('click',(e)=>{
   const ck=c('[data-ck]'); if(ck){ toggleSet(ck.dataset.ck); return; }
   if(c('[data-restdone]')){ const dk=c('[data-restdone]').dataset.restdone; S.done[dk]=!S.done[dk]; save(); render(); return; }
   const rd=c('[data-ride]'); if(rd){ const k=rd.dataset.ride; S.rides[k]=!S.rides[k]; if(navigator.vibrate)navigator.vibrate(20); save(); render(); return; }
+  const dt=c('[data-daily-toggle]'); if(dt){ toggleDaily(dt.dataset.dailyToggle); return; }
+  const dbw=c('[data-log-daily-bw]'); if(dbw){ logDailyBW(dbw.dataset.logDailyBw); return; }
   if(c('[data-logbw]')){ logBW(); return; }
   if(c('[data-calcbf]')){ calcBF(); return; }
   const un=c('[data-unit]'); if(un){ S.unit=un.dataset.unit; save(); render(); return; }
   const mu=c('[data-mu]'); if(mu){ S.measUnit=mu.dataset.mu; save(); render(); return; }
-  if(c('[data-startday]')){ S.startDate=todayISO(); save(); go('today'); return; }
-  if(c('[data-restart]')){ S.startDate=todayISO(); S.logs={}; S.done={}; S.reviewed={}; S.rides={}; S.flow={}; save(); go('today'); return; }
+  if(c('[data-start-today]')||c('[data-startday]')){ setStartDate(todayISO()); return; }
+  if(c('[data-restart-schedule]')||c('[data-restart]')){ restartSchedule(); return; }
   if(c('[data-reset]')){ if(confirm('Erase all logged sets, weights and body-fat history? This cannot be undone.')){ localStorage.removeItem('fitlab_v1'); S=load(); go('today'); } return; }
 });
 // date pickers
 document.addEventListener('change',(e)=>{
   const el=e.target;
-  if(el.id==='startIn'||el.id==='startIn2'){ if(el.value){ S.startDate=el.value; dayOffset=0; save(); render(); } return; }
+  if(el.id==='startIn'||el.id==='startIn2'){ if(el.value){ setStartDate(el.value); } return; }
   if(el.id==='jumpIn'){ if(el.value){ const sel=new Date(el.value+'T00:00'), st=new Date(S.startDate+'T00:00'); const selNum=Math.round((sel-st)/86400000); const base=Math.max(0,daysSinceStart()); dayOffset=Math.min(83,Math.max(0,selNum))-base; render(); window.scrollTo({top:0}); } return; }
 });
 // set weight/reps inputs (no re-render → keeps focus)

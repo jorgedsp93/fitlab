@@ -4,6 +4,8 @@ A mobile-first web app to run a 12-week, 5-day gym program aimed at getting back
 
 ## What's inside
 - **Today** — the day's guided workout blocks, focus muscle groups, phase, conditioning finisher, step + protein targets.
+- **Start date selector** — pick any Day 1 date and restart the 12-week schedule from that date without wiping bodyweight/body-fat history.
+- **Daily log card** — one-tap ride, steps, protein, and bodyweight logging from Today or any opened day.
 - **Plan** — the full 12-week calendar (3 phases: Foundation → Build → Define). Tap any day to open it.
 - **Library** — every exercise with 3 visuals (start photo, end photo, muscle body-map) + step-by-step cues.
 - **Workout flow** — one exercise or superset at a time with automatic local saving as each set is logged.
@@ -44,6 +46,7 @@ Exercise photos + instructions: [yuhonas/free-exercise-db](https://github.com/yu
 
 ## Files
 - `index.html` — the entire app (UI + program logic + embedded exercise data)
+- `assets/` — generated FitLab logo and workout day icons
 - `sw.js` — service worker (offline app shell + image cache)
 - `manifest.webmanifest` — PWA manifest
 - `icon-*.png`, `apple-touch-icon.png` — app icons

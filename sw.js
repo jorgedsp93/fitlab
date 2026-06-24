@@ -1,5 +1,5 @@
 /* FitLab service worker — offline app shell + opportunistic exercise-image cache */
-const SHELL = 'fitlab-shell-v9';
+const SHELL = 'fitlab-shell-v10';
 const IMG = 'fitlab-img-v1';
 const SHELL_FILES = [
   './',
@@ -7,7 +7,15 @@ const SHELL_FILES = [
   './manifest.webmanifest',
   './icon-192.png',
   './icon-512.png',
-  './apple-touch-icon.png'
+  './apple-touch-icon.png',
+  './assets/fitlab-logo.png',
+  './assets/day-push.png',
+  './assets/day-pull.png',
+  './assets/day-legs.png',
+  './assets/day-recovery.png',
+  './assets/day-upper.png',
+  './assets/day-lower-v2.png',
+  './assets/day-rest.png'
 ];
 
 self.addEventListener('install', (e) => {
