@@ -164,6 +164,14 @@ a{color:var(--accent);}
 .weighthint{color:#d7f3e8;background:rgba(52,211,153,.08);border-color:rgba(52,211,153,.22);font-weight:700;}
 .weighthint b,.alts b,.evalitem b{color:var(--text);}
 .alts span{color:#d7dce6;}
+.swapbox{font-size:12.5px;color:var(--muted);background:rgba(34,211,238,.055);border:1px solid rgba(34,211,238,.22);border-radius:12px;padding:9px 10px;margin:8px 0;line-height:1.35;}
+.swaptop{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;}
+.swaptop b{font-size:12.5px;color:var(--text);}
+.swaptop span{font-size:11.5px;text-align:right;}
+.swapbuttons{display:flex;gap:7px;flex-wrap:wrap;margin-top:8px;}
+.swapbtn{display:inline-flex;align-items:center;justify-content:center;border:1px solid rgba(34,211,238,.32);background:rgba(34,211,238,.10);color:var(--accent2);border-radius:10px;padding:7px 9px;font-size:12px;font-weight:850;}
+.swapbtn.on{border-color:rgba(52,211,153,.45);background:rgba(52,211,153,.12);color:var(--accent);}
+.swapbtn.swapclear{border-color:var(--line);background:rgba(255,255,255,.035);color:var(--muted);}
 .exextras{margin:6px 0 8px;font-size:12.5px;color:var(--muted);}
 .exextras summary{display:inline-flex;align-items:center;color:var(--accent2);font-weight:800;list-style:none;cursor:pointer;}
 .exextras summary::-webkit-details-marker{display:none;}
@@ -1387,7 +1395,7 @@ function muscleMap(primary, secondary){
 /* ---------- state ---------- */
 const todayISO = ()=> new Date().toISOString().slice(0,10);
 // The 7-day cycle counts forward from a user-chosen start date: Day 1 = startDate.
-const DEFAULT = { startDate:todayISO(), unit:'lb', logs:{}, done:{}, reviewed:{}, lastW:{}, bw:[], bf:[], heightCm:185.4, rides:{}, flow:{}, daily:{} };
+const DEFAULT = { startDate:todayISO(), unit:'lb', logs:{}, done:{}, reviewed:{}, lastW:{}, bw:[], bf:[], heightCm:185.4, rides:{}, flow:{}, daily:{}, swaps:{} };
 let S = load();
 function load(){ try{ const s=Object.assign({}, DEFAULT, JSON.parse(localStorage.getItem('fitlab_v1')||'{}'));
   if(!s.startDate) s.startDate=todayISO();   // upgrades from older versions begin today
@@ -1396,6 +1404,7 @@ function load(){ try{ const s=Object.assign({}, DEFAULT, JSON.parse(localStorage
   if(!s.flow) s.flow={};
   if(!s.reviewed) s.reviewed={};
   if(!s.daily) s.daily={};
+  if(!s.swaps) s.swaps={};
   return s; }catch(e){ return Object.assign({},DEFAULT);} }
 let saveT; function save(){ clearTimeout(saveT); saveT=setTimeout(()=>localStorage.setItem('fitlab_v1', JSON.stringify(S)),120); }
 
@@ -1581,6 +1590,58 @@ function swapPrompt(id){
   if(eq.includes('dumbbell')) return 'Dumbbells taken?';
   return 'Need a substitute?';
 }
+function normalizeExerciseName(name){ return String(name||'').toLowerCase().replace(/[^a-z0-9]+/g,''); }
+const ALT_ID_ALIASES = {
+  overheaddumbbellextension:'Standing_Dumbbell_Triceps_Extension',
+  benchdips:'Dips_-_Triceps_Version',
+  closegrippushups:'Dips_-_Triceps_Version',
+  dumbbellromaniandeadlift:'Romanian_Deadlift',
+  hipthrust:'Barbell_Hip_Thrust',
+  pullups:'Pullups',
+  pullup:'Pullups',
+  barbellbenchpress:'Barbell_Bench_Press_-_Medium_Grip',
+  inclinebarbellpress:'Incline_Dumbbell_Press',
+  dumbbellcurl:'Hammer_Curls',
+  ezbarcurl:'Barbell_Curl',
+  walklunges:'Dumbbell_Lunges',
+  walkinglunges:'Dumbbell_Lunges',
+  machinecrunch:'Cable_Crunch',
+  declinecrunch:'Cable_Crunch',
+  sideplank:'Plank',
+};
+function exerciseIdForName(name){
+  const key=normalizeExerciseName(name);
+  if(ALT_ID_ALIASES[key]) return ALT_ID_ALIASES[key];
+  for(const id in EXERCISES){
+    if(normalizeExerciseName(EXERCISES[id].name)===key) return id;
+  }
+  return null;
+}
+function swapChoicesFor(id){
+  const seen=new Set();
+  return alternatesFor(id).map(name=>({name,id:exerciseIdForName(name)}))
+    .filter(choice=>choice.id && EXERCISES[choice.id] && choice.id!==id && !seen.has(choice.id) && seen.add(choice.id))
+    .slice(0,3);
+}
+function effectiveExercise(e,dk){
+  const baseId=e.originalId||e.id;
+  const alt=S.swaps?.[dk]?.[baseId];
+  if(alt && EXERCISES[alt]) return Object.assign({},e,{id:alt,originalId:baseId,swapped:true});
+  return Object.assign({},e,{originalId:baseId,swapped:false});
+}
+function workoutExercises(plan,dk){
+  if(plan.type!=='workout') return [];
+  return plan.ex.map(e=>effectiveExercise(e,dk));
+}
+function setExerciseSwap(dk,baseId,altId){
+  if(!dk||!baseId) return;
+  S.swaps[dk]=S.swaps[dk]||{};
+  if(!altId || altId===baseId) delete S.swaps[dk][baseId];
+  else S.swaps[dk][baseId]=altId;
+  if(!Object.keys(S.swaps[dk]).length) delete S.swaps[dk];
+  save();
+  render();
+}
 function dayNum(dk){ const m=String(dk).match(/^w(\d+)d(\d+)$/); return m?(+m[1]-1)*7+(+m[2]):-1; }
 // most recent earlier session that logged this exercise (done sets) → array of {w,r}
 function lastPerf(exId,curDk){ const cur=dayNum(curDk); let best=-1,res=null; for(const dk in S.logs){ if(dk===curDk) continue; const n=dayNum(dk); if(n<0||n>=cur) continue; const arr=S.logs[dk][exId]; if(!arr) continue; const done=arr.filter(s=>s.done&&s.w!==''); if(!done.length) continue; if(n>best){best=n;res=done;} } return res; }
@@ -1625,17 +1686,18 @@ function ytLink(name){ return 'https://www.youtube.com/results?search_query='+en
 // Curated demo video per exercise; falls back to a YouTube search if missing.
 const VIDEOS = {"Barbell_Bench_Press_-_Medium_Grip": "https://www.youtube.com/watch?v=7iOgPtRiY1A", "Incline_Dumbbell_Press": "https://www.youtube.com/watch?v=8fXfwG4ftaQ", "Dumbbell_Bench_Press": "https://www.youtube.com/watch?v=1V3vpcaxRYQ", "Standing_Military_Press": "https://www.youtube.com/watch?v=3RdVYQ8l_V8", "Dumbbell_Shoulder_Press": "https://www.youtube.com/watch?v=k6tzKisR3NY", "Seated_Dumbbell_Press": "https://www.youtube.com/watch?v=fAlu-BsnPqE", "Side_Lateral_Raise": "https://www.youtube.com/watch?v=Myim1WH6Qec", "Cable_Crossover": "https://www.youtube.com/watch?v=Jokaz7dBJNg", "Triceps_Pushdown": "https://www.youtube.com/watch?v=7OF77JMEXhM", "Dips_-_Triceps_Version": "https://www.youtube.com/watch?v=thx13oPVK5c", "Standing_Dumbbell_Triceps_Extension": "https://www.youtube.com/watch?v=AYqg9S5FrUU", "Barbell_Deadlift": "https://www.youtube.com/watch?v=ZaTM37cfiDs", "Romanian_Deadlift": "https://www.youtube.com/watch?v=ecuZtKTNI9U", "Pullups": "https://www.youtube.com/watch?v=OEXosPwzFdc", "Wide-Grip_Lat_Pulldown": "https://www.youtube.com/watch?v=hl98TV4nlTM", "Bent_Over_Barbell_Row": "https://www.youtube.com/watch?v=p9RihhjmJsw", "Seated_Cable_Rows": "https://www.youtube.com/watch?v=8QuMq1GMMng", "Face_Pull": "https://www.youtube.com/watch?v=NQ8h8rEzmZQ", "Barbell_Curl": "https://www.youtube.com/watch?v=MKWBV29S6c0", "Hammer_Curls": "https://www.youtube.com/watch?v=K9LiwcGuqA0", "Barbell_Squat": "https://www.youtube.com/watch?v=ZaSetOZFo-k", "Front_Barbell_Squat": "https://www.youtube.com/watch?v=WftnRk3ukeA", "Hack_Squat": "https://www.youtube.com/watch?v=g9i05umL5vc", "Leg_Press": "https://www.youtube.com/watch?v=nDh_BlnLCGc", "Lying_Leg_Curls": "https://www.youtube.com/watch?v=3gZm9wGTsEo", "Leg_Extensions": "https://www.youtube.com/watch?v=tWFBltkWhBE", "Standing_Calf_Raises": "https://www.youtube.com/watch?v=B30JglFGx8Y", "Dumbbell_Lunges": "https://www.youtube.com/watch?v=5eQd_hsXESI", "Barbell_Hip_Thrust": "https://www.youtube.com/watch?v=W86oVlnLqY4", "Hanging_Leg_Raise": "https://www.youtube.com/watch?v=WFAziRYp2bg", "Cable_Crunch": "https://www.youtube.com/watch?v=x10ihjIYy8s", "Plank": "https://www.youtube.com/watch?v=v25dawSzRTM", "Russian_Twist": "https://www.youtube.com/watch?v=hL10_LcXyCM"};
 function videoLink(id,name){ return VIDEOS[id] || ytLink(name); }
-function dayProgress(plan){ const dk=dayKey(plan.week,plan.dayIndex); let tot=0,done=0; for(const e of plan.ex){ tot+=e.sets; done+=Math.min(exDoneCount(dk,e.id),e.sets);} return {done,tot,pct: tot?Math.round(done/tot*100):0}; }
+function dayProgress(plan){ const dk=dayKey(plan.week,plan.dayIndex); let tot=0,done=0; for(const e of workoutExercises(plan,dk)){ tot+=e.sets; done+=Math.min(exDoneCount(dk,e.id),e.sets);} return {done,tot,pct: tot?Math.round(done/tot*100):0}; }
 function isWorkoutComplete(plan){ if(plan.type==='rest') return !!S.done[dayKey(plan.week,plan.dayIndex)]; const p=dayProgress(plan); return p.tot>0 && p.done>=p.tot; }
-function workoutBlocks(plan){
+function workoutBlocks(plan,dk){
   if(plan.type!=='workout') return [];
+  const exercises=workoutExercises(plan,dk||dayKey(plan.week,plan.dayIndex));
   const blocks=[];
-  for(let i=0;i<plan.ex.length;){
-    const first=plan.ex[i];
+  for(let i=0;i<exercises.length;){
+    const first=exercises[i];
     const ex=[first];
     let j=i+1;
     if(first.ss){
-      while(j<plan.ex.length && plan.ex[j].ss===first.ss){ ex.push(plan.ex[j]); j++; }
+      while(j<exercises.length && exercises[j].ss===first.ss){ ex.push(exercises[j]); j++; }
     }
     blocks.push({ index:blocks.length, id:first.ss||first.id, title:first.ssName||EXERCISES[first.id]?.name||'Exercise', ex });
     i=j;
@@ -1646,20 +1708,20 @@ function blockTotalSets(block){ return block.ex.reduce((n,e)=>n+e.sets,0); }
 function blockDoneCount(block,dk){ return block.ex.reduce((n,e)=>n+Math.min(exDoneCount(dk,e.id),e.sets),0); }
 function isBlockComplete(block,dk){ return blockDoneCount(block,dk)>=blockTotalSets(block); }
 function firstOpenBlockIndex(plan){
-  const dk=dayKey(plan.week,plan.dayIndex), blocks=workoutBlocks(plan);
+  const dk=dayKey(plan.week,plan.dayIndex), blocks=workoutBlocks(plan,dk);
   const idx=blocks.findIndex(b=>!isBlockComplete(b,dk));
   return idx>=0 ? idx : 0;
 }
 function flowIndexFor(plan){
-  const blocks=workoutBlocks(plan); if(!blocks.length) return 0;
   const dk=dayKey(plan.week,plan.dayIndex);
+  const blocks=workoutBlocks(plan,dk); if(!blocks.length) return 0;
   const saved=Number(S.flow?.[dk]);
   if(Number.isFinite(saved)) return Math.max(0,Math.min(blocks.length-1,saved));
   return firstOpenBlockIndex(plan);
 }
 function setFlowIndex(plan,index){
-  const blocks=workoutBlocks(plan); if(!blocks.length) return;
   const dk=dayKey(plan.week,plan.dayIndex);
+  const blocks=workoutBlocks(plan,dk); if(!blocks.length) return;
   S.flow[dk]=Math.max(0,Math.min(blocks.length-1,index));
   save();
 }
@@ -1843,8 +1905,23 @@ function exRow(e,dk){
     <span class="donedot"></span>
   </div>`;
 }
+function swapControl(e,dk){
+  const baseId=e.originalId||e.id;
+  const base=EXERCISES[baseId];
+  const current=EXERCISES[e.id];
+  const choices=swapChoicesFor(baseId).filter(choice=>choice.id!==e.id);
+  if(!choices.length && !e.swapped) return '';
+  const status=e.swapped ? `Using ${current?.name||e.id}` : 'Pick a replacement if the station is busy';
+  return `<div class="swapbox">
+    <div class="swaptop"><b>${esc(swapPrompt(baseId))}</b><span>${esc(status)}</span></div>
+    <div class="swapbuttons">
+      ${choices.map(choice=>`<button class="swapbtn" data-swap-ex="${esc(dk)}|${esc(baseId)}|${esc(choice.id)}">${esc(EXERCISES[choice.id].name)}</button>`).join('')}
+      ${e.swapped?`<button class="swapbtn swapclear" data-clear-swap="${esc(dk)}|${esc(baseId)}">Use ${esc(base?.name||'original')}</button>`:''}
+    </div>
+  </div>`;
+}
 function workoutPreview(plan,dk){
-  const blocks=workoutBlocks(plan);
+  const blocks=workoutBlocks(plan,dk);
   const cur=flowIndexFor(plan);
   return `<div class="card tight previewcard">
     <div class="card-h"><h3>Workout order</h3><span class="tiny faint">${blocks.length} blocks</span></div>
@@ -1900,7 +1977,8 @@ function exBlock(e,dk,idx,plan,opts={}){
   const inc=incFor(e);
   const weightLabel=cap(loadMeta(e.id).label);
   const weightPlaceholder=loadMeta(e.id).mult>1?'each':S.unit;
-  const alts=alternatesFor(e.id);
+  const baseId=e.originalId||e.id;
+  const alts=alternatesFor(baseId);
   const compact=compactSuggestion(e.id,e,sug);
   const rows=sets.map((st,i)=>`
     <div class="set-row ${st.done?'done':''}" data-row="${e.id}|${i}">
@@ -1917,6 +1995,7 @@ function exBlock(e,dk,idx,plan,opts={}){
     </div>
     ${e.superset&&!opts.hideSupersetTag?`<div class="supersettag">Superset: ${esc(e.ssName||'alternate with the paired move')} — minimal rest</div>`:''}
     <div class="sugg">${esc(compact)}</div>
+    ${swapControl(e,dk)}
     <details class="exextras">
       <summary>Load + swap help</summary>
       <div class="exdetails">
@@ -1933,7 +2012,7 @@ function exBlock(e,dk,idx,plan,opts={}){
   </div>`;
 }
 function renderWorkoutFlow(plan,dk){
-  const blocks=workoutBlocks(plan);
+  const blocks=workoutBlocks(plan,dk);
   const idx=flowIndexFor(plan);
   const block=blocks[idx] || blocks[0];
   if(!block) return '';
@@ -1950,7 +2029,7 @@ function renderWorkoutFlow(plan,dk){
       <div class="flowbadge">${blockLabel(block)} ${idx+1}/${blocks.length}</div>
     </div>
     ${block.ex.length>1?`<div class="supersettag" style="margin-bottom:8px">${blockLabel(block)}: alternate each move, then rest ${Math.max(...block.ex.map(e=>e.rest||45))}s after the round</div>`:''}
-    <div class="flowmoves">${block.ex.map((e,i)=>exBlock(e,dk,plan.ex.indexOf(e),plan,{hideSupersetTag:true})).join('')}</div>
+    <div class="flowmoves">${block.ex.map((e,i)=>exBlock(e,dk,i,plan,{hideSupersetTag:true})).join('')}</div>
     <div class="flowactions">
       <button class="btn ghost sm" data-flow-step="-1" ${prevDisabled}>Back</button>
       <button class="btn primary sm" ${nextAttrs}>${nextLabel}</button>
@@ -1962,7 +2041,7 @@ function renderWorkoutFlow(plan,dk){
 function workoutEvaluationCard(plan,dk){
   let planned=0, done=0, volume=0, top=null;
   const misses=[], next=[], rows=[];
-  for(const e of plan.ex){
+  for(const e of workoutExercises(plan,dk)){
     planned+=e.sets;
     const arr=(S.logs[dk]||{})[e.id]||[];
     const sets=arr.filter(s=>s.done);
@@ -2186,7 +2265,7 @@ function workoutExportDetail(week,dayIndex){
   let doneSets=0;
   let heaviest=null;
 
-  for(const planned of plan.ex){
+  for(const planned of workoutExercises(plan,dk)){
     const exercise=EXERCISES[planned.id];
     if(!exercise) continue;
     const logged=((S.logs[dk]||{})[planned.id]||[])
@@ -2806,7 +2885,7 @@ function setStartDate(value){
   window.scrollTo({top:0});
 }
 function hasScheduleProgress(){
-  return [S.logs,S.done,S.reviewed,S.rides,S.flow,S.daily].some(obj=>obj && Object.keys(obj).length);
+  return [S.logs,S.done,S.reviewed,S.rides,S.flow,S.daily,S.swaps].some(obj=>obj && Object.keys(obj).length);
 }
 function clearScheduleProgress(){
   S.logs={};
@@ -2815,6 +2894,7 @@ function clearScheduleProgress(){
   S.rides={};
   S.flow={};
   S.daily={};
+  S.swaps={};
 }
 function restartScheduleFrom(value,opts={}){
   const requested=value || S.startDate || todayISO();
@@ -2979,6 +3059,8 @@ document.addEventListener('click',(e)=>{
   }
   const flow=c('[data-flow-step]'); if(flow){ const plan=planFor(viewingPos.week,viewingPos.dayIndex); setFlowIndex(plan,flowIndexFor(plan)+parseInt(flow.dataset.flowStep,10)); render(); window.scrollTo({top:0}); return; }
   const od=c('[data-open-day]'); if(od){ const [w,d]=od.dataset.openDay.split('.').map(Number); primeWorkoutFlow(w,d); viewingPos={week:w,dayIndex:d}; go('day'); return; }
+  const swap=c('[data-swap-ex]'); if(swap){ const [dk,baseId,altId]=swap.dataset.swapEx.split('|'); setExerciseSwap(dk,baseId,altId); return; }
+  const clearSwap=c('[data-clear-swap]'); if(clearSwap){ const [dk,baseId]=clearSwap.dataset.clearSwap.split('|'); setExerciseSwap(dk,baseId,null); return; }
   const exEl=c('[data-ex]'); if(exEl && !c('input') && !c('[data-ck]') && !c('[data-rest]')){ openSheet(exEl.dataset.ex); return; }
   const rest=c('[data-rest]'); if(rest){ const [s,n]=rest.dataset.rest.split('|'); startRest(+s,'Rest · '+n); return; }
   const adj=c('[data-adj]'); if(adj){ adjustSet(adj.dataset.adj); return; }
