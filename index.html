@@ -1391,6 +1391,7 @@ const DEFAULT = { startDate:todayISO(), unit:'lb', logs:{}, done:{}, reviewed:{}
 let S = load();
 function load(){ try{ const s=Object.assign({}, DEFAULT, JSON.parse(localStorage.getItem('fitlab_v1')||'{}'));
   if(!s.startDate) s.startDate=todayISO();   // upgrades from older versions begin today
+  if(s.startDate>todayISO()) s.startDate=todayISO();
   if(!s.rides) s.rides=s.commute||{};
   if(!s.flow) s.flow={};
   if(!s.reviewed) s.reviewed={};
@@ -1682,13 +1683,10 @@ function dailyFor(dateKey){
   S.daily[dateKey]=S.daily[dateKey]||{};
   return S.daily[dateKey];
 }
-function tomorrowISO(){ const d=new Date(todayISO()+'T00:00'); d.setDate(d.getDate()+1); return ymd(d); }
 function prettyISO(value){ return new Date(value+'T00:00').toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'}); }
 function startStatusText(){
   const diff=Math.round((new Date(S.startDate+'T00:00')-new Date(todayISO()+'T00:00'))/86400000);
-  if(diff===1) return `Day 1 starts tomorrow · ${prettyISO(S.startDate)}`;
-  if(diff>1) return `Day 1 starts in ${diff} days · ${prettyISO(S.startDate)}`;
-  if(diff===0) return `Day 1 is today · ${prettyISO(S.startDate)}`;
+  if(diff>=0) return `Day 1 is today · ${prettyISO(todayISO())}`;
   const day=Math.min(83,Math.max(0,daysSinceStart()));
   const week=Math.floor(day/7)+1;
   return day>=83 ? `Final week · started ${prettyISO(S.startDate)}` : `Week ${week}, Day ${(day%7)+1} · started ${prettyISO(S.startDate)}`;
@@ -1702,14 +1700,13 @@ function scheduleCard(){
     <div class="setupstatus"><i></i><span>${esc(startStatusText())}</span></div>
     <div class="card-h"><h3>Choose Day 1</h3></div>
     <div class="setstart">
-      <label class="datefield"><span>Start date</span><input class="dateinput" type="date" id="startIn" value="${S.startDate}" aria-label="Program start date"/></label>
+      <label class="datefield"><span>Start date</span><input class="dateinput" type="date" id="startIn" value="${S.startDate}" max="${todayISO()}" aria-label="Program start date"/></label>
     </div>
     <div class="setupactions">
-      <button class="btn primary setupprimary" data-start-tomorrow="1">Start tomorrow</button>
-      <button class="btn ghost sm" data-start-today="1">Use today</button>
+      <button class="btn primary sm" data-start-today="1">Use today</button>
       <button class="btn ghost sm" data-restart-schedule="1">Restart from date</button>
     </div>
-    <div class="setupnote">Restart clears workouts, rides, steps, and protein checkoffs. Bodyweight and body-fat history stay saved.</div>
+    <div class="setupnote">Future starts are disabled. Restart clears workouts, rides, steps, and protein checkoffs. Bodyweight and body-fat history stay saved.</div>
   </div>`;
 }
 function dailyLogCard(date,w,d,plan){
@@ -2802,7 +2799,7 @@ function renderStats(){
 function sparkBars(arr){ const mn=Math.min(...arr),mx=Math.max(...arr),rng=(mx-mn)||1; return arr.map(v=>`<i style="height:${10+((v-mn)/rng)*50}px"></i>`).join(''); }
 function setStartDate(value){
   if(!value) return;
-  S.startDate=value;
+  S.startDate=value>todayISO() ? todayISO() : value;
   dayOffset=0;
   save();
   render();
@@ -2820,7 +2817,8 @@ function clearScheduleProgress(){
   S.daily={};
 }
 function restartScheduleFrom(value,opts={}){
-  const selected=value || S.startDate || todayISO();
+  const requested=value || S.startDate || todayISO();
+  const selected=requested>todayISO() ? todayISO() : requested;
   if(opts.confirm!==false && !confirm(`Restart the 12-week schedule from ${selected}? This clears workout sets, rides, steps/protein checkoffs, and workout reviews. Bodyweight and body-fat history stay saved.`)) return;
   S.startDate=selected;
   clearScheduleProgress();
@@ -2993,7 +2991,6 @@ document.addEventListener('click',(e)=>{
   if(c('[data-calcbf]')){ calcBF(); return; }
   const un=c('[data-unit]'); if(un){ S.unit=un.dataset.unit; save(); render(); return; }
   const mu=c('[data-mu]'); if(mu){ S.measUnit=mu.dataset.mu; save(); render(); return; }
-  if(c('[data-start-tomorrow]')){ restartScheduleFrom(tomorrowISO(),{confirm:hasScheduleProgress()}); return; }
   if(c('[data-start-today]')||c('[data-startday]')){ setStartDate(todayISO()); return; }
   if(c('[data-restart-schedule]')||c('[data-restart]')){ restartSchedule(); return; }
   if(c('[data-reset]')){ if(confirm('Erase all logged sets, weights and body-fat history? This cannot be undone.')){ localStorage.removeItem('fitlab_v1'); S=load(); go('today'); } return; }
