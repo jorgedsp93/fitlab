@@ -321,17 +321,72 @@ nav button.on{color:var(--accent);}
 /* simplified Today extras */
 .hint{font-size:12.5px;color:var(--muted);text-align:center;margin:14px 6px;line-height:1.6;}
 .hint a{color:var(--accent);font-weight:700;}
+.textlink{display:inline;color:var(--accent);font:inherit;font-weight:800;padding:0;text-decoration:none;}
 .startline{display:flex;align-items:center;justify-content:center;gap:8px;font-size:12.5px;color:var(--faint);margin:22px 0 4px;}
 .startline input{background:var(--surface2);border:1px solid var(--line);color:var(--text);border-radius:9px;padding:7px 10px;font-size:13px;font-family:inherit;color-scheme:dark;}
-.setupcard{background:rgba(15,19,27,.96);border-color:rgba(65,76,98,.62);box-shadow:0 14px 34px rgba(0,0,0,.18);}
-.setuphead{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px;}
+.setupcard{background:linear-gradient(180deg,rgba(20,24,34,.98),rgba(13,16,23,.98));border-color:rgba(74,86,108,.64);box-shadow:0 16px 38px rgba(0,0,0,.24);padding:15px;}
+.setuphead{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px;}
 .setuphead .tiny{font-weight:800;text-transform:uppercase;letter-spacing:.6px;}
-.setstart{display:block;}
-.setupactions{display:grid;grid-template-columns:.8fr 1.2fr;gap:8px;margin-top:9px;}
+.setupstatus{display:flex;align-items:center;gap:9px;min-width:0;font-size:12.5px;font-weight:800;color:#dce6f4;background:rgba(255,255,255,.035);border:1px solid var(--line);border-radius:12px;padding:9px 10px;margin-bottom:10px;}
+.setupstatus i{width:9px;height:9px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 5px rgba(52,211,153,.12);flex:none;}
+.setupstatus span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.setstart{display:block;margin-top:8px;}
+.datefield{display:flex;align-items:center;gap:10px;background:var(--surface2);border:1px solid var(--line);border-radius:14px;padding:10px 12px;}
+.datefield span{font-size:11px;font-weight:900;letter-spacing:.7px;text-transform:uppercase;color:var(--faint);white-space:nowrap;}
+.datefield input{border:0;background:transparent;padding:0;text-align:right;}
+.setupactions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px;}
 .setupactions .btn{width:100%;}
+.setupactions .setupprimary{grid-column:1/-1;font-size:15px;padding:14px;}
 .dateinput,.loginput{width:100%;background:var(--surface2);border:1px solid var(--line);border-radius:11px;padding:12px;color:var(--text);font-size:15px;font-weight:800;color-scheme:dark;}
-.setupnote{font-size:12px;color:var(--muted);line-height:1.45;margin-top:9px;}
+.datefield .dateinput{border:0;}
+.setupnote{font-size:12px;color:var(--muted);line-height:1.45;margin-top:10px;}
 .restheroicon{width:86px;height:86px;border-radius:22px;object-fit:cover;box-shadow:0 12px 32px rgba(0,0,0,.34);}
+.todayhero{position:relative;overflow:hidden;background:linear-gradient(165deg,#151b25 0%,#111720 52%,#0d1118 100%);border:1px solid rgba(78,91,116,.62);border-radius:22px;padding:14px;margin-bottom:14px;box-shadow:0 18px 42px rgba(0,0,0,.26);}
+.todayhero:before{content:"";position:absolute;right:-38px;top:-52px;width:170px;height:170px;border-radius:50%;background:radial-gradient(circle,rgba(34,211,238,.2),transparent 68%);pointer-events:none;}
+.daynav{position:relative;display:grid;grid-template-columns:44px 1fr 44px;align-items:center;gap:10px;}
+.todaycenter{text-align:center;min-width:0;}
+.todayeyebrow{font-size:11px;font-weight:900;letter-spacing:.9px;text-transform:uppercase;color:var(--muted);}
+.todaycenter h1{font-size:29px;line-height:1.06;margin:5px 0 3px;font-weight:900;letter-spacing:-.4px;}
+.todaymeta{font-size:13px;color:var(--muted);font-weight:700;}
+.todaybody{position:relative;margin-top:14px;}
+.workoutstatus{display:flex;align-items:center;justify-content:space-between;gap:10px;color:#d9e2ee;font-size:12.5px;font-weight:800;margin-bottom:9px;}
+.statuspill{display:inline-flex;align-items:center;gap:6px;border:1px solid rgba(52,211,153,.26);background:rgba(52,211,153,.1);color:var(--accent);border-radius:999px;padding:5px 9px;font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.6px;white-space:nowrap;}
+.progressline{height:9px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden;margin:9px 0 12px;}
+.progressline i{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,var(--accent),var(--accent2));}
+.heroactions{display:grid;grid-template-columns:1fr;gap:9px;}
+.heroactions .btn{min-height:50px;}
+.restsummary{display:flex;align-items:center;gap:13px;background:rgba(255,255,255,.035);border:1px solid var(--line);border-radius:16px;padding:12px;}
+.restsummary .restheroicon{width:64px;height:64px;border-radius:16px;box-shadow:0 10px 26px rgba(0,0,0,.28);}
+.restsummary b{font-size:16px;}
+.restsummary span{display:block;color:var(--muted);font-size:12.5px;margin-top:2px;}
+.habitscard{background:linear-gradient(180deg,rgba(255,255,255,.035),rgba(255,255,255,.015));}
+.habittop{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px;}
+.habitmeter{width:54px;height:54px;border-radius:16px;background:var(--surface2);border:1px solid var(--line);display:flex;flex-direction:column;align-items:center;justify-content:center;flex:none;}
+.habitmeter b{font-size:18px;line-height:1;color:var(--accent);}
+.habitmeter span{font-size:9px;font-weight:900;letter-spacing:.7px;text-transform:uppercase;color:var(--faint);margin-top:3px;}
+.habitlist{display:grid;grid-template-columns:1fr;gap:8px;}
+.habitbtn{width:100%;display:grid;grid-template-columns:32px 1fr auto;align-items:center;gap:10px;text-align:left;background:rgba(255,255,255,.035);border:1px solid var(--line);border-radius:13px;padding:10px;}
+.habitbtn .dot{width:32px;height:32px;border-radius:10px;background:var(--surface2);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;color:var(--faint);font-weight:900;}
+.habitbtn b{display:block;font-size:14px;line-height:1.1;}
+.habitbtn span{display:block;font-size:12px;color:var(--muted);line-height:1.25;margin-top:2px;}
+.habitbtn em{font-style:normal;font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.6px;color:var(--faint);}
+.habitbtn.on{border-color:rgba(52,211,153,.42);background:rgba(52,211,153,.075);}
+.habitbtn.on .dot{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);}
+.habitbtn.on em{color:var(--accent);}
+.dailyweight{display:grid;grid-template-columns:1fr auto;gap:8px;margin-top:10px;}
+.dailyweight .loginput{min-height:46px;}
+.dailyweight .btn{min-width:80px;}
+.previewcard{padding:14px;}
+.previewlist{display:flex;flex-direction:column;gap:8px;}
+.previewblock{display:grid;grid-template-columns:34px 1fr auto;align-items:center;gap:10px;background:rgba(255,255,255,.028);border:1px solid var(--line);border-radius:13px;padding:10px;}
+.previewnum{width:34px;height:34px;border-radius:11px;background:var(--surface2);display:flex;align-items:center;justify-content:center;color:var(--accent2);font-weight:900;border:1px solid var(--line);}
+.previewblock.done .previewnum{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);}
+.previewblock.active{border-color:rgba(34,211,238,.34);background:rgba(34,211,238,.055);}
+.previewtitle{font-size:14px;font-weight:850;line-height:1.15;}
+.previewsub{font-size:12px;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.previewcount{font-size:12px;font-weight:900;color:var(--accent);white-space:nowrap;}
+.quickstrip{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;color:var(--muted);font-size:12.5px;font-weight:700;margin:12px 4px 2px;}
+.quickstrip span{background:rgba(255,255,255,.035);border:1px solid var(--line);border-radius:999px;padding:5px 9px;}
 .dailygrid{display:grid;grid-template-columns:1fr 1fr;gap:9px;}
 .logmetric{background:rgba(255,255,255,.035);border:1px solid var(--line);border-radius:13px;padding:10px;min-width:0;}
 .logtap{width:100%;display:flex;align-items:center;gap:9px;text-align:left;margin-bottom:8px;}
@@ -1627,21 +1682,34 @@ function dailyFor(dateKey){
   S.daily[dateKey]=S.daily[dateKey]||{};
   return S.daily[dateKey];
 }
+function tomorrowISO(){ const d=new Date(todayISO()+'T00:00'); d.setDate(d.getDate()+1); return ymd(d); }
+function prettyISO(value){ return new Date(value+'T00:00').toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'}); }
+function startStatusText(){
+  const diff=Math.round((new Date(S.startDate+'T00:00')-new Date(todayISO()+'T00:00'))/86400000);
+  if(diff===1) return `Day 1 starts tomorrow · ${prettyISO(S.startDate)}`;
+  if(diff>1) return `Day 1 starts in ${diff} days · ${prettyISO(S.startDate)}`;
+  if(diff===0) return `Day 1 is today · ${prettyISO(S.startDate)}`;
+  const day=Math.min(83,Math.max(0,daysSinceStart()));
+  const week=Math.floor(day/7)+1;
+  return day>=83 ? `Final week · started ${prettyISO(S.startDate)}` : `Week ${week}, Day ${(day%7)+1} · started ${prettyISO(S.startDate)}`;
+}
 function scheduleCard(){
   return `<div class="card setupcard">
     <div class="setuphead">
       <div class="brandbar"><img src="assets/fitlab-logo-v3.png" alt=""/>FitLab</div>
       <div class="tiny faint">Program start</div>
     </div>
-    <div class="card-h"><h3>Start date</h3></div>
+    <div class="setupstatus"><i></i><span>${esc(startStatusText())}</span></div>
+    <div class="card-h"><h3>Choose Day 1</h3></div>
     <div class="setstart">
-      <input class="dateinput" type="date" id="startIn" value="${S.startDate}" aria-label="Program start date"/>
+      <label class="datefield"><span>Start date</span><input class="dateinput" type="date" id="startIn" value="${S.startDate}" aria-label="Program start date"/></label>
     </div>
     <div class="setupactions">
+      <button class="btn primary setupprimary" data-start-tomorrow="1">Start tomorrow</button>
       <button class="btn ghost sm" data-start-today="1">Use today</button>
-      <button class="btn primary sm" data-restart-schedule="1">Restart schedule</button>
+      <button class="btn ghost sm" data-restart-schedule="1">Restart from date</button>
     </div>
-    <div class="setupnote">Pick any date for Day 1. Restart only clears schedule logs; bodyweight and body-fat history stay saved.</div>
+    <div class="setupnote">Restart clears workouts, rides, steps, and protein checkoffs. Bodyweight and body-fat history stay saved.</div>
   </div>`;
 }
 function dailyLogCard(date,w,d,plan){
@@ -1649,29 +1717,27 @@ function dailyLogCard(date,w,d,plan){
   const daily=S.daily[dateKey]||{};
   const ride=rideOn(w,d);
   const stepsTarget=PHASES[plan.phase].steps.toLocaleString();
-  return `<div class="card tight">
-    <div class="card-h"><h3>Log today</h3><span class="tiny faint">${esc(fmtDate(date))}</span></div>
-    <div class="dailygrid">
-      <div class="logmetric">
-        <button class="logtap ${ride?'on':''}" data-ride="${dayKey(w,d)}">
-          <span class="dot">${ride?'✓':'+'}</span><span><b>Bike ride</b><span>${ride?'Logged':'Tap when done'}</span></span>
-        </button>
-      </div>
-      <div class="logmetric">
-        <button class="logtap ${daily.steps?'on':''}" data-daily-toggle="${dateKey}|steps">
-          <span class="dot">${daily.steps?'✓':'+'}</span><span><b>Steps</b><span>${daily.steps?'Hit goal':stepsTarget+' target'}</span></span>
-        </button>
-      </div>
-      <div class="logmetric">
-        <button class="logtap ${daily.protein?'on':''}" data-daily-toggle="${dateKey}|protein">
-          <span class="dot">${daily.protein?'✓':'+'}</span><span><b>Protein</b><span>${daily.protein?'Logged':proteinTarget()+' target'}</span></span>
-        </button>
-      </div>
-      <div class="logmetric">
-        <b class="small">Bodyweight</b>
-        <input class="loginput" id="dailyBwIn" inputmode="decimal" placeholder="${S.unit}" aria-label="Bodyweight"/>
-        <button class="btn primary sm logsave" data-log-daily-bw="${dateKey}">Log</button>
-      </div>
+  const doneCount=(ride?1:0)+(daily.steps?1:0)+(daily.protein?1:0);
+  const habits=[
+    {on:ride, action:`data-ride="${dayKey(w,d)}"`, title:'Bike ride', detail:ride?'Logged':'Not logged'},
+    {on:!!daily.steps, action:`data-daily-toggle="${dateKey}|steps"`, title:'Steps', detail:daily.steps?'Goal hit':`${stepsTarget} target`},
+    {on:!!daily.protein, action:`data-daily-toggle="${dateKey}|protein"`, title:'Protein', detail:daily.protein?'Logged':`${proteinTarget()} target`},
+  ];
+  return `<div class="card tight habitscard">
+    <div class="habittop">
+      <div><h3 style="margin:0;font-size:16px">Daily check-in</h3><div class="tiny muted">${esc(fmtDate(date))}</div></div>
+      <div class="habitmeter"><b>${doneCount}/3</b><span>done</span></div>
+    </div>
+    <div class="habitlist">
+      ${habits.map(h=>`<button class="habitbtn ${h.on?'on':''}" ${h.action}>
+        <span class="dot">${h.on?'✓':'+'}</span>
+        <span><b>${esc(h.title)}</b><span>${esc(h.detail)}</span></span>
+        <em>${h.on?'Done':'Log'}</em>
+      </button>`).join('')}
+    </div>
+    <div class="dailyweight">
+      <input class="loginput" id="dailyBwIn" inputmode="decimal" placeholder="Bodyweight (${S.unit})" aria-label="Bodyweight"/>
+      <button class="btn primary sm" data-log-daily-bw="${dateKey}">Log</button>
     </div>
   </div>`;
 }
@@ -1715,35 +1781,51 @@ function renderToday(){
   const reviewed=!!S.reviewed[dk];
   const date=dateForPos(week,dayIndex);
   const isToday=ymd(date)===todayISO();
-  const dateLabel=baseNum<0 && dayOffset===0 ? 'Starts' : (isToday ? 'Today' : '');
-  const returnLink=isToday || (baseNum<0 && dayOffset===0) ? '' : ` · <a data-day-today="1">${baseNum<0?'back to start':'back to today'}</a>`;
+  const relDiff=Math.round((new Date(ymd(date)+'T00:00')-new Date(todayISO()+'T00:00'))/86400000);
+  const dateLabel=baseNum<0 && dayOffset===0 ? 'Starts' : (relDiff===0 ? 'Today' : (relDiff===1 ? 'Tomorrow' : (relDiff===-1 ? 'Yesterday' : '')));
+  const returnLink=isToday || (baseNum<0 && dayOffset===0) ? '' : ` · <button class="textlink" data-day-today="1">${baseNum<0?'back to start':'back to today'}</button>`;
+  const ctaLabel=reviewed?'Open review':(complete?'Review workout':(prog.done>0?`Continue workout`:'Start workout'));
   return `
   ${scheduleCard()}
 
-  <div class="app-head daypager">
+  <div class="todayhero">
+  <div class="daynav">
     <button class="pgbtn" data-day-step="-1" ${num<=0?'disabled':''} aria-label="Previous day">‹</button>
-    <div class="pgmid">
-      <label class="jumpwrap hello">${dateLabel?dateLabel+' · ':''}${fmtDate(date)}
+    <div class="todaycenter">
+      <label class="jumpwrap todayeyebrow">${dateLabel?dateLabel+' · ':''}${fmtDate(date)}
         <input type="date" id="jumpIn" value="${ymd(date)}" min="${S.startDate}" max="${ymd(dateForPos(12,6))}">
       </label>
       <h1>${plan.title}</h1>
-      <div class="small muted" style="margin-top:2px">Week ${week} · Day ${dayIndex+1} of 7${returnLink}</div>
+      <div class="todaymeta">Week ${week} · Day ${dayIndex+1} of 7${returnLink}</div>
     </div>
     <button class="pgbtn" data-day-step="1" ${num>=83?'disabled':''} aria-label="Next day">›</button>
+  </div>
+  <div class="todaybody">
+  ${plan.type==='workout' ? `
+    <div class="workoutstatus">
+      <span>${prog.done}/${prog.tot} sets logged</span>
+      <span class="statuspill">${complete?'Complete':(prog.done?'In progress':'Ready')}</span>
+    </div>
+    <div class="progressline"><i style="width:${prog.pct}%"></i></div>
+    <div class="heroactions"><button class="btn primary" data-open-day="${week}.${dayIndex}">${ctaLabel}</button></div>
+  ` : `
+    <div class="restsummary">
+      ${dayIconImg(plan.key,'restheroicon')}
+      <span><b>Recovery day</b><span>${esc(plan.cardio.d)}</span></span>
+    </div>`}
+  </div>
   </div>
 
   ${dailyLogCard(date,week,dayIndex,plan)}
 
-  ${plan.type==='workout' ? `
-  ${workoutPreview(plan,dk)}
-  <button class="btn primary" data-open-day="${week}.${dayIndex}">${reviewed?'Reviewed — open':(complete?'✓ Done — review':(prog.done>0?`Continue · ${prog.done}/${prog.tot} sets`:'Start workout'))}</button>
-  ` : `
-  <div class="card center" style="padding:26px 18px">
-    ${dayIconImg(plan.key,'restheroicon')}
-    <p class="muted" style="margin:10px 0 0">${plan.cardio.d}</p>
-  </div>`}
+  ${plan.type==='workout' ? workoutPreview(plan,dk) : ''}
 
-  <div class="hint">${plan.type==='workout'?`🫀 ${plan.cardio.d}<br>`:''}👟 ${PHASES[plan.phase].steps.toLocaleString()} steps · 🥩 ${proteinTarget()} protein · <a data-go="guide">tips</a></div>
+  <div class="quickstrip">
+    ${plan.type==='workout'?`<span>${esc(plan.cardio.d)}</span>`:''}
+    <span>${PHASES[plan.phase].steps.toLocaleString()} steps</span>
+    <span>${proteinTarget()} protein</span>
+    <button class="textlink" data-go="guide">tips</button>
+  </div>
   `;
 }
 // One-tap bike-ride logger — available any day (commute or a long ride)
@@ -1767,11 +1849,18 @@ function exRow(e,dk){
 function workoutPreview(plan,dk){
   const blocks=workoutBlocks(plan);
   const cur=flowIndexFor(plan);
-  return `<div class="card tight miniworkout">
-    ${blocks.map((block,i)=>`<div class="mwrow">
-      <div><div class="mwtitle">${i+1}. ${esc(block.title)}</div><div class="mwsub">${esc(block.ex.map(e=>EXERCISES[e.id]?.name||e.id).join(' + '))}</div></div>
-      <div class="mwcount">${blockDoneCount(block,dk)}/${blockTotalSets(block)}</div>
-    </div>`).join('')}
+  return `<div class="card tight previewcard">
+    <div class="card-h"><h3>Workout order</h3><span class="tiny faint">${blocks.length} blocks</span></div>
+    <div class="previewlist">
+      ${blocks.map((block,i)=>{
+        const done=isBlockComplete(block,dk), active=i===cur&&!done;
+        return `<div class="previewblock ${done?'done':''} ${active?'active':''}">
+          <div class="previewnum">${done?'✓':i+1}</div>
+          <div><div class="previewtitle">${esc(block.title)}</div><div class="previewsub">${esc(block.ex.map(e=>EXERCISES[e.id]?.name||e.id).join(' + '))}</div></div>
+          <div class="previewcount">${blockDoneCount(block,dk)}/${blockTotalSets(block)}</div>
+        </div>`;
+      }).join('')}
+    </div>
     <div class="blockdots">${blocks.map((block,i)=>`<i class="${isBlockComplete(block,dk)?'done':(i===cur?'on':'')}"></i>`).join('')}</div>
   </div>`;
 }
@@ -1831,12 +1920,10 @@ function exBlock(e,dk,idx,plan,opts={}){
     </div>
     ${e.superset&&!opts.hideSupersetTag?`<div class="supersettag">Superset: ${esc(e.ssName||'alternate with the paired move')} — minimal rest</div>`:''}
     <div class="sugg">${esc(compact)}</div>
-    <div class="weighthint" data-load-hint="${e.id}">${esc(visibleLoadHint(e.id,sets))}</div>
-    <div class="alts"><b>${esc(swapPrompt(e.id))}</b> <span>${alts.map(esc).join(' · ')}</span></div>
     <details class="exextras">
-      <summary>More guidance</summary>
+      <summary>Load + swap help</summary>
       <div class="exdetails">
-        <div><b>Load:</b> ${esc(weightHint(e.id,sets))}</div>
+        <div data-load-hint="${e.id}"><b>Load:</b> ${esc(visibleLoadHint(e.id,sets))}</div>
         <div><b>Swaps:</b> ${alts.map(esc).join(' · ')}</div>
         <div><b>Why:</b> ${esc(sug.note)}</div>
       </div>
@@ -2721,18 +2808,28 @@ function setStartDate(value){
   render();
   window.scrollTo({top:0});
 }
-function restartSchedule(){
-  const selected=$('#startIn')?.value || S.startDate || todayISO();
-  if(!confirm(`Restart the 12-week schedule from ${selected}? This clears workout sets, rides, steps/protein checkoffs, and workout reviews. Bodyweight and body-fat history stay saved.`)) return;
-  S.startDate=selected;
+function hasScheduleProgress(){
+  return [S.logs,S.done,S.reviewed,S.rides,S.flow,S.daily].some(obj=>obj && Object.keys(obj).length);
+}
+function clearScheduleProgress(){
   S.logs={};
   S.done={};
   S.reviewed={};
   S.rides={};
   S.flow={};
   S.daily={};
+}
+function restartScheduleFrom(value,opts={}){
+  const selected=value || S.startDate || todayISO();
+  if(opts.confirm!==false && !confirm(`Restart the 12-week schedule from ${selected}? This clears workout sets, rides, steps/protein checkoffs, and workout reviews. Bodyweight and body-fat history stay saved.`)) return;
+  S.startDate=selected;
+  clearScheduleProgress();
   save();
   go('today');
+}
+function restartSchedule(){
+  const selected=$('#startIn')?.value || S.startDate || todayISO();
+  restartScheduleFrom(selected);
 }
 function toggleDaily(token){
   const [dateKey,field]=token.split('|');
@@ -2896,6 +2993,7 @@ document.addEventListener('click',(e)=>{
   if(c('[data-calcbf]')){ calcBF(); return; }
   const un=c('[data-unit]'); if(un){ S.unit=un.dataset.unit; save(); render(); return; }
   const mu=c('[data-mu]'); if(mu){ S.measUnit=mu.dataset.mu; save(); render(); return; }
+  if(c('[data-start-tomorrow]')){ restartScheduleFrom(tomorrowISO(),{confirm:hasScheduleProgress()}); return; }
   if(c('[data-start-today]')||c('[data-startday]')){ setStartDate(todayISO()); return; }
   if(c('[data-restart-schedule]')||c('[data-restart]')){ restartSchedule(); return; }
   if(c('[data-reset]')){ if(confirm('Erase all logged sets, weights and body-fat history? This cannot be undone.')){ localStorage.removeItem('fitlab_v1'); S=load(); go('today'); } return; }
@@ -2919,7 +3017,7 @@ function refreshLoadHint(ex){
   if(!viewingPos) return;
   const dk=dayKey(viewingPos.week,viewingPos.dayIndex);
   document.querySelectorAll('[data-load-hint]').forEach(el=>{
-    if(el.dataset.loadHint===ex) el.textContent=visibleLoadHint(ex,(S.logs[dk]||{})[ex]||[]);
+    if(el.dataset.loadHint===ex) el.innerHTML='<b>Load:</b> '+esc(visibleLoadHint(ex,(S.logs[dk]||{})[ex]||[]));
   });
 }
 function toggleSet(token){
