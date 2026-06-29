@@ -630,6 +630,55 @@ const EXERCISES = {
 "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Cable_Crossover/1.jpg"
 ]
 },
+"Dumbbell_Flyes": {
+"name": "Dumbbell Flyes",
+"primary": [
+"chest"
+],
+"secondary": [
+"shoulders"
+],
+"equipment": "dumbbell",
+"mechanic": "isolation",
+"level": "beginner",
+"instructions": [
+"Lie on a flat bench with a dumbbell in each hand and your palms facing each other.",
+"Press the dumbbells above your chest with a slight bend in your elbows. Keep that elbow angle mostly fixed.",
+"Lower the dumbbells out to the sides in a wide arc until you feel a stretch across your chest.",
+"Bring the dumbbells back together over your chest by squeezing your pecs, not by turning it into a press.",
+"Use a lighter load than a dumbbell press and keep the reps smooth."
+],
+"desc": "A dumbbell chest fly is the closest free-weight replacement when the cable station is busy.",
+"images": [
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Dumbbell_Flyes/0.jpg",
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Dumbbell_Flyes/1.jpg"
+]
+},
+"Pushups": {
+"name": "Push-ups",
+"primary": [
+"chest"
+],
+"secondary": [
+"shoulders",
+"triceps"
+],
+"equipment": "body only",
+"mechanic": "compound",
+"level": "beginner",
+"instructions": [
+"Set your hands slightly wider than shoulder width and keep your body in a straight line.",
+"Brace your abs and lower your chest toward the floor under control.",
+"Keep your elbows angled slightly back instead of flaring straight out.",
+"Press the floor away until your arms are straight, then repeat.",
+"Elevate your hands to make it easier or add a slow tempo to make it harder."
+],
+"desc": "A no-equipment chest replacement when benches, cables, or machines are taken.",
+"images": [
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Pushups/0.jpg",
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Pushups/1.jpg"
+]
+},
 "Triceps_Pushdown": {
 "name": "Triceps Pushdown",
 "primary": [
@@ -1462,10 +1511,12 @@ const LOAD_META = {
   "Dumbbell_Shoulder_Press": { label:'per dumbbell', mult:2 },
   "Seated_Dumbbell_Press": { label:'per dumbbell', mult:2 },
   "Side_Lateral_Raise": { label:'per dumbbell', mult:2 },
+  "Dumbbell_Flyes": { label:'per dumbbell', mult:2 },
   "Hammer_Curls": { label:'per dumbbell', mult:2 },
   "Dumbbell_Lunges": { label:'per dumbbell', mult:2 },
   "Standing_Dumbbell_Triceps_Extension": { label:'single dumbbell', mult:1 },
   "Pullups": { label:'added or assist', mult:1 },
+  "Pushups": { label:'added weight', mult:1 },
   "Dips_-_Triceps_Version": { label:'added or assist', mult:1 },
   "Hanging_Leg_Raise": { label:'added weight', mult:1 },
   "Plank": { label:'added weight', mult:1 },
@@ -1554,7 +1605,7 @@ const ALTERNATES = {
   "Dumbbell_Bench_Press": ['Barbell Bench Press','Machine Chest Press','Push-ups'],
   "Dumbbell_Shoulder_Press": ['Seated Dumbbell Press','Machine Shoulder Press','Standing Military Press'],
   "Seated_Dumbbell_Press": ['Dumbbell Shoulder Press','Machine Shoulder Press','Standing Military Press'],
-  "Cable_Crossover": ['Dumbbell Flye','Pec Deck','Push-ups'],
+  "Cable_Crossover": ['Dumbbell Flyes','Push-ups','Dumbbell Bench Press'],
   "Side_Lateral_Raise": ['Cable Lateral Raise','Machine Lateral Raise','Plate Front Raise'],
   "Triceps_Pushdown": ['Overhead Dumbbell Extension','Bench Dips','Close-Grip Push-ups'],
   "Standing_Dumbbell_Triceps_Extension": ['Cable Overhead Extension','Triceps Pushdown','Bench Dips'],
@@ -1601,6 +1652,12 @@ const ALT_ID_ALIASES = {
   pullup:'Pullups',
   barbellbenchpress:'Barbell_Bench_Press_-_Medium_Grip',
   inclinebarbellpress:'Incline_Dumbbell_Press',
+  dumbbellchestfly:'Dumbbell_Flyes',
+  dumbbellflye:'Dumbbell_Flyes',
+  dumbbellflyes:'Dumbbell_Flyes',
+  pecdeck:'Dumbbell_Flyes',
+  pushups:'Pushups',
+  pushup:'Pushups',
   dumbbellcurl:'Hammer_Curls',
   ezbarcurl:'Barbell_Curl',
   walklunges:'Dumbbell_Lunges',
@@ -1915,7 +1972,7 @@ function swapControl(e,dk){
   return `<div class="swapbox">
     <div class="swaptop"><b>${esc(swapPrompt(baseId))}</b><span>${esc(status)}</span></div>
     <div class="swapbuttons">
-      ${choices.map(choice=>`<button class="swapbtn" data-swap-ex="${esc(dk)}|${esc(baseId)}|${esc(choice.id)}">${esc(EXERCISES[choice.id].name)}</button>`).join('')}
+      ${choices.map(choice=>`<button class="swapbtn" data-swap-ex="${esc(dk)}|${esc(baseId)}|${esc(choice.id)}">${esc(choice.name)}</button>`).join('')}
       ${e.swapped?`<button class="swapbtn swapclear" data-clear-swap="${esc(dk)}|${esc(baseId)}">Use ${esc(base?.name||'original')}</button>`:''}
     </div>
   </div>`;
