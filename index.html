@@ -1489,7 +1489,14 @@ function setsFor(dk,id,count,defW,defR){
   S.logs[dk]=S.logs[dk]||{};
   const a=S.logs[dk][id];
   if(a&&a.length===count){
-    if(!a.some(s=>s.done)){
+    if(a.some(s=>s.done)){
+      a.forEach(s=>{
+        if(!s.done){
+          if(!blank(defW) && blank(s.w)) s.w=String(defW);
+          if(!blank(defR) && blank(s.r)) s.r=String(defR);
+        }
+      });
+    }else{
       if(!blank(defW) && a.every(s=>blank(s.w))) a.forEach(s=>{ s.w=String(defW); });
       if(!blank(defR) && a.every(s=>blank(s.r))) a.forEach(s=>{ s.r=String(defR); });
     }
@@ -1708,9 +1715,29 @@ function recentDoneSet(exId,curDk){
   for(const dk of keys){
     const arr=S.logs[dk]?.[exId]; if(!arr) continue;
     const done=arr.filter(s=>s.done&&s.w!=='');
-    if(done.length) return {dk,set:done[0],total:totalLoadForExercise(exId,done[0].w)};
+    if(done.length){ const set=done[done.length-1]; return {dk,set,total:totalLoadForExercise(exId,set.w)}; }
   }
   return null;
+}
+function currentWorkoutSuggestion(exId,e,curDk,rng){
+  const done=((S.logs[curDk]||{})[exId]||[]).filter(s=>s.done&&(!blank(s.w)||!blank(s.r)));
+  if(!done.length) return null;
+  const last=done[done.length-1];
+  const weight=blank(last.w)?'':Number(last.w);
+  const reps=done.map(s=>parseInt(s.r,10)||0);
+  const repsStr=reps.map(r=>r||'?').join(', ');
+  if(rng.amrap) return {
+    weight,
+    reps:'',
+    note:`Current workout: ${repsStr} reps so far. Keep the same setup unless form breaks.`
+  };
+  const lastReps=parseInt(last.r,10)||rng.min;
+  const targetReps=Math.max(rng.min,Math.min(rng.max,lastReps || rng.min));
+  return {
+    weight,
+    reps:targetReps,
+    note:`Current workout: ${done.length}/${e.sets} sets done at ${weight?formatEntryWeight(exId,weight):'bodyweight'} with reps ${repsStr}. Use this for the next set unless form breaks.`
+  };
 }
 function linkedSuggestion(exId,e,curDk,rng){
   for(const [anchorId,ratio] of (LOAD_LINKS[exId]||[])){
@@ -1730,7 +1757,9 @@ function linkedSuggestion(exId,e,curDk,rng){
 }
 // double-progression suggestion: pre-fill weight + target reps, with a coaching note
 function suggest(exId,e,curDk){
-  const rng=parseRange(e.reps), prev=lastPerf(exId,curDk);
+  const rng=parseRange(e.reps), current=currentWorkoutSuggestion(exId,e,curDk);
+  if(current) return current;
+  const prev=lastPerf(exId,curDk);
   if(!prev){ const linked=linkedSuggestion(exId,e,curDk,rng); if(linked) return linked; return {weight:'', reps: rng.amrap?'':rng.min, note:`First time — pick a weight you can control for ${e.reps} reps. ${weightHint(exId,[])}`}; }
   const w=parseFloat(prev[0].w)||''; const reps=prev.map(s=>parseInt(s.r)||0); const repsStr=reps.join(', ');
   if(rng.amrap){ const tot=reps.reduce((a,b)=>a+b,0); return {weight:w, reps:'', note:`Last time: ${repsStr} reps (${tot} total). Beat it.`}; }
@@ -1745,6 +1774,20 @@ const VIDEOS = {"Barbell_Bench_Press_-_Medium_Grip": "https://www.youtube.com/wa
 function videoLink(id,name){ return VIDEOS[id] || ytLink(name); }
 function dayProgress(plan){ const dk=dayKey(plan.week,plan.dayIndex); let tot=0,done=0; for(const e of workoutExercises(plan,dk)){ tot+=e.sets; done+=Math.min(exDoneCount(dk,e.id),e.sets);} return {done,tot,pct: tot?Math.round(done/tot*100):0}; }
 function isWorkoutComplete(plan){ if(plan.type==='rest') return !!S.done[dayKey(plan.week,plan.dayIndex)]; const p=dayProgress(plan); return p.tot>0 && p.done>=p.tot; }
+function estimateSetSeconds(e,setCount){
+  if(!setCount) return 0;
+  return setCount*45 + Math.max(0,setCount-1)*(e.rest||60) + 30;
+}
+function workoutTimeEstimate(plan,dk){
+  let total=0, remaining=0;
+  for(const e of workoutExercises(plan,dk)){
+    total+=estimateSetSeconds(e,e.sets);
+    const left=Math.max(0,e.sets-Math.min(exDoneCount(dk,e.id),e.sets));
+    remaining+=estimateSetSeconds(e,left);
+  }
+  return { total:Math.max(1,Math.ceil(total/60)), remaining:Math.max(0,Math.ceil(remaining/60)) };
+}
+function minLabel(min){ return min===1?'1 min':`${min} min`; }
 function workoutBlocks(plan,dk){
   if(plan.type!=='workout') return [];
   const exercises=workoutExercises(plan,dk||dayKey(plan.week,plan.dayIndex));
@@ -1896,6 +1939,7 @@ function renderToday(){
   const complete=isWorkoutComplete(plan);
   const reviewed=!!S.reviewed[dk];
   const date=dateForPos(week,dayIndex);
+  const time=plan.type==='workout' ? workoutTimeEstimate(plan,dk) : null;
   const isToday=ymd(date)===todayISO();
   const relDiff=Math.round((new Date(ymd(date)+'T00:00')-new Date(todayISO()+'T00:00'))/86400000);
   const dateLabel=baseNum<0 && dayOffset===0 ? 'Starts' : (relDiff===0 ? 'Today' : (relDiff===1 ? 'Tomorrow' : (relDiff===-1 ? 'Yesterday' : '')));
@@ -1919,7 +1963,7 @@ function renderToday(){
   <div class="todaybody">
   ${plan.type==='workout' ? `
     <div class="workoutstatus">
-      <span>${prog.done}/${prog.tot} sets logged</span>
+      <span>${prog.done}/${prog.tot} sets logged · ≈ ${minLabel(time.total)}</span>
       <span class="statuspill">${complete?'Complete':(prog.done?'In progress':'Ready')}</span>
     </div>
     <div class="progressline"><i style="width:${prog.pct}%"></i></div>
@@ -2012,9 +2056,10 @@ function renderDayView(){
   const prog=dayProgress(plan);
   const complete=isWorkoutComplete(plan);
   const reviewed=!!S.reviewed[dk];
+  const time=workoutTimeEstimate(plan,dk);
   return `${backHead(plan.title, `Week ${week} · Day ${dayIndex+1} of 7 · ${fmtDate(date)}`)}
   <div class="bar" style="margin:0 0 4px"><i style="width:${prog.pct}%"></i></div>
-  <div class="small muted" style="margin-bottom:14px">${prog.done}/${prog.tot} sets · ${prog.pct}% · Phase ${plan.phase+1} ${ph.name}</div>
+  <div class="small muted" style="margin-bottom:14px">${prog.done}/${prog.tot} sets · ${prog.pct}% · ≈ ${minLabel(time.remaining)} left · Phase ${plan.phase+1} ${ph.name}</div>
   ${renderWorkoutFlow(plan,dk)}
   <div class="hint" style="margin-top:0">🫀 ${plan.cardio.d}</div>
   ${dailyLogCard(date,week,dayIndex,plan)}
@@ -2075,6 +2120,7 @@ function renderWorkoutFlow(plan,dk){
   if(!block) return '';
   const done=blockDoneCount(block,dk), total=blockTotalSets(block);
   const prog=dayProgress(plan);
+  const time=workoutTimeEstimate(plan,dk);
   const reviewed=!!S.reviewed[dk];
   const prevDisabled=idx<=0 ? 'disabled' : '';
   const atEnd=idx>=blocks.length-1;
@@ -2092,7 +2138,7 @@ function renderWorkoutFlow(plan,dk){
       <button class="btn primary sm" ${nextAttrs}>${nextLabel}</button>
     </div>
     <div class="blockdots">${blocks.map((b,i)=>`<i class="${isBlockComplete(b,dk)?'done':(i===idx?'on':'')}"></i>`).join('')}</div>
-    <div class="flowhint">${done>=total?'Saved. Move to the next block when ready.':'Weights and reps save as you type.'}</div>
+    <div class="flowhint">${done>=total?'Saved. Move to the next block when ready.':'Weights and reps save as you type.'} ≈ ${minLabel(time.remaining)} left.</div>
   </div>`;
 }
 function workoutEvaluationCard(plan,dk){
@@ -3164,7 +3210,8 @@ function toggleSet(token){
   // update top progress bar without full re-render
   const plan=planFor(viewingPos.week,viewingPos.dayIndex); const p=dayProgress(plan);
   const bar=document.querySelector('.bar > i'); if(bar) bar.style.width=p.pct+'%';
-  const lbl=document.querySelector('.bar + .small'); if(lbl) lbl.textContent=`${p.done}/${p.tot} sets · ${p.pct}% · Phase ${plan.phase+1} ${PHASES[plan.phase].name}`;
+  const time=workoutTimeEstimate(plan,dk);
+  const lbl=document.querySelector('.bar + .small'); if(lbl) lbl.textContent=`${p.done}/${p.tot} sets · ${p.pct}% · ≈ ${minLabel(time.remaining)} left · Phase ${plan.phase+1} ${PHASES[plan.phase].name}`;
   save();
   render();
 }
