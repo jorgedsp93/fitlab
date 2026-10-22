@@ -1,4 +1,4 @@
-# FitLab v12.1 audit
+# FitLab v12.2 audit
 
 Scope: the complete static application, all 84 days of the program, every workout block, storage and data migration, exercise alternatives, progress views, accessibility, PWA caching, and Garmin exports.
 
@@ -24,6 +24,12 @@ Scope: the complete static application, all 84 days of the program, every workou
 | Service worker deletes unrelated caches, caches error responses, and serves HTML as missing assets | Restrict cache ownership, avoid failed-response writes, and limit HTML fallback to the app entry routes. Review pages cannot overwrite the offline shell. |
 | Zoom disabled; missing input names, focus trapping, and keyboard affordances | Restore zoom, label every set input, add visible focus, trap/restore modal focus, support reduced motion. |
 
+## Numeric entry follow-up
+
+The initial audit filled input values directly and therefore did not establish that tapping a field opened it for editing. The user reported that the pounds field would not open the keyboard. Live review reproduced a tap leaving the weight field unfocused, while direct keyboard entry through an automation locator succeeded.
+
+Numeric fields now use ordinary editable text inputs with decimal/numeric keyboard hints and synchronous focus in the tap handler. Validation remains in application code, including integer reps, numeric ranges, and decimal-comma normalization. Regression checks now cover direct taps, character-by-character edits, clearing and replacing completed values, reload, bodyweight, and measurements. A physical iPhone keyboard still requires device verification; JSDOM does not model a virtual keyboard.
+
 ## Design changes
 
 - A warm neutral interface with one green accent, restrained borders, consistent typography and spacing, and light/dark/system appearance settings.
@@ -39,7 +45,7 @@ Scope: the complete static application, all 84 days of the program, every workou
 
 ## Validation
 
-- 24 automated checks pass, including the program matrix and official FIT decoder.
+- 28 automated checks pass, including the program matrix and official FIT decoder.
 - Node's test runner with JSDOM exercises real application event handlers, rendering and persistence.
 - A matrix renders all 84 days and all workout blocks before/after logging.
 - Regression cases cover reload, local dates/DST, units, invalid input, supersets, background timers, swaps, measurements, progression, migration, backups, storage failures, schedule confirmation, theme and modal focus.
