@@ -1,4 +1,4 @@
-# FitLab v12.2 audit
+# FitLab v12.3 audit
 
 Scope: the complete static application, all 84 days of the program, every workout block, storage and data migration, exercise alternatives, progress views, accessibility, PWA caching, and Garmin exports.
 
@@ -28,7 +28,9 @@ Scope: the complete static application, all 84 days of the program, every workou
 
 The initial audit filled input values directly and therefore did not establish that tapping a field opened it for editing. The user reported that the pounds field would not open the keyboard. Live review reproduced a tap leaving the weight field unfocused, while direct keyboard entry through an automation locator succeeded.
 
-Numeric fields now use ordinary editable text inputs with decimal/numeric keyboard hints and synchronous focus in the tap handler. Validation remains in application code, including integer reps, numeric ranges, and decimal-comma normalization. Regression checks now cover direct taps, character-by-character edits, clearing and replacing completed values, reload, bodyweight, and measurements. A physical iPhone keyboard still requires device verification; JSDOM does not model a virtual keyboard.
+Global smooth scrolling was also removed after live checks showed a tap landing on a different row while the viewport was moving. Explicit review scrolling remains available.
+
+Numeric fields now use ordinary editable text inputs with decimal/numeric keyboard hints and synchronous focus in the tap handler. Validation remains in application code, including integer reps, numeric ranges, and decimal-comma normalization. Regression checks now cover direct taps, character-by-character edits, clearing and replacing completed values, reload, bodyweight, and measurements. The live desktop browser confirmed direct tap, keyboard entry of 137.5 lb and 8 reps, completion, and navigation back to the saved set. A physical iPhone keyboard still requires device verification; JSDOM does not model a virtual keyboard.
 
 ## Design changes
 

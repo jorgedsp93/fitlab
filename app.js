@@ -2184,7 +2184,7 @@ function renderMore(){
   <section class="card tight"><button class="menurow" data-go="library">${icon('book')}<span><b>Exercise library</b><small>Form cues, photos, and muscle maps</small></span>${icon('arrow')}</button><button class="menurow" data-go="guide">${icon('leaf')}<span><b>Your training companion</b><small>Get more out of your routine</small></span>${icon('arrow')}</button></section>
   <details class="disclosure"><summary>Program settings<span class="tiny muted">12 weeks</span></summary>${scheduleCard()}</details>
   <details class="disclosure"><summary>Your data & backups</summary><p class="small muted">Your logs live in this browser. Export a backup before changing phones, clearing browser data, or starting a new cycle.</p><div class="exportactions"><button class="btn primary sm" data-backup="1">Download full backup</button><button class="btn ghost sm" data-restore="1">Restore a backup</button>${hasBackup?'<button class="btn ghost sm" data-recovery-backup="1">Download recovery copy</button>':''}</div><p class="note">A restore replaces the current data after confirmation. A recovery copy of your current data is saved first.</p></details>
-  <div class="local-note">${icon('shield')}<span>Private by design. No account or tracking. Your workouts stay on this device unless you export them.</span></div><p class="footer-signature">FITLAB · VERSION 12.2</p>`;
+  <div class="local-note">${icon('shield')}<span>Private by design. No account or tracking. Your workouts stay on this device unless you export them.</span></div><p class="footer-signature">FITLAB · VERSION 12.3</p>`;
 }
 function setStartDate(value){
   if(!validDate(value)||value>todayISO()){toast('Choose a valid start date on or before today.');return false;}
