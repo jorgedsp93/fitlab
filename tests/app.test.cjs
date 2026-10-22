@@ -112,3 +112,54 @@ test('legacy duplicate swaps cannot double-count a completed set',()=>withApp(un
   a.run(`S=normalizeState({...S,swaps:{w1d1:{'Wide-Grip_Lat_Pulldown':'Pullups'}},logs:{w1d1:{Pullups:[{w:'0',r:'8',done:true}]}}});`);
   assert.equal(a.run('dayProgress(planFor(1,1)).done'),1);
 }));
+
+
+test('a direct tap focuses every workout weight and reps field, and typing keeps that node focused',()=>withApp(undefined,a=>{
+  a.click('[data-open-day]');
+  for(const field of a.doc.querySelectorAll('[data-number]')){
+    a.doc.activeElement.blur();
+    field.click();
+    assert.equal(a.doc.activeElement,field,`Tap failed to focus ${field.getAttribute('aria-label')}`);
+    const value=field.dataset.field==='w'?'135.5':'10';
+    field.value='';
+    field.dispatchEvent(new a.w.Event('input',{bubbles:true}));
+    for(const character of value){
+      field.value+=character;
+      field.dispatchEvent(new a.w.InputEvent('input',{bubbles:true,data:character,inputType:'insertText'}));
+      assert.equal(a.doc.activeElement,field,'Typing replaced or blurred the field');
+      assert.equal(field.isConnected,true);
+    }
+    assert.equal(field.value,value);
+  }
+  a.click('[data-ck]');
+  assert.equal(a.run(`S.logs.w1d0['${bench}'][0].w`),'135.5');
+  assert.equal(a.run(`S.logs.w1d0['${bench}'][0].r`),'10');
+}));
+
+test('editing a completed set by tap accepts replacement, clearing, decimal drafts and zero',()=>withApp(undefined,a=>{
+  a.click('[data-open-day]');a.input('[data-field="w"]','135.5');a.click('[data-ck]');
+  const field=a.doc.querySelector('[data-field="w"]');field.click();
+  for(const value of ['','2','22','22.','22.5']){a.input('[data-field="w"]',value);assert.equal(a.doc.activeElement,field);assert.equal(field.value,value);}
+  assert.equal(a.doc.querySelector('[data-ck]').getAttribute('aria-pressed'),'false');
+  a.input('[data-field="w"]','0');a.click('[data-ck]');assert.equal(a.run(`S.logs.w1d0['${bench}'][0].w`),'0');
+  a.run(`openSheet('${bench}');closeSheet({fromPop:true})`);a.click('[data-field="w"]');assert.equal(a.doc.activeElement,a.doc.querySelector('[data-field="w"]'));assert.equal(a.doc.querySelector('#app').inert,false);
+}));
+
+test('decimal comma weights survive completion and reload; malformed numeric text cannot be saved',()=>{
+  let saved;
+  withApp(undefined,a=>{
+    a.click('[data-open-day]');
+    for(const value of ['hello','1e2','0x20','--1','12..5','12,5,5','5001']){a.input('[data-field="w"]',value);a.click('[data-ck]');assert.equal(a.run(`S.logs.w1d0['${bench}'][0].done`),false,value);}
+    a.input('[data-field="w"]','22,5');a.click('[data-ck]');assert.equal(a.run(`S.logs.w1d0['${bench}'][0].w`),'22.5');saved=a.w.localStorage.getItem('fitlab_v1');
+  });
+  withApp(saved,a=>{a.click('[data-open-day]');assert.equal(a.doc.querySelector('[data-field="w"]').value,'22.5');});
+});
+
+test('daily bodyweight, progress bodyweight, and body measurements support tap then type',()=>withApp(undefined,a=>{
+  a.doc.querySelector('[data-bw-form]').closest('details').open=true;
+  a.click('#dailyBwIn');assert.equal(a.doc.activeElement.id,'dailyBwIn');a.input('#dailyBwIn','200,5');a.doc.querySelector('[data-bw-form]').dispatchEvent(new a.w.Event('submit',{bubbles:true,cancelable:true}));assert.equal(a.run('lastBW()'),200.5);
+  a.run(`go('stats')`);a.click('#bwIn');assert.equal(a.doc.activeElement.id,'bwIn');a.input('#bwIn','199.5');a.doc.querySelector('[data-stats-bw-form]').dispatchEvent(new a.w.Event('submit',{bubbles:true,cancelable:true}));assert.equal(a.run('lastBW()'),199.5);
+  a.doc.querySelector('[data-bf-form]').closest('details').open=true;
+  for(const id of ['waistIn','neckIn']){a.click('#'+id);assert.equal(a.doc.activeElement.id,id);}
+  assert.equal(a.run(`upsertMeasurement('bw',todayISO(),'1e2')`),false);
+}));
