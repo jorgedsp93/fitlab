@@ -35,6 +35,8 @@ Scope: the complete static application, all 84 days of the program, every workou
 - The exercise library is accessible again. Failed remote photos receive a useful fallback; text instructions remain available.
 - Removed unsupported calorie-burn guarantees and aggressive body-fat messaging from the UI. Existing exercise programming is preserved.
 
+![Deployed FitLab v12.1 Today screen with synthetic test data](preview.jpg)
+
 ## Validation
 
 - 24 automated checks pass, including the program matrix and official FIT decoder.
@@ -43,7 +45,8 @@ Scope: the complete static application, all 84 days of the program, every workou
 - Regression cases cover reload, local dates/DST, units, invalid input, supersets, background timers, swaps, measurements, progression, migration, backups, storage failures, schedule confirmation, theme and modal focus.
 - FIT files are decoded with `@garmin/fitsdk`; TCX is parsed as XML.
 - Service-worker tests cover offline navigation, cache ownership, HTTP errors, scope, and missing assets.
-- `tests/viewports.html` runs the real app at 320, 390 and 768 CSS-pixel widths for manual browser review.
+- `tests/viewports.html` runs the real app at 320, 390 and 768 CSS-pixel widths; live review confirmed the layouts.
+- Production checks verified preserved sets, continued logging, local calendar dates, light/dark appearance, Plan and Progress. GitHub CI and Pages deployment both completed successfully.
 
 ## Practical limits
 
