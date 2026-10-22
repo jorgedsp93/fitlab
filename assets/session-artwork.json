@@ -1,0 +1,48 @@
+{
+  "generator": "Built-in image generation",
+  "date": "2026-10-22",
+  "style": "Square transparent editorial fitness illustration; muted forest green and sage clothing, warm neutral skin, charcoal equipment, softly dimensional shapes, one person, no text or logo. Decorative session category artwork, not a form tutorial.",
+  "assets": [
+    {
+      "file": "session-push-v13.png",
+      "session": "push",
+      "prompt": "Same illustrated woman on a flat bench, one continuous straight barbell held in both hands above her chest, matching weight plates at each end, feet on floor. Barbell bench press."
+    },
+    {
+      "file": "session-pull-v13.png",
+      "session": "pull",
+      "prompt": "A person doing a seated cable row on a cable rowing machine, pulling a handle toward their lower ribs. Clearly a back pulling exercise."
+    },
+    {
+      "file": "session-legs-v13.png",
+      "session": "legs",
+      "prompt": "A person performing a barbell back squat in a simple squat rack, viewed three-quarter side. Clearly a leg training exercise."
+    },
+    {
+      "file": "session-upper-v13.png",
+      "session": "upper",
+      "prompt": "A person doing a seated overhead dumbbell shoulder press on an upright bench. Two dumbbells, clearly upper body pressing."
+    },
+    {
+      "file": "session-lower-v13.png",
+      "session": "lower",
+      "prompt": "A person doing a controlled reverse lunge holding a dumbbell in each hand down at their sides. Clearly legs and core training."
+    },
+    {
+      "file": "session-recovery-v13.png",
+      "session": "recovery",
+      "prompt": "A relaxed person riding an upright bicycle gently, light active recovery, not racing."
+    },
+    {
+      "file": "session-rest-v13.png",
+      "session": "rest",
+      "prompt": "A relaxed person seated comfortably on a simple floor mat, legs crossed, shoulders relaxed, hands resting on knees. A quiet rest day."
+    }
+  ],
+  "processing": "Generated transparent PNGs reduced proportionally to 600 px for the app. Originals retained.",
+  "exercisePhotos": {
+    "source": "https://github.com/yuhonas/free-exercise-db",
+    "revision": "f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5",
+    "note": "Exercise thumbnails follow the actual exercise ID, including replacements. Plank uses the held position photo rather than the kneeling setup."
+  }
+}

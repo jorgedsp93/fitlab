@@ -21,8 +21,8 @@ const EXERCISES = {
 ],
 "desc": "Lie back on a flat bench. Using a medium width grip (a grip that creates a 90-degree angle in the middle of the movement between the forearms and the upper arms), lift the bar from the rack and hold it straight over you with your arms locked. This will be your starting position.",
 "images": [
-"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Barbell_Bench_Press_-_Medium_Grip/0.jpg",
-"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Barbell_Bench_Press_-_Medium_Grip/1.jpg"
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Barbell_Bench_Press_-_Medium_Grip/0.jpg",
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Barbell_Bench_Press_-_Medium_Grip/1.jpg"
 ]
 },
 "Incline_Dumbbell_Press": {
@@ -48,8 +48,8 @@ const EXERCISES = {
 ],
 "desc": "Lie back on an incline bench with a dumbbell in each hand atop your thighs. The palms of your hands will be facing each other.",
 "images": [
-"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Incline_Dumbbell_Press/0.jpg",
-"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Incline_Dumbbell_Press/1.jpg"
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Incline_Dumbbell_Press/0.jpg",
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Incline_Dumbbell_Press/1.jpg"
 ]
 },
 "Dumbbell_Bench_Press": {
@@ -73,8 +73,8 @@ const EXERCISES = {
 ],
 "desc": "Lie down on a flat bench with a dumbbell in each hand resting on top of your thighs. The palms of your hands will be facing each other.",
 "images": [
-"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Dumbbell_Bench_Press/0.jpg",
-"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Dumbbell_Bench_Press/1.jpg"
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Dumbbell_Bench_Press/0.jpg",
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Dumbbell_Bench_Press/1.jpg"
 ]
 },
 "Standing_Military_Press": {
@@ -98,8 +98,8 @@ const EXERCISES = {
 ],
 "desc": "Start by placing a barbell that is about chest high on a squat rack. Once you have selected the weights, grab the barbell using a pronated (palms facing forward) grip. Make sure to grip the bar wider than shoulder width apart from each other.",
 "images": [
-"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Standing_Military_Press/0.jpg",
-"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Standing_Military_Press/1.jpg"
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Standing_Military_Press/0.jpg",
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Standing_Military_Press/1.jpg"
 ]
 },
 "Dumbbell_Shoulder_Press": {
@@ -123,8 +123,8 @@ const EXERCISES = {
 ],
 "desc": "While holding a dumbbell in each hand, sit on a military press bench or utility bench that has back support. Place the dumbbells upright on top of your thighs.",
 "images": [
-"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Dumbbell_Shoulder_Press/0.jpg",
-"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Dumbbell_Shoulder_Press/1.jpg"
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Dumbbell_Shoulder_Press/0.jpg",
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Dumbbell_Shoulder_Press/1.jpg"
 ]
 },
 "Seated_Dumbbell_Press": {
@@ -148,8 +148,8 @@ const EXERCISES = {
 ],
 "desc": "Grab a couple of dumbbells and sit on a military press bench or a utility bench that has a back support on it as you place the dumbbells upright on top of your thighs.",
 "images": [
-"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Seated_Dumbbell_Press/0.jpg",
-"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Seated_Dumbbell_Press/1.jpg"
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Seated_Dumbbell_Press/0.jpg",
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Seated_Dumbbell_Press/1.jpg"
 ]
 },
 "Side_Lateral_Raise": {
@@ -169,8 +169,8 @@ const EXERCISES = {
 ],
 "desc": "Pick a couple of dumbbells and stand with a straight torso and the dumbbells by your side at arms length with the palms of the hand facing you. This will be your starting position.",
 "images": [
-"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Side_Lateral_Raise/0.jpg",
-"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Side_Lateral_Raise/1.jpg"
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Side_Lateral_Raise/0.jpg",
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Side_Lateral_Raise/1.jpg"
 ]
 },
 "Cable_Crossover": {
@@ -193,8 +193,8 @@ const EXERCISES = {
 ],
 "desc": "To get yourself into the starting position, place the pulleys on a high position (above your head), select the resistance to be used and hold the pulleys in each hand.",
 "images": [
-"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Cable_Crossover/0.jpg",
-"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Cable_Crossover/1.jpg"
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Cable_Crossover/0.jpg",
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Cable_Crossover/1.jpg"
 ]
 },
 "Dumbbell_Flyes": {
@@ -217,8 +217,8 @@ const EXERCISES = {
 ],
 "desc": "A dumbbell chest fly is the closest free-weight replacement when the cable station is busy.",
 "images": [
-"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Dumbbell_Flyes/0.jpg",
-"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Dumbbell_Flyes/1.jpg"
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Dumbbell_Flyes/0.jpg",
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Dumbbell_Flyes/1.jpg"
 ]
 },
 "Pushups": {
@@ -242,8 +242,8 @@ const EXERCISES = {
 ],
 "desc": "A no-equipment chest replacement when benches, cables, or machines are taken.",
 "images": [
-"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Pushups/0.jpg",
-"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Pushups/1.jpg"
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Pushups/0.jpg",
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Pushups/1.jpg"
 ]
 },
 "Triceps_Pushdown": {
@@ -264,8 +264,8 @@ const EXERCISES = {
 ],
 "desc": "Attach a straight or angled bar to a high pulley and grab with an overhand grip (palms facing down) at shoulder width.",
 "images": [
-"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Triceps_Pushdown/0.jpg",
-"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Triceps_Pushdown/1.jpg"
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Triceps_Pushdown/0.jpg",
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Triceps_Pushdown/1.jpg"
 ]
 },
 "Dips_-_Triceps_Version": {
@@ -288,8 +288,8 @@ const EXERCISES = {
 ],
 "desc": "To get into the starting position, hold your body at arm's length with your arms nearly locked above the bars.",
 "images": [
-"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Dips_-_Triceps_Version/0.jpg",
-"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Dips_-_Triceps_Version/1.jpg"
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Dips_-_Triceps_Version/0.jpg",
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Dips_-_Triceps_Version/1.jpg"
 ]
 },
 "Standing_Dumbbell_Triceps_Extension": {
@@ -310,8 +310,8 @@ const EXERCISES = {
 ],
 "desc": "To begin, stand up with a dumbbell held by both hands. Your feet should be about shoulder width apart from each other. Slowly use both hands to grab the dumbbell and lift it over your head until both arms are fully extended.",
 "images": [
-"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Standing_Dumbbell_Triceps_Extension/0.jpg",
-"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Standing_Dumbbell_Triceps_Extension/1.jpg"
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Standing_Dumbbell_Triceps_Extension/0.jpg",
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Standing_Dumbbell_Triceps_Extension/1.jpg"
 ]
 },
 "Barbell_Deadlift": {
@@ -341,8 +341,8 @@ const EXERCISES = {
 ],
 "desc": "Stand in front of a loaded barbell.",
 "images": [
-"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Barbell_Deadlift/0.jpg",
-"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Barbell_Deadlift/1.jpg"
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Barbell_Deadlift/0.jpg",
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Barbell_Deadlift/1.jpg"
 ]
 },
 "Romanian_Deadlift": {
@@ -367,8 +367,8 @@ const EXERCISES = {
 ],
 "desc": "Put a barbell in front of you on the ground and grab it using a pronated (palms facing down) grip that a little wider than shoulder width. Tip: Depending on the weight used, you may need wrist wraps to perform the exercise and also a raised platform in order to allow for better range of motion.",
 "images": [
-"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Romanian_Deadlift/0.jpg",
-"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Romanian_Deadlift/1.jpg"
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Romanian_Deadlift/0.jpg",
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Romanian_Deadlift/1.jpg"
 ]
 },
 "Pullups": {
@@ -392,8 +392,8 @@ const EXERCISES = {
 ],
 "desc": "Grab the pull-up bar with the palms facing forward using the prescribed grip. Note on grips: For a wide grip, your hands need to be spaced out at a distance wider than your shoulder width. For a medium grip, your hands need to be spaced out at a distance equal to your shoulder width and for a close grip at a distance smaller than your shoulder width.",
 "images": [
-"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Pullups/0.jpg",
-"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Pullups/1.jpg"
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Pullups/0.jpg",
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Pullups/1.jpg"
 ]
 },
 "Wide-Grip_Lat_Pulldown": {
@@ -419,8 +419,8 @@ const EXERCISES = {
 ],
 "desc": "Sit down on a pull-down machine with a wide bar attached to the top pulley. Make sure that you adjust the knee pad of the machine to fit your height. These pads will prevent your body from being raised by the resistance attached to the bar.",
 "images": [
-"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Wide-Grip_Lat_Pulldown/0.jpg",
-"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Wide-Grip_Lat_Pulldown/1.jpg"
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Wide-Grip_Lat_Pulldown/0.jpg",
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Wide-Grip_Lat_Pulldown/1.jpg"
 ]
 },
 "Bent_Over_Barbell_Row": {
@@ -444,8 +444,8 @@ const EXERCISES = {
 ],
 "desc": "Holding a barbell with a pronated grip (palms facing down), bend your knees slightly and bring your torso forward, by bending at the waist, while keeping the back straight until it is almost parallel to the floor. Tip: Make sure that you keep the head up. The barbell should hang directly in front of you as your arms hang perpendicular to the floor and your torso. This is your starting position.",
 "images": [
-"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Bent_Over_Barbell_Row/0.jpg",
-"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Bent_Over_Barbell_Row/1.jpg"
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Bent_Over_Barbell_Row/0.jpg",
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Bent_Over_Barbell_Row/1.jpg"
 ]
 },
 "Seated_Cable_Rows": {
@@ -470,8 +470,8 @@ const EXERCISES = {
 ],
 "desc": "For this exercise you will need access to a low pulley row machine with a V-bar. Note: The V-bar will enable you to have a neutral grip where the palms of your hands face each other. To get into the starting position, first sit down on the machine and place your feet on the front platform or crossbar provided making sure that your knees are slightly bent and not locked.",
 "images": [
-"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Seated_Cable_Rows/0.jpg",
-"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Seated_Cable_Rows/1.jpg"
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Seated_Cable_Rows/0.jpg",
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Seated_Cable_Rows/1.jpg"
 ]
 },
 "Face_Pull": {
@@ -490,8 +490,8 @@ const EXERCISES = {
 ],
 "desc": "Facing a high pulley with a rope or dual handles attached, pull the weight directly towards your face, separating your hands as you do so. Keep your upper arms parallel to the ground.",
 "images": [
-"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Face_Pull/0.jpg",
-"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Face_Pull/1.jpg"
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Face_Pull/0.jpg",
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Face_Pull/1.jpg"
 ]
 },
 "Barbell_Curl": {
@@ -514,8 +514,8 @@ const EXERCISES = {
 ],
 "desc": "Stand up with your torso upright while holding a barbell at a shoulder-width grip. The palm of your hands should be facing forward and the elbows should be close to the torso. This will be your starting position.",
 "images": [
-"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Barbell_Curl/0.jpg",
-"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Barbell_Curl/1.jpg"
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Barbell_Curl/0.jpg",
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Barbell_Curl/1.jpg"
 ]
 },
 "Hammer_Curls": {
@@ -536,8 +536,8 @@ const EXERCISES = {
 ],
 "desc": "Stand up with your torso upright and a dumbbell on each hand being held at arms length. The elbows should be close to the torso.",
 "images": [
-"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Hammer_Curls/0.jpg",
-"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Hammer_Curls/1.jpg"
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Hammer_Curls/0.jpg",
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Hammer_Curls/1.jpg"
 ]
 },
 "Barbell_Squat": {
@@ -564,8 +564,8 @@ const EXERCISES = {
 ],
 "desc": "This exercise is best performed inside a squat rack for safety purposes. To begin, first set the bar on a rack to just below shoulder level. Once the correct height is chosen and the bar is loaded, step under the bar and place the back of your shoulders (slightly below the neck) across it.",
 "images": [
-"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Barbell_Squat/0.jpg",
-"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Barbell_Squat/1.jpg"
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Barbell_Squat/0.jpg",
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Barbell_Squat/1.jpg"
 ]
 },
 "Front_Barbell_Squat": {
@@ -591,8 +591,8 @@ const EXERCISES = {
 ],
 "desc": "This exercise is best performed inside a squat rack for safety purposes. To begin, first set the bar on a rack that best matches your height. Once the correct height is chosen and the bar is loaded, bring your arms up under the bar while keeping the elbows high and the upper arm slightly above parallel to the floor. Rest the bar on top of the deltoids and cross your arms while grasping the bar for total control.",
 "images": [
-"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Front_Barbell_Squat/0.jpg",
-"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Front_Barbell_Squat/1.jpg"
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Front_Barbell_Squat/0.jpg",
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Front_Barbell_Squat/1.jpg"
 ]
 },
 "Hack_Squat": {
@@ -619,8 +619,8 @@ const EXERCISES = {
 ],
 "desc": "Place the back of your torso against the back pad of the machine and hook your shoulders under the shoulder pads provided.",
 "images": [
-"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Hack_Squat/0.jpg",
-"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Hack_Squat/1.jpg"
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Hack_Squat/0.jpg",
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Hack_Squat/1.jpg"
 ]
 },
 "Leg_Press": {
@@ -645,8 +645,8 @@ const EXERCISES = {
 ],
 "desc": "Using a leg press machine, sit down on the machine and place your legs on the platform directly in front of you at a medium (shoulder width) foot stance. (Note: For the purposes of this discussion we will use the medium stance described above which targets overall development; however you can choose any of the three stances described in the foot positioning section).",
 "images": [
-"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Leg_Press/0.jpg",
-"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Leg_Press/1.jpg"
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Leg_Press/0.jpg",
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Leg_Press/1.jpg"
 ]
 },
 "Lying_Leg_Curls": {
@@ -666,8 +666,8 @@ const EXERCISES = {
 ],
 "desc": "Adjust the machine lever to fit your height and lie face down on the leg curl machine with the pad of the lever on the back of your legs (just a few inches under the calves). Tip: Preferably use a leg curl machine that is angled as opposed to flat since an angled position is more favorable for hamstrings recruitment.",
 "images": [
-"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Lying_Leg_Curls/0.jpg",
-"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Lying_Leg_Curls/1.jpg"
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Lying_Leg_Curls/0.jpg",
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Lying_Leg_Curls/1.jpg"
 ]
 },
 "Leg_Extensions": {
@@ -687,8 +687,8 @@ const EXERCISES = {
 ],
 "desc": "For this exercise you will need to use a leg extension machine. First choose your weight and sit on the machine with your legs under the pad (feet pointed forward) and the hands holding the side bars. This will be your starting position. Tip: You will need to adjust the pad so that it falls on top of your lower leg (just above your feet). Also, make sure that your legs form a 90-degree angle between the lower and upper leg. If the angle is less than 90-degrees then that means the knee is over the toes which in turn creates undue stress at the knee joint. If the machine is designed that way, either look for another machine or just make sure that when you start executing the exercise you stop going down once you hit the 90-degree angle.",
 "images": [
-"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Leg_Extensions/0.jpg",
-"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Leg_Extensions/1.jpg"
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Leg_Extensions/0.jpg",
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Leg_Extensions/1.jpg"
 ]
 },
 "Standing_Calf_Raises": {
@@ -709,8 +709,8 @@ const EXERCISES = {
 ],
 "desc": "Adjust the padded lever of the calf raise machine to fit your height.",
 "images": [
-"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Standing_Calf_Raises/0.jpg",
-"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Standing_Calf_Raises/1.jpg"
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Standing_Calf_Raises/0.jpg",
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Standing_Calf_Raises/1.jpg"
 ]
 },
 "Dumbbell_Lunges": {
@@ -734,8 +734,8 @@ const EXERCISES = {
 ],
 "desc": "Stand with your torso upright holding two dumbbells in your hands by your sides. This will be your starting position.",
 "images": [
-"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Dumbbell_Lunges/0.jpg",
-"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Dumbbell_Lunges/1.jpg"
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Dumbbell_Lunges/0.jpg",
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Dumbbell_Lunges/1.jpg"
 ]
 },
 "Barbell_Hip_Thrust": {
@@ -757,8 +757,8 @@ const EXERCISES = {
 ],
 "desc": "Begin seated on the ground with a bench directly behind you. Have a loaded barbell over your legs. Using a fat bar or having a pad on the bar can greatly reduce the discomfort caused by this exercise.",
 "images": [
-"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Barbell_Hip_Thrust/0.jpg",
-"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Barbell_Hip_Thrust/1.jpg"
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Barbell_Hip_Thrust/0.jpg",
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Barbell_Hip_Thrust/1.jpg"
 ]
 },
 "Hanging_Leg_Raise": {
@@ -778,8 +778,8 @@ const EXERCISES = {
 ],
 "desc": "Hang from a chin-up bar with both arms extended at arms length in top of you using either a wide grip or a medium grip. The legs should be straight down with the pelvis rolled slightly backwards. This will be your starting position.",
 "images": [
-"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Hanging_Leg_Raise/0.jpg",
-"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Hanging_Leg_Raise/1.jpg"
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Hanging_Leg_Raise/0.jpg",
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Hanging_Leg_Raise/1.jpg"
 ]
 },
 "Cable_Crunch": {
@@ -801,8 +801,8 @@ const EXERCISES = {
 ],
 "desc": "Kneel below a high pulley that contains a rope attachment.",
 "images": [
-"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Cable_Crunch/0.jpg",
-"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Cable_Crunch/1.jpg"
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Cable_Crunch/0.jpg",
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Cable_Crunch/1.jpg"
 ]
 },
 "Plank": {
@@ -820,8 +820,8 @@ const EXERCISES = {
 ],
 "desc": "Get into a prone position on the floor, supporting your weight on your toes and your forearms. Your arms are bent and directly below the shoulder.",
 "images": [
-"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Plank/0.jpg",
-"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Plank/1.jpg"
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Plank/0.jpg",
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Plank/1.jpg"
 ]
 },
 "Russian_Twist": {
@@ -844,8 +844,8 @@ const EXERCISES = {
 ],
 "desc": "Lie down on the floor placing your feet either under something that will not move or by having a partner hold them. Your legs should be bent at the knees.",
 "images": [
-"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Russian_Twist/0.jpg",
-"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Russian_Twist/1.jpg"
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Russian_Twist/0.jpg",
+"https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5/exercises/Russian_Twist/1.jpg"
 ]
 }
 };
@@ -909,11 +909,11 @@ const SPLIT = [
 
 const PHASES = [
   { name:'Foundation', weeks:'Weeks 1–4', steps:9000, color:'#34d399',
-    tag:'Build the base. Groove technique, establish a moderate calorie deficit (~300–400 kcal).' },
+    tag:'Build the base. Establish controlled reps and a repeatable routine.' },
   { name:'Build', weeks:'Weeks 5–8', steps:10000, color:'#22d3ee',
-    tag:'Push volume & intensity. Add a metabolic finisher, tighten the deficit (~400–500 kcal).' },
+    tag:'Build training volume with one additional set on selected main lifts.' },
   { name:'Define', weeks:'Weeks 9–12', steps:12000, color:'#fbbf24',
-    tag:'Hold strength, dial up conditioning & steps, sharpen nutrition to chase sub-10%.' },
+    tag:'Keep tracking strength. Adapt optional conditioning to your energy.' },
 ];
 const phaseOf = (w)=> w<=4?0 : w<=8?1 : 2;
 
@@ -1013,7 +1013,7 @@ const STORAGE_KEY='fitlab_v1';
 const BACKUP_KEY='fitlab_backup_v12';
 function validDate(value){ if(typeof value!=='string'||!/^\d{4}-\d{2}-\d{2}$/.test(value))return false;const date=new Date(value+'T12:00:00Z');return Number.isFinite(date.getTime())&&date.toISOString().slice(0,10)===value; }
 function calendarDay(value){ const [y,m,d]=value.split('-').map(Number); return Date.UTC(y,m-1,d)/86400000; }
-function newState(){ return {startDate:todayISO(),unit:'lb',logs:{},done:{},reviewed:{},lastW:{},bw:[],bf:[],heightCm:185.4,rides:{},flow:{},daily:{},swaps:{},theme:'light',schemaVersion:12}; }
+function newState(){ return {startDate:todayISO(),unit:'lb',logs:{},done:{},reviewed:{},lastW:{},bw:[],bf:[],heightCm:null,heightConfirmed:false,rides:{},flow:{},daily:{},swaps:{},sessions:{},schedule:{dates:{},pausedAt:null},archives:[],preferences:{weekdays:[],weeklyTarget:5,focus:'strength',increments:{},keepAwake:true,sound:false,habits:{ride:{enabled:true,target:null},steps:{enabled:true,target:null},protein:{enabled:true,target:null},sleep:{enabled:false,target:null}}},backupAt:null,theme:'light',schemaVersion:13}; }
 function record(value){ return value && typeof value==='object' && !Array.isArray(value); }
 function normalizeState(value){
   if(!record(value)) throw new Error('Invalid FitLab data');
@@ -1021,7 +1021,8 @@ function normalizeState(value){
   if(!validDate(s.startDate)||s.startDate>todayISO()) s.startDate=todayISO();
   s.unit=s.unit==='kg'?'kg':'lb';
   s.theme=['light','dark','auto'].includes(s.theme)?s.theme:'light';
-  s.heightCm=Number.isFinite(+s.heightCm)&&+s.heightCm>50?+s.heightCm:185.4;
+  s.heightCm=Number.isFinite(+s.heightCm)&&+s.heightCm>=100&&+s.heightCm<=250?+s.heightCm:null;
+  s.heightConfirmed=value.schemaVersion>=13&&value.heightConfirmed===true&&s.heightCm!==null;
   for(const key of ['logs','done','reviewed','lastW','rides','flow','daily','swaps']) if(!record(s[key])) s[key]={};
   if(!Object.keys(s.rides).length && record(value.commute)) s.rides={...value.commute};
   for(const key of ['bw','bf']) s[key]=(Array.isArray(s[key])?s[key]:[]).filter(x=>record(x)&&validDate(x.d)&&Number.isFinite(+x.v)&&+x.v>0).map(x=>({...x,v:+x.v})).sort((a,b)=>a.d.localeCompare(b.d));
@@ -1041,7 +1042,8 @@ function normalizeState(value){
     const used=new Set(planned.filter(e=>!swaps[e.id]||!EXERCISES[swaps[e.id]]).map(e=>e.id));
     for(const e of planned){const target=swaps[e.id];if(!target)continue;if(!EXERCISES[target]||used.has(target)){delete swaps[e.id];used.add(e.id);}else used.add(target);}
   }
-  s.schemaVersion=12;
+  normalizeCompanionState(s,value);
+  s.schemaVersion=13;
   return s;
 }
 function entryNumber(value){
@@ -1057,7 +1059,7 @@ function load(){
     const raw=localStorage.getItem(STORAGE_KEY);
     if(!raw) return newState();
     const value=JSON.parse(raw), normalized=normalizeState(value);
-    if(value.schemaVersion!==12 && !localStorage.getItem(BACKUP_KEY)) localStorage.setItem(BACKUP_KEY,raw);
+    if(value.schemaVersion!==13 && !localStorage.getItem(BACKUP_KEY)) localStorage.setItem(BACKUP_KEY,raw);
     return normalized;
   }catch(error){storageProblem='FitLab could not read your saved data. The original is untouched. Export a backup from More before restoring data.';return newState();}
 }
@@ -1080,7 +1082,8 @@ function changeUnit(unit){
 const dayKey = (w,d)=>`w${w}d${d}`;
 function daysSinceStart(){ return calendarDay(todayISO())-calendarDay(S.startDate); }
 function todayPos(){ const d=daysSinceStart(); if(d<0) return {week:1,dayIndex:0,before:true}; const week=Math.floor(d/7)+1; return {week, dayIndex:d%7, done:week>12}; }
-function dateForPos(w,d){ const base=new Date(S.startDate+'T00:00'); base.setDate(base.getDate()+(w-1)*7+d); return base; }
+function baseDateForPos(w,d,state=S){const base=new Date(state.startDate+'T00:00');base.setDate(base.getDate()+(w-1)*7+d);return base;}
+function dateForPos(w,d,state=S){const dk=`w${w}d${d}`,date=state.sessions?.[dk]?.performedDate||state.schedule?.dates?.[dk];return validDate(date)?new Date(date+'T00:00'):baseDateForPos(w,d,state);}
 const rideOn = (w,d)=> !!S.rides[dayKey(w,d)];
 
 /* ---------- helpers ---------- */
@@ -1088,35 +1091,22 @@ const $=(s,r=document)=>r.querySelector(s);
 const esc=(t)=>String(t??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const cap=(t)=>t.replace(/\b\w/g,c=>c.toUpperCase());
 const fmtDate=(d)=>d.toLocaleDateString(undefined,{weekday:'long',month:'short',day:'numeric'});
-const ymd=(d)=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+function ymd(d){return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
 function blank(v){ return v==='' || v==null; }
 function setsFor(dk,id,count,defW,defR){
-  S.logs[dk]=S.logs[dk]||{};
-  const a=S.logs[dk][id];
-  if(a&&a.length>=count){
-    if(a.some(s=>s.done)){
-      a.forEach(s=>{
-        if(!s.done){
-          if(!blank(defW) && blank(s.w)) s.w=String(defW);
-          if(!blank(defR) && blank(s.r)) s.r=String(defR);
-        }
-      });
-    }else{
-      if(!blank(defW) && a.every(s=>blank(s.w))) a.forEach(s=>{ s.w=String(defW); });
-      if(!blank(defR) && a.every(s=>blank(s.r))) a.forEach(s=>{ s.r=String(defR); });
-    }
-    return a;
-  }
-  const n=Array.from({length:count},(_,i)=>(a&&a[i])||{w:(!blank(defW)?String(defW):''),r:(!blank(defR)?String(defR):''),done:false});
-  S.logs[dk][id]=n;
-  return n;
+  const a=(S.logs[dk]??={})[id]??=[];
+  while(workSets(a).length<count)a.push({w:blank(defW)?'':String(defW),r:blank(defR)?'':String(defR),done:false});
+  // Keep completed work, but hide spare draft rows when a session is shortened.
+  let kept=0;S.logs[dk][id]=a.filter(x=>x.kind==='warmup'||++kept<=count||x.done);
+  for(const x of S.logs[dk][id])if(!x.done&&x.kind!=='warmup'){if(blank(x.w)&&!blank(defW))x.w=String(defW);if(blank(x.r)&&!blank(defR))x.r=String(defR);}
+  return S.logs[dk][id];
 }
-function exDoneCount(dk,id){ const a=(S.logs[dk]||{})[id]||[]; return a.filter(x=>x.done).length; }
+function exDoneCount(dk,id){ const a=(S.logs[dk]||{})[id]||[]; return finishedSets(a).length; }
 
 /* ---------- auto-progression engine ---------- */
 const LEG_IDS=['Barbell_Squat','Front_Barbell_Squat','Hack_Squat','Leg_Press','Romanian_Deadlift','Barbell_Deadlift','Barbell_Hip_Thrust'];
 function parseRange(reps){ if(/amrap/i.test(reps)) return {amrap:true}; const n=(reps.match(/\d+/g)||[]).map(Number); if(n.length>=2) return {min:n[0],max:n[1]}; if(n.length===1) return {min:n[0],max:n[0]}; return {min:8,max:12}; }
-function incFor(e){ const big=e.comp&&LEG_IDS.includes(e.id); return S.unit==='kg'?(big?5:2.5):(big?10:5); }
+function incFor(e){const custom=S.preferences.increments[e.id];if(custom)return convertedWeight(custom.value,custom.unit); const big=e.comp&&LEG_IDS.includes(e.id); return S.unit==='kg'?(big?5:2.5):(big?10:5); }
 const LOAD_META = {
   "Incline_Dumbbell_Press": { label:'per dumbbell', mult:2 },
   "Dumbbell_Bench_Press": { label:'per dumbbell', mult:2 },
@@ -1127,9 +1117,9 @@ const LOAD_META = {
   "Hammer_Curls": { label:'per dumbbell', mult:2 },
   "Dumbbell_Lunges": { label:'per dumbbell', mult:2 },
   "Standing_Dumbbell_Triceps_Extension": { label:'single dumbbell', mult:1 },
-  "Pullups": { label:'added or assist', mult:1 },
+  "Pullups": { label:'added weight only', mult:1 },
   "Pushups": { label:'added weight', mult:1 },
-  "Dips_-_Triceps_Version": { label:'added or assist', mult:1 },
+  "Dips_-_Triceps_Version": { label:'added weight only', mult:1 },
   "Hanging_Leg_Raise": { label:'added weight', mult:1 },
   "Plank": { label:'added weight', mult:1 },
   "Russian_Twist": { label:'held weight', mult:1 },
@@ -1169,6 +1159,7 @@ function weightHint(id,sets){
   const example=meta.mult>1 ? `Enter the number on one dumbbell. Example: if you use two 35 ${S.unit} dumbbells, type 35; FitLab counts 70 ${S.unit} total.` : '';
   const live=total&&meta.mult>1 ? ` Current total load: ${total} ${S.unit}.` : '';
   if(meta.mult>1) return `${example}${live}`;
+  if(['Pullups','Dips_-_Triceps_Version'].includes(id))return 'Log added weight only; use 0 if unweighted or assisted. Record the band or assistance in Notes, and compare only matching setups.';
   if(meta.label==='machine setting') return `Enter the machine setting shown on the pin/stack. Treat a different machine as its own feel, even if the number matches.`;
   if(meta.label==='stack weight') return `Enter the stack number shown on the cable machine.`;
   return `Log ${meta.label}.`;
@@ -1266,29 +1257,26 @@ function effectiveExercise(e,dk){
   return Object.assign({},e,{originalId:baseId,swapped:false});
 }
 function workoutExercises(plan,dk){
-  if(plan.type!=='workout') return [];
-  return plan.ex.map(e=>effectiveExercise(e,dk));
+  if(plan.type!=='workout')return [];
+  const m=S.sessions[dk]||{},order=m.order||[];
+  return [...plan.ex,...(m.added||[])].filter(e=>!m.omitted?.[e.id]).map(e=>{const x=effectiveExercise(e,dk);x.sets=Math.max(exDoneCount(dk,x.id),m.counts?.[x.id]??x.sets);return x;}).sort((a,b)=>{const ai=order.indexOf(a.originalId),bi=order.indexOf(b.originalId);return (ai<0?999:ai)-(bi<0?999:bi);});
 }
 function setExerciseSwap(dk,baseId,altId){
   const n=dayNum(dk);if(n<0||n>83||!EXERCISES[baseId]||(altId&&!EXERCISES[altId]))return false;
-  const plan=planFor(Math.floor(n/7)+1,n%7),exercises=workoutExercises(plan,dk),current=exercises.find(e=>e.originalId===baseId);
+  const plan=planFor(Math.floor(n/7)+1,n%7),exercises=workoutExercises(plan,dk),current=exercises.find(e=>e.originalId===baseId),target=altId||baseId;
   if(!current)return false;
-  if(exDoneCount(dk,current.id)){toast('Undo the logged sets before changing this exercise.');return false;}
-  const target=altId||baseId;
-  if(exercises.some(e=>e.originalId!==baseId&&e.id===target)){toast('That exercise is already in this session. Choose another alternative.');return false;}
-  S.swaps[dk]=S.swaps[dk]||{};
-  if(!altId || altId===baseId) delete S.swaps[dk][baseId];
-  else S.swaps[dk][baseId]=altId;
-  if(!Object.keys(S.swaps[dk]).length) delete S.swaps[dk];
-  save();
-  render();
-  return true;
+  if(exercises.some(e=>e.originalId!==baseId&&e.id===target)||exDoneCount(dk,target)){toast('That exercise already has a place or completed work in this session.');return false;}
+  const completed=exDoneCount(dk,current.id),remaining=current.sets-completed;
+  if(!remaining){toast('All sets are complete. Add another exercise to do more.');return false;}
+  if(completed){S.logs[dk][current.id]=S.logs[dk][current.id].filter(s=>s.done);(sessionFor(dk).counts??={})[target]=remaining;}
+  S.swaps[dk]??={};if(target===baseId)delete S.swaps[dk][baseId];else S.swaps[dk][baseId]=target;
+  delete S.reviewed[dk];save();render();return true;
 }
 function dayNum(dk){ const m=String(dk).match(/^w(\d+)d(\d+)$/); return m?(+m[1]-1)*7+(+m[2]):-1; }
 // most recent earlier session that logged this exercise (done sets) → array of {w,r}
-function lastPerf(exId,curDk){ const cur=dayNum(curDk); let best=-1,res=null; for(const dk in S.logs){ if(dk===curDk) continue; const n=dayNum(dk); if(n<0||n>=cur) continue; const arr=S.logs[dk][exId]; if(!arr) continue; const done=arr.filter(s=>s.done&&s.w!==''); if(!done.length) continue; if(n>best){best=n;res=done;} } return res; }
+function lastPerf(exId,curDk){const h=pastPerformance(exId,curDk);return h?h.sets.map(s=>({...s,w:String(convertedWeight(s.w,h.unit))})):null;}
 function currentWorkoutSuggestion(exId,e,curDk,rng=parseRange(e.reps)){
-  const done=((S.logs[curDk]||{})[exId]||[]).filter(s=>s.done&&(!blank(s.w)||!blank(s.r)));
+  const done=workSets((S.logs[curDk]||{})[exId]||[]).filter(s=>s.done&&(!blank(s.w)||!blank(s.r)));
   if(!done.length) return null;
   const last=done[done.length-1];
   const weight=blank(last.w)?'':Number(last.w);
@@ -1315,6 +1303,7 @@ function suggest(exId,e,curDk){
   if(!prev){ return {weight:'', reps: rng.amrap?'':rng.min, note:`First time — pick a weight you can control for ${e.reps} reps. ${weightHint(exId,[])}`}; }
   const w=parseFloat(prev[0].w)||''; const reps=prev.map(s=>parseInt(s.r)||0); const repsStr=reps.join(', ');
   if(rng.amrap){ const tot=reps.reduce((a,b)=>a+b,0); return {weight:w, reps:'', note:`Last time: ${repsStr} reps (${tot} total). Beat it.`}; }
+  const prior=pastPerformance(exId,curDk);if(prior?.meta.effort?.[exId]==='hard')return {weight:w,reps:rng.min,note:`Last session felt too hard. Hold the load or lower it, and aim for controlled reps before adding weight.`};
   const inc=incFor(e);
   if(w && prev.length>=e.sets && prev.every(s=>Number(s.w)===w) && reps.every(r=>r>=rng.max)){ const nw=Math.round((w+inc)*10)/10; return {weight:nw, reps:rng.min, note:`You maxed the reps at ${formatEntryWeight(exId,w)} — go up to ${formatEntryWeight(exId,nw)} × ${rng.min}.`}; }
   if(w && reps.some(r=>r<rng.min)) return {weight:w, reps:rng.min, note:`Hold ${formatEntryWeight(exId,w)}. Last: ${repsStr}. Get ${rng.min}+ clean reps on every set.`};
@@ -1324,7 +1313,7 @@ function ytLink(name){ return 'https://www.youtube.com/results?search_query='+en
 // Curated demo video per exercise; falls back to a YouTube search if missing.
 const VIDEOS = {"Barbell_Bench_Press_-_Medium_Grip": "https://www.youtube.com/watch?v=7iOgPtRiY1A", "Incline_Dumbbell_Press": "https://www.youtube.com/watch?v=8fXfwG4ftaQ", "Dumbbell_Bench_Press": "https://www.youtube.com/watch?v=1V3vpcaxRYQ", "Standing_Military_Press": "https://www.youtube.com/watch?v=3RdVYQ8l_V8", "Dumbbell_Shoulder_Press": "https://www.youtube.com/watch?v=k6tzKisR3NY", "Seated_Dumbbell_Press": "https://www.youtube.com/watch?v=fAlu-BsnPqE", "Side_Lateral_Raise": "https://www.youtube.com/watch?v=Myim1WH6Qec", "Cable_Crossover": "https://www.youtube.com/watch?v=Jokaz7dBJNg", "Triceps_Pushdown": "https://www.youtube.com/watch?v=7OF77JMEXhM", "Dips_-_Triceps_Version": "https://www.youtube.com/watch?v=thx13oPVK5c", "Standing_Dumbbell_Triceps_Extension": "https://www.youtube.com/watch?v=AYqg9S5FrUU", "Barbell_Deadlift": "https://www.youtube.com/watch?v=ZaTM37cfiDs", "Romanian_Deadlift": "https://www.youtube.com/watch?v=ecuZtKTNI9U", "Pullups": "https://www.youtube.com/watch?v=OEXosPwzFdc", "Wide-Grip_Lat_Pulldown": "https://www.youtube.com/watch?v=hl98TV4nlTM", "Bent_Over_Barbell_Row": "https://www.youtube.com/watch?v=p9RihhjmJsw", "Seated_Cable_Rows": "https://www.youtube.com/watch?v=8QuMq1GMMng", "Face_Pull": "https://www.youtube.com/watch?v=NQ8h8rEzmZQ", "Barbell_Curl": "https://www.youtube.com/watch?v=MKWBV29S6c0", "Hammer_Curls": "https://www.youtube.com/watch?v=K9LiwcGuqA0", "Barbell_Squat": "https://www.youtube.com/watch?v=ZaSetOZFo-k", "Front_Barbell_Squat": "https://www.youtube.com/watch?v=WftnRk3ukeA", "Hack_Squat": "https://www.youtube.com/watch?v=g9i05umL5vc", "Leg_Press": "https://www.youtube.com/watch?v=nDh_BlnLCGc", "Lying_Leg_Curls": "https://www.youtube.com/watch?v=3gZm9wGTsEo", "Leg_Extensions": "https://www.youtube.com/watch?v=tWFBltkWhBE", "Standing_Calf_Raises": "https://www.youtube.com/watch?v=B30JglFGx8Y", "Dumbbell_Lunges": "https://www.youtube.com/watch?v=5eQd_hsXESI", "Barbell_Hip_Thrust": "https://www.youtube.com/watch?v=W86oVlnLqY4", "Hanging_Leg_Raise": "https://www.youtube.com/watch?v=WFAziRYp2bg", "Cable_Crunch": "https://www.youtube.com/watch?v=x10ihjIYy8s", "Plank": "https://www.youtube.com/watch?v=v25dawSzRTM", "Russian_Twist": "https://www.youtube.com/watch?v=hL10_LcXyCM"};
 function videoLink(id,name){ return VIDEOS[id] || ytLink(name); }
-function dayProgress(plan){ const dk=dayKey(plan.week,plan.dayIndex); let tot=0,done=0; for(const e of workoutExercises(plan,dk)){ tot+=e.sets; done+=Math.min(exDoneCount(dk,e.id),e.sets);} return {done,tot,pct: tot?Math.round(done/tot*100):0}; }
+function dayProgress(plan){const dk=dayKey(plan.week,plan.dayIndex),active=workoutExercises(plan,dk),ids=new Set(active.map(e=>e.id));let tot=0,done=0;for(const e of active){tot+=e.sets;done+=Math.min(exDoneCount(dk,e.id),e.sets);}for(const [id,sets] of Object.entries(S.logs[dk]||{}))if(!ids.has(id)){const retained=finishedSets(sets).length;tot+=retained;done+=retained;}return {done,tot,pct:tot?Math.round(done/tot*100):0};}
 function isWorkoutComplete(plan){ if(plan.type==='rest') return !!S.done[dayKey(plan.week,plan.dayIndex)]; const p=dayProgress(plan); return p.tot>0 && p.done>=p.tot; }
 function estimateSetSeconds(e,setCount){
   if(!setCount) return 0;
@@ -1391,7 +1380,6 @@ function blockSummary(block,dk){
   const names=block.ex.map(e=>EXERCISES[e.id]?.name||e.id).join(' + ');
   return `${names} · ${blockDoneCount(block,dk)}/${blockTotalSets(block)} sets`;
 }
-function proteinTarget(){ const w=lastBW(); if(!w) return '≈180 g'; const lb=S.unit==='kg'?w*2.205:w; return Math.round(lb)+' g'; }
 function lastBW(){ return S.bw.length? S.bw[S.bw.length-1].v : null; }
 function dailyFor(dateKey){
   S.daily[dateKey]=S.daily[dateKey]||{};
@@ -1424,88 +1412,33 @@ function startStatusText(){const n=daysSinceStart();return n<0?`Starts ${prettyI
 function scheduleCard(){return `<div class="setupstatus">${esc(startStatusText())}</div>
   <label><span class="field-label">Program start date</span><input class="dateinput" type="date" id="startIn" value="${esc(S.startDate)}" max="${todayISO()}" aria-label="Program start date"></label>
   <div class="setupactions"><button class="btn ghost sm" data-save-start="1">Update date</button><button class="btn ghost sm" data-restart-schedule="1">Start fresh</button></div>
-  <p class="setupnote">Updating the date moves your schedule. Starting fresh saves a recovery backup before clearing the current program. Body measurements stay.</p>`;}
-function dailyLogCard(date,w,d,plan){
-  const key=ymd(date),daily=S.daily[key]||{},ride=rideOn(w,d);
-  const habits=[{on:ride,action:`data-ride="${dayKey(w,d)}"`,name:'Ride',detail:ride?'Logged':'Any bike ride',icon:'bike'},
-    {on:!!daily.steps,action:`data-daily-toggle="${key}|steps"`,name:'Steps',detail:daily.steps?'Goal reached':`${PHASES[plan.phase].steps.toLocaleString()} goal`,icon:'steps'},
-    {on:!!daily.protein,action:`data-daily-toggle="${key}|protein"`,name:'Protein',detail:daily.protein?'Goal reached':proteinTarget(),icon:'protein'}];
-  const weight=S.bw.filter(x=>x.d===key).at(-1);
-  return `<section aria-label="Daily check-in"><div class="section-row"><h3>Small things, daily.</h3><span class="tiny muted">${habits.filter(x=>x.on).length} of 3</span></div>
-    <div class="habitlist">${habits.map(h=>`<button class="habitbtn ${h.on?'on':''}" ${h.action} aria-pressed="${h.on}" aria-label="${h.name}: ${h.on?'logged, tap to undo':'tap to log'}"><span class="habit-icon">${icon(h.on?'check':h.icon)}</span><span><b>${h.name}</b><small>${esc(h.detail)}</small></span></button>`).join('')}</div>
-    <details class="disclosure"><summary>${weight?`Bodyweight · ${displayNumber(weight.v)} ${S.unit}`:'Log bodyweight'}<span class="tiny muted">${prettyISO(key)}</span></summary>
-    <form class="inlineform" data-bw-form="${key}"><label><span class="field-label">Bodyweight (${S.unit})</span><input id="dailyBwIn" type="text" data-number="1" autocomplete="off" autocapitalize="off" spellcheck="false" inputmode="decimal" aria-label="Bodyweight" value="${weight?esc(weight.v):''}" placeholder="e.g. ${S.unit==='lb'?'200':'90'}" required></label><button class="btn primary sm" type="submit">Save</button></form></details></section>`;
-}
-let view='today',viewingPos=null,dayOffset=0,returnView='today',selectedWeek=null,libraryQuery='';
+  <p class="setupnote">Updating the start date moves unstarted sessions. Completed dates stay. Starting a new cycle archives your current training history.</p>`;}
+let view='today',viewingPos=null,dayOffset=0,returnView='today',selectedWeek=null,libraryQuery='',browseDay=null;
 const TABS=[['today','Today'],['plan','Plan'],['stats','Progress'],['more','More']];
 function displayNumber(value){return Number(value).toLocaleString(undefined,{maximumFractionDigits:1});}
 function applyTheme(){const dark=S.theme==='dark'||(S.theme==='auto'&&window.matchMedia?.('(prefers-color-scheme: dark)').matches);document.documentElement.dataset.theme=dark?'dark':'light';document.querySelector('meta[name="theme-color"]')?.setAttribute('content',dark?'#121916':'#f5f6f2');}
-function go(v,options={}){if(!['today','plan','stats','more','library','guide','day'].includes(v))return;view=v;if(v==='today'&&!options.keepDay)dayOffset=0;render();history.pushState(routeState(),'',location.href);window.scrollTo({top:0});$('#app').focus({preventScroll:true});}
-function render(){applyTheme();const r={today:renderToday,plan:renderPlan,library:renderLibrary,stats:renderStats,more:renderMore,guide:renderGuide,day:renderDayView}[view];$('#app').innerHTML=r?r():'';renderNav();storageNotice();}
-function renderNav(){const active=view==='day'?returnView:['library','guide'].includes(view)?'more':view;$('#nav').innerHTML=TABS.map(([v,l])=>`<button data-go="${v}" class="${active===v?'on':''}" ${active===v?'aria-current="page"':''}><span class="ni">${icon(v)}</span>${l}</button>`).join('');}
-function selectedDayNumber(){return Math.min(83,Math.max(0,Math.max(0,daysSinceStart())+dayOffset));}
-function weekStrip(week,day){return `<div class="weekstrip" aria-label="This week">${SPLIT.map((_,d)=>{const date=dateForPos(week,d),done=isWorkoutComplete(planFor(week,d));return `<button data-select-day="${(week-1)*7+d}" class="${d===day?'selected':''} ${ymd(date)===todayISO()?'istoday':''}" aria-label="${esc(fmtDate(date))}, ${SPLIT[d].title}${done?', complete':''}" aria-pressed="${d===day}"><span class="weekday">${date.toLocaleDateString(undefined,{weekday:'short'})}</span><span class="date">${date.getDate()}</span>${done?'<span class="weekdot"></span>':''}</button>`;}).join('')}</div>`;}
-function renderToday(){
-  const days=daysSinceStart();
-  if(days>83&&dayOffset===0)return `${heading('A chapter completed.','Your 12-week schedule has reached its end.')}<div class="card"><div class="workout-art" style="margin-bottom:24px">${icon('check')}</div><h2>Keep the momentum.</h2><p class="muted">Your training history is in Progress. Start another cycle whenever you’re ready.</p><button class="btn primary" data-new-cycle="1">Start a new cycle</button><button class="textlink" data-go="stats">View your progress</button></div>`;
-  const n=selectedDayNumber(),w=Math.floor(n/7)+1,d=n%7,plan=planFor(w,d),dk=dayKey(w,d),p=dayProgress(plan),complete=isWorkoutComplete(plan),date=dateForPos(w,d),time=workoutTimeEstimate(plan,dk);
-  const isToday=ymd(date)===todayISO(),rest=plan.type==='rest';
-  const focus=plan.focus.map(x=>REGION[x]||cap(x)).filter((x,i,a)=>a.indexOf(x)===i).join(' · ');
-  return `${header()}<div class="intro"><div class="section-row" style="margin:0 0 10px"><span class="eyebrow">${isToday?'Make time for you':esc(fmtDate(date))}</span><div class="datepager"><button class="iconbtn" data-day-step="-7" ${n<7?'disabled':''} aria-label="Previous week">${icon('back')}</button><button class="iconbtn" data-day-step="7" ${n>76?'disabled':''} aria-label="Next week">${icon('arrow')}</button></div></div><h1>${rest?'Recovery is progress.':'One session at a time.'}</h1></div>
-  ${weekStrip(w,d)}
-  <section class="training-card" aria-label="Your workout"><div class="training-top"><span class="eyebrow">${rest?'Recharge':'Your session'} · Week ${w}</span><span class="pill">${PHASES[plan.phase].name}</span></div>
-  <div class="training-main"><div><h2>${esc(plan.title.replace(' Day',' day'))}</h2><p>${esc(focus)}</p></div><div class="workout-art">${icon(rest?'leaf':'train')}</div></div>
-  ${rest?`<p class="small muted" style="margin-bottom:22px">${esc(plan.cardio.d)}</p><button class="btn ${complete?'ghost':'primary'}" data-restdone="${dk}" aria-pressed="${complete}">${icon(complete?'check':'leaf')}${complete?'Recovery logged':'Mark recovery complete'}</button>`:`
-    <div class="training-meta"><span>${icon('clock')}About ${time.total} min</span><span>${icon('train')}${plan.ex.length} exercises</span><span>${icon('plan')}${p.tot} sets</span></div>
-    ${p.done?`<div class="progress-meta"><span>${p.done} of ${p.tot} sets</span><span>${complete?'Complete':`${p.pct}%`}</span></div><div class="bar" aria-label="Workout ${p.pct}% complete"><i style="width:${p.pct}%"></i></div>`:''}
-    <button class="btn primary" data-open-day="${w}.${d}">${complete||S.reviewed[dk]?'View workout':p.done?'Continue workout':'Start workout'}${icon('arrow')}</button>`}
-  <div class="phase-note"><label class="datepicker">${esc(date.toLocaleDateString(undefined,{month:'short',day:'numeric'}))}<input type="date" id="jumpIn" aria-label="Jump to workout date" value="${ymd(date)}" min="${S.startDate}" max="${ymd(dateForPos(12,6))}"></label>${isToday?'<span>Today</span>':'<button class="textlink" data-day-today="1">Back to today</button>'}</div></section>
-  ${dailyLogCard(date,w,d,plan)}
-  ${!rest?`<details class="disclosure"><summary>What’s in this session<span class="tiny muted">${workoutBlocks(plan,dk).length} blocks</span></summary>${workoutPreview(plan,dk)}</details>`:''}
-  <p class="nextnote">${rest?'Give yourself room to recover.':esc(plan.cardio.d)}</p>`;
+function go(v,options={}){if(!['today','plan','stats','more','library','guide','day','review','archive'].includes(v))return;view=v;if(v==='today'&&!options.keepDay){dayOffset=0;browseDay=null;}render();history.pushState(routeState(),'',location.href);window.scrollTo({top:0});$('#app').focus({preventScroll:true});}
+function render(){applyTheme();const r={today:renderToday,plan:renderPlan,library:renderLibrary,stats:renderStats,more:renderMore,guide:renderGuide,day:renderDayView,review:renderReview,archive:renderArchive}[view];$('#app').innerHTML=r?r():'';renderNav();storageNotice();}
+function renderNav(){const active=['day','review'].includes(view)?returnView:view==='archive'?'stats':['library','guide'].includes(view)?'more':view;$('#nav').innerHTML=TABS.map(([v,l])=>`<button data-go="${v}" class="${active===v?'on':''}" ${active===v?'aria-current="page"':''}><span class="ni">${icon(v)}</span>${l}</button>`).join('');}
+function selectedDayNumber(){
+  if(browseDay!==null)return browseDay;
+  const calendar=Math.min(83,Math.max(0,Math.max(0,daysSinceStart())+dayOffset));if(dayOffset!==0)return calendar;
+  const running=Object.keys(S.sessions).find(k=>S.sessions[k].runningSince);if(running)return dayNum(running);
+  const next=nextSession();if(next&&(Object.keys(S.schedule.dates).length||ymd(dateForPos(next.week,next.dayIndex))<=todayISO()))return (next.week-1)*7+next.dayIndex;
+  return calendar;
 }
+function weekStrip(week,day){return `<div class="weekstrip" aria-label="This week">${SPLIT.map((_,d)=>{const date=dateForPos(week,d),done=isWorkoutComplete(planFor(week,d));return `<button data-select-day="${(week-1)*7+d}" class="${d===day?'selected':''} ${ymd(date)===todayISO()?'istoday':''}" aria-label="${esc(fmtDate(date))}, ${SPLIT[d].title}${done?', complete':''}" aria-pressed="${d===day}"><span class="weekday">${date.toLocaleDateString(undefined,{weekday:'short'})}</span><span class="date">${date.getDate()}</span>${done?'<span class="weekdot"></span>':''}</button>`;}).join('')}</div>`;}
 function workoutPreview(plan,dk){return `<div class="previewlist">${workoutBlocks(plan,dk).map((b,i)=>`<button class="previewblock ${isBlockComplete(b,dk)?'done':''}" data-open-block="${plan.week}.${plan.dayIndex}.${i}"><span class="previewnum">${isBlockComplete(b,dk)?icon('check'):String(i+1).padStart(2,'0')}</span><span class="previewmain"><span class="previewtitle">${esc(b.title)}</span><span class="previewsub" style="display:block">${b.ex.length>1?esc(b.ex.map(e=>EXERCISES[e.id].name).join(' + ')):esc(`${b.ex[0].sets} sets · ${b.ex[0].reps} reps`)}</span></span><span class="previewcount">${blockDoneCount(b,dk)}/${blockTotalSets(b)}</span></button>`).join('')}</div>`;}
 function backHead(title,sub){return `<button class="backbtn" data-back="1">${icon('back')}Back to ${returnView==='stats'?'progress':returnView==='plan'?'plan':'today'}</button><div class="workout-header"><div><h1>${esc(title)}</h1><div class="small muted">${esc(sub)}</div></div></div>`;}
-function renderDayView(){
-  if(!viewingPos)return renderToday();
-  const {week:w,dayIndex:d}=viewingPos,plan=planFor(w,d),dk=dayKey(w,d),p=dayProgress(plan),date=dateForPos(w,d),time=workoutTimeEstimate(plan,dk);
-  if(plan.type==='rest')return `${backHead(plan.title,fmtDate(date))}<div class="card"><div class="workout-art" style="margin-bottom:24px">${icon('leaf')}</div><h2>A little room to recover.</h2><p class="muted">${esc(plan.cardio.d)}</p><button class="btn primary" data-restdone="${dk}" aria-pressed="${!!S.done[dk]}">${S.done[dk]?'Recovery logged · undo':'Mark recovery complete'}</button></div>${dailyLogCard(date,w,d,plan)}`;
-  return `${backHead(plan.title,`Week ${w} · ${date.toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'})}`)}
-  <div class="workout-progress"><div class="progress-meta"><span>${p.done} of ${p.tot} sets logged</span><span>${p.done===p.tot?'Session complete':`About ${time.remaining} min left`}</span></div><div class="bar"><i style="width:${p.pct}%"></i></div></div>
-  ${renderWorkoutFlow(plan,dk)}
-  <div class="workout-footer"><details class="disclosure"><summary>Session overview</summary>${workoutPreview(plan,dk)}</details>
-  ${p.done?`<button class="textlink" data-finish-workout="1">${S.reviewed[dk]?'View workout review':'Finish & review session'}</button>`:''}
-  ${(isWorkoutComplete(plan)||S.reviewed[dk])?`${workoutEvaluationCard(plan,dk)}<details class="disclosure"><summary>Export this workout</summary>${workoutExportCard(plan,dk,p)}</details>`:''}</div>`;
-}
-function swapControl(e,dk){
-  const baseId=e.originalId||e.id,plan=planFor(Math.floor(dayNum(dk)/7)+1,dayNum(dk)%7);
-  const used=new Set(workoutExercises(plan,dk).filter(x=>x.originalId!==baseId).map(x=>x.id));
-  const choices=swapChoicesFor(baseId).filter(x=>x.id!==e.id&&!used.has(x.id));
-  if(exDoneCount(dk,e.id))return '<p class="note">This exercise has logged sets. Undo those checkmarks before changing the exercise.</p>';
-  return `<div class="swapbuttons">${choices.map(x=>`<button class="swapbtn" data-swap-ex="${dk}|${baseId}|${x.id}">${esc(EXERCISES[x.id].name)}</button>`).join('')}${e.swapped?`<button class="swapbtn" data-clear-swap="${dk}|${baseId}">Use ${esc(EXERCISES[baseId].name)}</button>`:''}</div>${!choices.length&&!e.swapped?'<p class="note">No other supported substitute is available for this session.</p>':''}`;
-}
-function exBlock(e,dk){
+function baseExBlock(e,dk){
   const x=EXERCISES[e.id],sug=suggest(e.id,e,dk),sets=setsFor(dk,e.id,e.sets,sug.weight,sug.reps),bodyweight=x.equipment==='body only';
-  return `<section class="exblock" aria-label="${esc(x.name)}"><div class="eh"><img class="exercise-thumb" src="${x.images[0]}" alt="" loading="lazy"><button class="exercise-title" data-ex="${e.id}" aria-label="How to do ${esc(x.name)}"><b>${esc(x.name)}</b><small>${e.sets} sets · ${e.reps} reps</small></button><button class="iconbtn" data-ex="${e.id}" aria-label="${esc(x.name)} form guide">${icon('info')}</button></div>
-  <div class="sugg">${esc(compactSuggestion(e.id,e,sug))}</div><div class="settable"><div class="set-hd"><div>Set</div><div>${loadMeta(e.id).mult>1?'Each ':''}${S.unit}</div><div>Reps</div><div>Done</div></div>
-  ${sets.map((st,i)=>`<div class="set-row ${st.done?'done':''}" data-row="${e.id}|${i}"><span class="sn">${String(i+1).padStart(2,'0')}</span><input type="text" data-number="1" autocomplete="off" autocapitalize="off" spellcheck="false" inputmode="decimal" data-field="w" data-ex="${e.id}" data-i="${i}" aria-label="${esc(x.name)} set ${i+1} weight in ${S.unit}${loadMeta(e.id).mult>1?' per dumbbell':''}" value="${esc(st.w)}" placeholder="${bodyweight?'0':'—'}"><input type="text" data-number="1" autocomplete="off" autocapitalize="off" spellcheck="false" inputmode="numeric" data-field="r" data-ex="${e.id}" data-i="${i}" aria-label="${esc(x.name)} set ${i+1} reps" value="${esc(st.r)}" placeholder="—"><button class="ck" data-ck="${e.id}|${i}|${e.rest}" aria-label="${st.done?'Undo':'Complete'} ${esc(x.name)} set ${i+1}" aria-pressed="${st.done}">${icon('check')}</button></div>`).join('')}</div>
+  return `<section class="exblock" aria-label="${esc(x.name)}"><div class="eh"><img class="exercise-thumb" src="${exerciseImage(e.id)}" alt="" loading="lazy"><button class="exercise-title" data-ex="${e.id}" aria-label="How to do ${esc(x.name)}"><b>${esc(x.name)}</b><small>${e.sets} sets · ${e.reps} reps</small></button><button class="iconbtn" data-ex="${e.id}" aria-label="${esc(x.name)} form guide">${icon('info')}</button></div>
+  <div class="sugg">${esc(compactSuggestion(e.id,e,sug))}</div><div class="settable"><div class="set-hd"><div>Set</div><div>${loadMeta(e.id).mult>1?'Each ':''}${S.unit}</div><div>${e.id==='Plank'?'Seconds':'Reps'}</div><div>Done</div></div>
+  ${sets.map((st,i)=>`<div class="set-row ${st.done?'done':''}" data-row="${e.id}|${i}"><span class="sn">${String(i+1).padStart(2,'0')}</span><input type="text" data-number="1" autocomplete="off" autocapitalize="off" spellcheck="false" inputmode="decimal" data-field="w" data-ex="${e.id}" data-i="${i}" aria-label="${esc(setAccessibleName(x.name,sets,i))} weight in ${S.unit}${loadMeta(e.id).mult>1?' per dumbbell':''}" value="${esc(st.w)}" placeholder="${bodyweight?'0':'—'}"><input type="text" data-number="1" autocomplete="off" autocapitalize="off" spellcheck="false" inputmode="numeric" data-field="r" data-ex="${e.id}" data-i="${i}" aria-label="${esc(setAccessibleName(x.name,sets,i))} reps" value="${esc(st.r)}" placeholder="—"><button class="ck" data-ck="${e.id}|${i}|${e.rest}" aria-label="${st.done?'Undo':'Complete'} ${esc(setAccessibleName(x.name,sets,i))}" aria-pressed="${st.done}">${icon('check')}</button></div>`).join('')}</div>
   <details class="exextras"><summary>Guidance & alternatives</summary><div class="exdetails"><p>${esc(sug.note)}</p><p data-load-hint="${e.id}">${esc(weightHint(e.id,sets))}</p>${e.note?`<p>${esc(e.note)}</p>`:''}${swapControl(e,dk)}<a href="${videoLink(e.id,x.name)}" target="_blank" rel="noopener noreferrer">Watch demonstration ↗</a></div></details>
   <button class="restbtn" data-rest="${e.rest}|${esc(x.name)}">${icon('clock')}Rest ${e.rest>=60?`${Math.floor(e.rest/60)}:${String(e.rest%60).padStart(2,'0')}`:`${e.rest}s`}</button></section>`;
 }
-function renderWorkoutFlow(plan,dk){const blocks=workoutBlocks(plan,dk),idx=flowIndexFor(plan),b=blocks[idx],atEnd=idx===blocks.length-1,p=dayProgress(plan);if(!b)return '';
-  return `<section class="flowcard" aria-label="Workout logging"><div class="flowtop"><span class="eyebrow">${blockLabel(b)} ${idx+1} of ${blocks.length}</span><div class="blockdots" aria-hidden="true">${blocks.map((x,i)=>`<i class="${isBlockComplete(x,dk)?'done':idx===i?'on':''}"></i>`).join('')}</div></div>${b.ex.length>1?`<div class="superset-note"><b>${esc(b.title)}</b><br>Alternate the two moves. Rest after each round.</div>`:''}
-  ${b.ex.map(e=>exBlock(e,dk)).join('')}<div class="flowactions"><button class="btn ghost" data-flow-step="-1" ${idx===0?'disabled':''}>Previous</button><button class="btn primary" ${atEnd?`data-finish-workout="1" ${p.done?'':'disabled'}`:'data-flow-step="1"'}>${atEnd?'Finish & review':'Next exercise'}${icon('arrow')}</button></div><div class="flowhint">Your entries save on this device as you type.</div></section>`;
-}
-function workoutEvaluationCard(plan,dk){
-  const all=loggedExercises(plan,dk),sets=all.flatMap(e=>e.sets),p=dayProgress(plan),volume=all.reduce((sum,e)=>sum+e.sets.reduce((n,s)=>n+totalLoadForExercise(e.id,s.w)*(Number(s.r)||0),0),0);
-  if(!sets.length)return '';
-  return `<section class="card reviewcard"><div class="card-h"><h3>Session saved.</h3><span class="pill">${p.done===p.tot?'Complete':'Partial session'}</span></div><p class="small muted">${p.done===p.tot?'Every planned set is in the book.':'Your completed sets are saved. You can return to finish the rest.'}</p><div class="evalgrid"><div class="evalitem"><div class="v">${sets.length}</div><div class="k">sets logged</div></div><div class="evalitem"><div class="v">${Math.round(volume).toLocaleString()}</div><div class="k">${S.unit} × reps · external load</div></div></div><details class="disclosure"><summary>Exercise breakdown</summary><div class="reviewrows">${all.map(e=>`<div class="reviewrow"><div class="rvtop"><b>${esc(EXERCISES[e.id].name)}</b><span class="rvstatus">${e.sets.length} sets</span></div><div class="rvsub">${e.sets.map(s=>`${esc(formatSetLoad(e.id,s.w))} × ${esc(s.r||'?')}`).join('<br>')}</div></div>`).join('')}</div></details><p class="note">Repeat controlled reps before increasing weight. All weights are recorded in ${S.unit}.</p></section>`;
-}
-function renderPlan(){
-  const current=Math.min(12,Math.max(1,todayPos().week)),w=selectedWeek||current;
-  return `${heading('A plan to come back to.','12 weeks. Five training days. Room to recover.')}<div class="phase-track">${PHASES.map((p,i)=>`<div class="${phaseOf(w)===i?'on':''}"><b>${p.name}</b>${p.weeks}</div>`).join('')}</div><div class="week-picker"><label><span class="field-label">Choose week</span><select id="planWeek" aria-label="Choose week">${Array.from({length:12},(_,i)=>`<option value="${i+1}" ${w===i+1?'selected':''}>Week ${i+1}${i+1===current?' · current':''}</option>`).join('')}</select></label><span class="small muted">${dateForPos(w,0).toLocaleDateString(undefined,{month:'short',day:'numeric'})} – ${dateForPos(w,6).toLocaleDateString(undefined,{month:'short',day:'numeric'})}</span></div><div class="card tight">${SPLIT.map((p,d)=>{const date=dateForPos(w,d),plan=planFor(w,d),done=isWorkoutComplete(plan),progress=dayProgress(plan);return `<button class="plan-day ${ymd(date)===todayISO()?'today':''} ${done?'done':''}" data-open-day="${w}.${d}" aria-label="${esc(fmtDate(date))}, ${p.title}${done?', complete':''}"><span class="plan-date"><small>${date.toLocaleDateString(undefined,{weekday:'short'})}</small>${date.getDate()}</span><span class="meta"><b>${p.title}</b><span>${p.type==='rest'?'Rest & reset':`${plan.ex.length} exercises · ${progress.tot} sets`}</span></span><span class="status">${done?icon('check'):progress.done?`${progress.done}/${progress.tot}`:icon('arrow')}</span></button>`;}).join('')}</div><button class="menurow" data-go="library">${icon('book')}<span><b>Exercise library</b><small>Find your form. Explore alternatives.</small></span>${icon('arrow')}</button><details class="disclosure"><summary>Program settings</summary>${scheduleCard()}</details>`;
-}
-function libraryResults(){const query=libraryQuery.toLowerCase().trim(),groups={};for(const id in EXERCISES){const x=EXERCISES[id];if(query&&!`${x.name} ${x.equipment} ${x.primary.join(' ')}`.toLowerCase().includes(query))continue;const g=REGION[x.primary[0]]||'Other';(groups[g]??=[]).push(id);}return Object.keys(groups).length?Object.entries(groups).map(([g,ids])=>`<h2 class="libgroup-title">${g}</h2>${ids.map(id=>{const x=EXERCISES[id];return `<button class="librow" data-ex="${id}"><img src="${x.images[0]}" alt="" loading="lazy"><span><b>${esc(x.name)}</b><small>${esc(cap(x.equipment||'bodyweight'))}</small></span>${icon('arrow')}</button>`;}).join('')}`).join(''):'<p class="empty">No matching exercises. Try a muscle group or equipment name.</p>';}
+function libraryResults(){const query=libraryQuery.toLowerCase().trim(),groups={};for(const id in EXERCISES){const x=EXERCISES[id];if(query&&!`${x.name} ${x.equipment} ${x.primary.join(' ')}`.toLowerCase().includes(query))continue;const g=REGION[x.primary[0]]||'Other';(groups[g]??=[]).push(id);}return Object.keys(groups).length?Object.entries(groups).map(([g,ids])=>`<h2 class="libgroup-title">${g}</h2>${ids.map(id=>{const x=EXERCISES[id];return `<button class="librow" data-ex="${id}"><img src="${exerciseImage(id)}" alt="" loading="lazy"><span><b>${esc(x.name)}</b><small>${esc(cap(x.equipment||'bodyweight'))}</small></span>${icon('arrow')}</button>`;}).join('')}`).join(''):'<p class="empty">No matching exercises. Try a muscle group or equipment name.</p>';}
 function renderLibrary(){return `${heading('Find your form.','Every exercise, with photos and step-by-step cues.')}<input class="searchfield" id="exerciseSearch" type="search" aria-label="Search exercises" placeholder="Search exercises, muscles, equipment…" value="${esc(libraryQuery)}"><div id="libraryResults">${libraryResults()}</div>`;}
 function loggedExercises(plan,dk){
   const planned=workoutExercises(plan,dk),byId=new Map(planned.map(e=>[e.id,e]));
@@ -1532,7 +1465,7 @@ function workoutExportCard(plan, dk, prog){
   return `<div class="card exportcard">
     <div class="card-h"><h3>↥ Garmin export</h3><span class="tiny faint">manual upload</span></div>
     <div class="small muted">${hasSets
-      ? `Download your ${detail.summary.doneSets} logged sets, then upload the file on Garmin Connect Web. Workout timing and calories are estimates.`
+      ? `Download your ${detail.summary.doneSets} logged sets, then upload the file on Garmin Connect Web. Session time uses your timer when available; calories and exported set timing remain estimates.`
       : 'Log at least one set, then export this workout for Garmin Connect manual upload.'}</div>
     ${hasSets ? `
     <div class="exportmeta">
@@ -1654,11 +1587,12 @@ function workoutExportDetail(week,dayIndex){
     });
   }
 
-  const durationSeconds=estimateWorkoutSeconds(exercises);
+  const recorded=sessionElapsed(dk),durationSeconds=recorded||estimateWorkoutSeconds(exercises);
   let start=new Date(workoutDate.getFullYear(),workoutDate.getMonth(),workoutDate.getDate(),18,0,0);
   const now=new Date();
   if(ymd(workoutDate)===todayISO()&&start>now) start=new Date(Math.max(new Date(todayISO()+'T00:00').getTime(),now.getTime()-durationSeconds*1000));
-  const end=new Date(start.getTime()+durationSeconds*1000);
+  if(S.sessions[dk]?.startedAt)start=new Date(S.sessions[dk].startedAt);
+  const end=new Date(S.sessions[dk]?.endedAt||(S.sessions[dk]?.startedAt?Date.now():start.getTime()+durationSeconds*1000));
   const calories=Math.max(25,Math.round(durationSeconds/60*6));
 
   return {
@@ -1678,7 +1612,8 @@ function workoutExportDetail(week,dayIndex){
       cardioNote:plan.cardio?.d||'',
     },
     timing:{
-      estimated:true,
+      estimated:!recorded,
+      setTimingEstimated:true,
       startTime:start.toISOString(),
       endTime:end.toISOString(),
       durationSeconds,
@@ -1950,11 +1885,12 @@ function fitWorkoutSets(detail){
   for(const exercise of detail.exercises){
     for(const set of exercise.sets){
       const reps=Number(set.reps);
-      const activeSeconds=activeSetSeconds(set);
+      const scale=detail.timing.estimated?1:Math.min(1,detail.timing.durationSeconds/Math.max(1,estimateWorkoutSeconds(detail.exercises)));
+      const activeSeconds=activeSetSeconds(set)*scale;
       const start=new Date(cursor);
       const end=new Date(cursor+activeSeconds*1000);
       rows.push({exercise,set,start,end,durationSeconds:activeSeconds});
-      cursor=end.getTime()+(exercise.restSeconds||60)*1000;
+      cursor=end.getTime()+(exercise.restSeconds||60)*1000*scale;
     }
   }
   return rows;
@@ -1968,7 +1904,7 @@ function buildGarminFit(detail){
   const writer=new FitWriter();
   const startFit=fitTimestamp(detail.timing.startTime);
   const endFit=fitTimestamp(detail.timing.endTime);
-  const totalMs=Math.max(1000,Math.round(detail.timing.durationSeconds*1000));
+  const totalMs=Math.max(1000,Math.round(detail.timing.durationSeconds*1000)),wallMs=Math.max(totalMs,new Date(detail.timing.endTime)-new Date(detail.timing.startTime));
   const calories=Math.max(0,Math.min(0xfffe,Math.round(detail.summary.calories||0)));
   const productName='FitLab';
   const title=`FitLab ${detail.workout.title}`;
@@ -2041,7 +1977,7 @@ function buildGarminFit(detail){
     event:0,
     eventType:1,
     startTime:startFit,
-    totalElapsedTime:totalMs,
+    totalElapsedTime:wallMs,
     totalTimerTime:totalMs,
     totalDistance:0,
     totalCalories:calories,
@@ -2058,7 +1994,7 @@ function buildGarminFit(detail){
     startTime:startFit,
     sport:4,
     subSport:20,
-    totalElapsedTime:totalMs,
+    totalElapsedTime:wallMs,
     totalTimerTime:totalMs,
     totalDistance:0,
     totalCalories:calories,
@@ -2168,55 +2104,36 @@ function weightChart(){
   return `<svg class="weight-chart" viewBox="0 0 500 120" role="img" aria-label="Bodyweight trend: ${points.map(x=>`${x.d}: ${displayNumber(x.v)} ${S.unit}`).join('; ')}"><path d="M6 110H494" fill="none" stroke="var(--line)"/><path d="${path}" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>${xy.map(([x,y])=>`<circle cx="${x}" cy="${y}" r="3" fill="var(--accent)"/>`).join('')}</svg><div class="chart-labels"><span>${prettyISO(points[0].d)}</span><span>${prettyISO(points.at(-1).d)}</span></div>`;
 }
 function historyRows(items){return items.map(it=>`<div class="histrow"><button class="histmain" data-open-day="${it.w}.${it.d}"><div class="hd"><b>${esc(it.title)}</b><div class="tiny muted">${prettyISO(ymd(dateForPos(it.w,it.d)))}</div></div><span class="hr">${it.done} sets</span>${icon('arrow')}</button><button class="histexport" data-garmin-fit-export="${it.w}.${it.d}" aria-label="Export ${esc(it.title)} ${ymd(dateForPos(it.w,it.d))} as FIT">FIT</button></div>`).join('');}
-function renderStats(){
-  const history=workoutHistory(),sets=history.reduce((n,x)=>n+x.done,0),rides=Object.values(S.rides).filter(Boolean).length,bw=lastBW(),bf=S.bf.at(-1)?.v;
-  return `${heading('See how far you’ve come.','A little consistency adds up.')}<div class="statgrid"><div class="stat"><div class="v">${history.length}</div><div class="k">Sessions logged</div></div><div class="stat"><div class="v">${sets}</div><div class="k">Sets completed</div></div><div class="stat"><div class="v">${rides}</div><div class="k">Rides logged</div></div></div>
-  <section class="card"><div class="card-h"><h3>Bodyweight</h3><span class="tiny muted">${S.unit}</span></div><div class="weight-reading">${bw?displayNumber(bw):'—'} <small>${S.unit}</small></div>${weightChart()}
-  <form class="inlineform" data-stats-bw-form="1"><label><span class="field-label">Today’s weight (${S.unit})</span><input id="bwIn" type="text" data-number="1" autocomplete="off" autocapitalize="off" spellcheck="false" inputmode="decimal" aria-label="Today’s bodyweight" placeholder="Enter weight" required></label><button type="submit" class="btn primary sm">Save</button></form>
-  ${S.bw.length?`<details class="disclosure"><summary>Recent measurements</summary><div class="entry-list">${S.bw.slice(-14).reverse().map(x=>`<div class="entry-row"><span>${prettyISO(x.d)}</span><span>${displayNumber(x.v)} ${S.unit}</span></div>`).join('')}</div></details>`:''}</section>
-  <div class="section-row"><h3>Training history</h3><span class="tiny muted">${history.length} session${history.length===1?'':'s'}</span></div><div class="card tight">${history.length?historyRows(history.slice(0,6)):`<div class="empty">${icon('train')}Your first session is waiting.<br>Log a set and it will appear here.</div>`}${history.length>6?`<details class="disclosure"><summary>Earlier sessions (${history.length-6})</summary>${historyRows(history.slice(6))}</details>`:''}</div>
-  <details class="disclosure"><summary>Body-fat estimate<span class="tiny muted">${bf?`${bf}%`:'Optional'}</span></summary><p class="small muted">U.S. Navy estimate for men, using your saved height (${displayNumber(S.heightCm)} cm). This is a rough estimate, not a measured body-fat percentage.</p><div class="seg" style="margin-bottom:16px"><button data-mu="in" class="${(S.measUnit||'in')==='in'?'on':''}">inches</button><button data-mu="cm" class="${S.measUnit==='cm'?'on':''}">cm</button></div><form data-bf-form="1"><div class="flexrow"><label><span class="field-label">Waist at navel</span><input class="measurement-input" id="waistIn" type="text" data-number="1" autocomplete="off" autocapitalize="off" spellcheck="false" inputmode="decimal" required></label><label><span class="field-label">Neck</span><input class="measurement-input" id="neckIn" type="text" data-number="1" autocomplete="off" autocapitalize="off" spellcheck="false" inputmode="decimal" required></label></div><button class="btn ghost" type="submit" style="margin-top:12px">Estimate & save</button></form><div id="bfOut" role="status" style="margin:12px 0"></div></details>
-  ${history.length?`<details class="disclosure"><summary>Export workouts</summary><p class="small muted">Download a file, then import it on Garmin Connect Web. Timing and calorie values are estimates. Individual FIT files are available beside each session above.</p><div class="exportactions"><button class="btn ghost sm" data-garmin-export-all="1">All workouts · TCX</button><button class="btn ghost sm" data-json-export-all="1">Workout details · JSON</button><button class="btn ghost sm" data-garmin-upload="1">Open Garmin import ↗</button></div></details>`:''}`;
-}
-function renderMore(){
-  let hasBackup=false;try{hasBackup=!!localStorage.getItem(BACKUP_KEY);}catch{}
-  return `${heading('Make it yours.','Your preferences, tools, and training essentials.')}<section class="card"><div class="settingsrow"><div><b>Appearance</b></div><div class="seg" aria-label="Appearance">${['light','dark','auto'].map(x=>`<button data-theme="${x}" class="${S.theme===x?'on':''}" aria-pressed="${S.theme===x}">${cap(x)}</button>`).join('')}</div></div><div class="settingsrow"><div><b>Weight unit</b><small>Converts existing weights</small></div><div class="seg" aria-label="Weight unit">${['lb','kg'].map(x=>`<button data-unit="${x}" class="${S.unit===x?'on':''}" aria-pressed="${S.unit===x}">${x}</button>`).join('')}</div></div></section>
-  <section class="card tight"><button class="menurow" data-go="library">${icon('book')}<span><b>Exercise library</b><small>Form cues, photos, and muscle maps</small></span>${icon('arrow')}</button><button class="menurow" data-go="guide">${icon('leaf')}<span><b>Your training companion</b><small>Get more out of your routine</small></span>${icon('arrow')}</button></section>
-  <details class="disclosure"><summary>Program settings<span class="tiny muted">12 weeks</span></summary>${scheduleCard()}</details>
-  <details class="disclosure"><summary>Your data & backups</summary><p class="small muted">Your logs live in this browser. Export a backup before changing phones, clearing browser data, or starting a new cycle.</p><div class="exportactions"><button class="btn primary sm" data-backup="1">Download full backup</button><button class="btn ghost sm" data-restore="1">Restore a backup</button>${hasBackup?'<button class="btn ghost sm" data-recovery-backup="1">Download recovery copy</button>':''}</div><p class="note">A restore replaces the current data after confirmation. A recovery copy of your current data is saved first.</p></details>
-  <div class="local-note">${icon('shield')}<span>Private by design. No account or tracking. Your workouts stay on this device unless you export them.</span></div><p class="footer-signature">FITLAB · VERSION 12.4</p>`;
-}
 function setStartDate(value){
   if(!validDate(value)||value>todayISO()){toast('Choose a valid start date on or before today.');return false;}
   if(value===S.startDate){toast('Your start date is already set.');return true;}
-  if(hasScheduleProgress()&&!confirm('Move the schedule to this date? Existing workout dates will move too. Daily check-ins and body measurements keep their calendar dates.'))return false;
+  if(hasScheduleProgress()&&!confirm('Move the schedule to this date? Completed workout dates will stay in your history. Daily check-ins and body measurements keep their calendar dates.'))return false;
   if(!makeRecoveryCopy())return false;
-  S.startDate=value;dayOffset=0;selectedWeek=null;save();render();toast('Program start updated.');return true;
+  freezeHistoryDates();S.startDate=value;dayOffset=0;selectedWeek=null;save();render();toast('Program start updated.');return true;
 }
 function hasScheduleProgress(){return Object.values(S.logs).some(log=>Object.values(log).some(a=>a.some(s=>s.done||s.w!=='')))||Object.values(S.rides).some(Boolean)||Object.keys(S.daily).length>0;}
-function clearScheduleProgress(){for(const k of ['logs','done','reviewed','rides','flow','daily','swaps','lastW'])S[k]={};delete S.restTimer;stopRest();}
+function clearScheduleProgress(){for(const k of ['logs','done','reviewed','rides','flow','daily','swaps','lastW','sessions'])S[k]={};S.schedule={dates:{},pausedAt:null};delete S.restTimer;stopRest();}
 function makeRecoveryCopy(){try{localStorage.setItem(BACKUP_KEY,JSON.stringify(S));return true;}catch{toast('Could not save a recovery copy. Download a backup first.');return false;}}
 function restartScheduleFrom(value,opts={}){
   const date=value||todayISO();if(!validDate(date)||date>todayISO()){toast('Choose a valid start date on or before today.');return false;}
-  if(opts.confirm!==false&&!confirm(`Start a new 12-week cycle on ${prettyISO(date)}? Current workouts and check-ins will be cleared. A recovery copy will be saved; body measurements stay.`))return false;
+  if(opts.confirm!==false&&!confirm(`Start a new 12-week cycle on ${prettyISO(date)}? Your current cycle will be kept in Progress, including workouts and check-ins. Body measurements and preferences stay.`))return false;
   if(!makeRecoveryCopy())return false;
-  clearScheduleProgress();S.startDate=date;dayOffset=0;selectedWeek=null;save();go('today');toast('Your new cycle is ready.');return true;
+  const previous=copy(S);archiveCycle();clearScheduleProgress();S.startDate=date;dayOffset=0;selectedWeek=null;if(!save()){S=previous;render();return false;}go('today');toast('Your new cycle is ready.');return true;
 }
 function restartSchedule(){restartScheduleFrom($('#startIn')?.value||todayISO());}
-function toggleDaily(token){const [key,field]=token.split('|');if(!validDate(key)||!['steps','protein'].includes(field))return;const daily=dailyFor(key);daily[field]=!daily[field];save();render();}
+function toggleDaily(token){const [key,field]=token.split('|');if(!validDate(key)||!Object.keys(HABITS).includes(field))return;const daily=dailyFor(key);daily[field]=!daily[field];save();render();}
 function upsertMeasurement(key,date,value){const n=entryNumber(value);if(!validDate(date)||!Number.isFinite(n)||n<1||n>1500){toast('Enter a valid measurement.');return false;}S[key]=S[key].filter(x=>x.d!==date);S[key].push({d:date,v:Math.round(n*10)/10});S[key].sort((a,b)=>a.d.localeCompare(b.d));return save();}
 function logDailyBW(date){if(upsertMeasurement('bw',date,$('#dailyBwIn')?.value)){render();toast('Bodyweight saved.');}}
 function logBW(){if(upsertMeasurement('bw',todayISO(),$('#bwIn')?.value)){render();toast('Bodyweight saved.');}}
-function calcBF(){let waist=entryNumber($('#waistIn').value),neck=entryNumber($('#neckIn').value);const output=$('#bfOut');if(!Number.isFinite(waist)||!Number.isFinite(neck)||waist<=neck||neck<=0||waist>300||neck>200){output.textContent='Enter valid measurements; waist must exceed neck.';return;}if(S.measUnit==='cm'){waist/=2.54;neck/=2.54;}const value=Math.round((86.010*Math.log10(waist-neck)-70.041*Math.log10(S.heightCm/2.54)+36.76)*10)/10;if(!Number.isFinite(value)||value<2||value>60){output.textContent='These measurements give an implausible estimate. Check your values and units.';return;}upsertMeasurement('bf',todayISO(),value);output.textContent=`Estimated body fat: ${value}%. Saved for today.`;}
 function backupPayload(){return {source:'FitLab',backupVersion:1,exportedAt:new Date().toISOString(),data:S};}
-function downloadBackup(recovery=false){let content;if(recovery){try{content=localStorage.getItem(BACKUP_KEY);}catch{}if(!content){toast('No recovery copy is available.');return;}}else if(storageProblem.startsWith('FitLab could not read')){try{content=localStorage.getItem(STORAGE_KEY);}catch{}}else content=JSON.stringify(backupPayload(),null,2);downloadText(`fitlab-${recovery?'recovery':'backup'}-${todayISO()}.json`,content||JSON.stringify(backupPayload(),null,2),'application/json');toast('Backup downloaded. Keep it somewhere safe.');}
+function downloadBackup(recovery=false){let content;if(recovery){try{content=localStorage.getItem(BACKUP_KEY);}catch{}if(!content){toast('No recovery copy is available.');return;}}else if(storageProblem.startsWith('FitLab could not read')){try{content=localStorage.getItem(STORAGE_KEY);}catch{}}else {S.backupAt=new Date().toISOString();save();content=JSON.stringify(backupPayload(),null,2);}downloadText(`fitlab-${recovery?'recovery':'backup'}-${todayISO()}.json`,content||JSON.stringify(backupPayload(),null,2),'application/json');toast('Backup download requested. Keep the file somewhere safe.');if(view==='more')render();}
 function validateBackup(text){
   const value=JSON.parse(text),data=value.source==='FitLab'&&value.backupVersion===1?value.data:value;
   if(!record(data)||!validDate(data.startDate)||!['lb','kg'].includes(data.unit)||!record(data.logs)||!Array.isArray(data.bw)||!Array.isArray(data.bf))throw new Error('This is not a complete FitLab backup. Workout-only exports cannot be restored.');
   return normalizeState(data);
 }
 async function restoreBackup(file){if(!file)return;if(file.size>10*1024*1024){toast('That file is too large to be a FitLab backup.');return;}try{const next=validateBackup(await file.text());if(!confirm(`Restore this FitLab backup (program started ${prettyISO(next.startDate)})? It replaces your current data; a recovery copy will be saved first.`))return;if(storageProblem.startsWith('FitLab could not read')){const raw=localStorage.getItem(STORAGE_KEY);if(raw)localStorage.setItem(BACKUP_KEY,raw);}else if(!makeRecoveryCopy())return;localStorage.setItem(STORAGE_KEY,JSON.stringify(next));S=next;storageProblem='';stopRest();selectedWeek=null;go('today');toast('Backup restored.');}catch(error){toast(error instanceof SyntaxError?'This file is not valid JSON.':error.message||'Could not restore that backup.');}}
-function renderGuide(){return `${heading('Build a practice.','Simple habits. A routine you can return to.')}<div class="card guide"><h2>Show up. Log it. Repeat.</h2><p>Use Today for your next session. FitLab remembers your sets, so you can pick up where you left off.</p><details class="disclosure" open><summary>During a workout</summary><p>Enter the weight and reps you actually performed, then check the set. Dumbbell weights are per hand. Enter zero for an unweighted bodyweight exercise. In a superset, alternate moves; the timer starts when both sets in a round are checked.</p></details><details class="disclosure"><summary>Find the right exercise</summary><p>Tap an exercise name for photos and form cues. Open Guidance & alternatives to choose an available replacement before logging sets. Your history stays associated with the exercise you performed.</p></details><details class="disclosure"><summary>Make progress visible</summary><p>Review previous sessions in Progress. Weight suggestions use your logged training; treat them as a starting point and adjust for the equipment and how you feel. Bodyweight is recorded once per date so corrections update the existing entry.</p></details><details class="disclosure"><summary>Leave room for recovery</summary><p>Recovery days are part of your plan. Bike rides count as activity, and gym finishers are optional. The daily targets are prompts for consistency; adapt your routine to your needs.</p></details><details class="disclosure"><summary>Keep your history</summary><p>FitLab saves locally in this browser. Use More → Your data & backups to download a full backup and restore it on another device. Garmin exports contain workout details, not a restorable FitLab backup.</p></details></div>`;}
+function renderGuide(){return `${heading('Build a practice.','Simple habits. A routine you can return to.')}<div class="card guide"><h2>Show up. Log it. Repeat.</h2><p>Use Today for your next session. FitLab remembers your sets, so you can pick up where you left off.</p><details class="disclosure" open><summary>During a workout</summary><p>Enter the weight and reps you actually performed, then check the set. Dumbbell weights are per hand. Enter zero for an unweighted bodyweight exercise. Use + Warm-up for preparation sets; these are kept separately from your working sets. In a superset, the next movement appears automatically; the timer starts when both sets in a round are checked.</p></details><details class="disclosure"><summary>Find the right exercise</summary><p>Tap an exercise name for photos and form cues. Open Guidance & alternatives to choose a replacement for the remaining sets. Your history stays associated with the exercise you performed.</p></details><details class="disclosure"><summary>Make progress visible</summary><p>Review previous sessions in Progress. Weight suggestions use your logged training; treat them as a starting point and adjust for the equipment and how you feel. Bodyweight is recorded once per date so corrections update the existing entry.</p></details><details class="disclosure"><summary>Leave room for recovery</summary><p>Recovery days are part of your plan. Bike rides count as activity, and gym finishers are optional. Choose your own habits and optional targets in More.</p></details><details class="disclosure"><summary>Keep your history</summary><p>FitLab saves locally in this browser. New cycles keep previous cycles in Progress. Pause a session when taking a break; the session clock survives closing and reopening the app. Use More → Your data & backups to download a full backup and restore it on another device. Garmin exports contain workout details, not a restorable FitLab backup.</p></details></div>`;}
 
 /* ---------- accessible exercise sheet ---------- */
 let sheetHistoryOpen=false,sheetReturnFocus=null;
@@ -2225,15 +2142,15 @@ function openSheet(id){
   sheetReturnFocus=document.activeElement;
   $('#sheet').innerHTML=`<div class="sheettop"><div><h2 id="sheetTitle">${esc(x.name)}</h2><div class="small muted">${esc(cap(x.primary.join(', ')))}</div></div><button class="sheetclose" data-close="1">Close</button></div>
   <div class="carousel" aria-label="Exercise photos and muscle map">${[{img:x.images[0],label:'Start position'},{img:x.images[1],label:'End position'},{map:true,label:'Muscles worked'}].map((s,i)=>`<div class="slide">${s.map?muscleMap(x.primary,x.secondary):`<img src="${s.img}" alt="${esc(x.name)} — ${s.label}">`}<div class="cap"><span>${s.label}</span><span>${i+1} / 3</span></div></div>`).join('')}</div>
-  <a class="btn ghost" href="${videoLink(id,x.name)}" target="_blank" rel="noopener noreferrer">${icon('play')}Watch demonstration</a><div class="mgrid"><div><div class="k">Equipment</div><div class="v">${esc(x.equipment||'Bodyweight')}</div></div><div><div class="k">Log weight as</div><div class="v">${esc(loadMeta(id).label)}</div></div></div><h3>How to perform</h3><ol class="steps">${x.instructions.map(s=>`<li>${esc(s)}</li>`).join('')}</ol>`;
+  <h3>Quick cues</h3><ul class="quick-cues">${quickCues(id).map(c=>`<li>${esc(c)}</li>`).join('')}</ul><h3>Movement reference</h3><div class="movement-frames">${x.images.map((src,i)=>`<figure><img src="${src}" alt="${esc(x.name)} position ${i+1}"><figcaption>Position ${i+1}</figcaption></figure>`).join('')}</div><p class="note">Two reference photos of this exercise. Swipe the photos above for the muscle map; open the demonstration for full motion.</p><a class="btn ghost" href="${videoLink(id,x.name)}" target="_blank" rel="noopener noreferrer">${icon('play')}Watch demonstration</a><div class="mgrid"><div><div class="k">Equipment</div><div class="v">${esc(x.equipment||'Bodyweight')}</div></div><div><div class="k">Log weight as</div><div class="v">${esc(loadMeta(id).label)}</div></div></div><h3>How to perform</h3><ol class="steps">${x.instructions.map(s=>`<li>${esc(s)}</li>`).join('')}</ol>`;
   $('#sheetWrap').classList.add('open');$('#sheet').scrollTop=0;$('#app').inert=true;document.querySelector('nav').inert=true;document.body.style.overflow='hidden';$('#sheet .sheetclose').focus();
   if(!sheetHistoryOpen){history.pushState({...history.state,fitlabSheet:id},'',location.href);sheetHistoryOpen=true;}
 }
 function closeSheet(opts={}){const wasOpen=$('#sheetWrap').classList.contains('open');$('#sheetWrap').classList.remove('open');$('#app').inert=false;document.querySelector('nav').inert=false;document.body.style.overflow='';if(sheetReturnFocus?.isConnected)sheetReturnFocus.focus({preventScroll:true});if(wasOpen&&sheetHistoryOpen&&!opts.fromPop)history.back();sheetHistoryOpen=false;}
-function routeState(){return {fitlab:true,view,viewingPos,returnView,dayOffset,selectedWeek};}
+function routeState(){return {fitlab:true,view,viewingPos,returnView,dayOffset,selectedWeek,archiveSelection,browseDay};}
 window.addEventListener('popstate',event=>{
   if($('#sheetWrap').classList.contains('open'))closeSheet({fromPop:true});
-  const state=event.state;if(state?.fitlab){view=state.view;viewingPos=state.viewingPos;returnView=state.returnView||'today';dayOffset=state.dayOffset||0;selectedWeek=state.selectedWeek;render();}
+  const state=event.state;if(state?.fitlab){view=state.view;viewingPos=state.viewingPos;returnView=state.returnView||'today';dayOffset=state.dayOffset||0;selectedWeek=state.selectedWeek;archiveSelection=state.archiveSelection;browseDay=state.browseDay??null;render();}
 });
 document.addEventListener('keydown',e=>{
   if(!$('#sheetWrap').classList.contains('open'))return;
@@ -2243,7 +2160,7 @@ document.addEventListener('keydown',e=>{
 /* ---------- rest timer: deadlines survive background throttling ---------- */
 let rtInt=null;
 function restSecondsLeft(){return S.restTimer?Math.max(0,Math.ceil((S.restTimer.endsAt-Date.now())/1000)):0;}
-function tickRest(){const left=restSecondsLeft();if(!left){const hadTimer=!!S.restTimer;stopRest();if(hadTimer){toast('Rest complete. Ready when you are.');navigator.vibrate?.([120,60,120]);}return;}$('#restbar').classList.add('show');$('#rtnum').textContent=`${Math.floor(left/60)}:${String(left%60).padStart(2,'0')}`;$('#rtlabel').textContent=S.restTimer.label||'Rest';}
+function tickRest(){const left=restSecondsLeft();if(!left){const hadTimer=!!S.restTimer;stopRest();if(hadTimer){toast('Rest complete. Ready when you are.');navigator.vibrate?.([120,60,120]);playRestSound();}return;}$('#restbar').classList.add('show');$('#rtnum').textContent=`${Math.floor(left/60)}:${String(left%60).padStart(2,'0')}`;$('#rtlabel').textContent=S.restTimer.label||'Rest';}
 function startRest(sec,label){if(!Number.isFinite(sec)||sec<=0)return;clearInterval(rtInt);S.restTimer={endsAt:Date.now()+sec*1000,label:label||'Rest'};save();tickRest();rtInt=setInterval(tickRest,250);}
 function stopRest(){clearInterval(rtInt);rtInt=null;delete S.restTimer;$('#restbar').classList.remove('show');save();}
 let toastTimer;
@@ -2259,13 +2176,13 @@ document.addEventListener('click',e=>{
   if(c('[data-close]')){closeSheet();return;}
   const nav=c('[data-go]');if(nav){go(nav.dataset.go);return;}
   if(c('[data-back]')){go(returnView,{keepDay:true});return;}
-  const step=c('[data-day-step]');if(step){const n=Math.max(0,Math.min(83,selectedDayNumber()+Number(step.dataset.dayStep)));dayOffset=n-Math.max(0,daysSinceStart());render();return;}
-  const select=c('[data-select-day]');if(select){dayOffset=Number(select.dataset.selectDay)-Math.max(0,daysSinceStart());render();return;}
-  if(c('[data-day-today]')){dayOffset=0;render();return;}
+  const step=c('[data-day-step]');if(step){const n=Math.max(0,Math.min(83,selectedDayNumber()+Number(step.dataset.dayStep)));browseDay=n;dayOffset=n-Math.max(0,daysSinceStart());render();return;}
+  const select=c('[data-select-day]');if(select){browseDay=Number(select.dataset.selectDay);dayOffset=browseDay-Math.max(0,daysSinceStart());render();return;}
+  if(c('[data-day-today]')){dayOffset=0;browseDay=null;render();return;}
   const ob=c('[data-open-block]');if(ob){openDay(...ob.dataset.openBlock.split('.').map(Number));return;}
-  const od=c('[data-open-day]');if(od){openDay(...od.dataset.openDay.split('.').map(Number));return;}
+  const od=c('[data-open-day]');if(od){if(od.dataset.start){const [w,d]=od.dataset.openDay.split('.').map(Number);if(!startSession(dayKey(w,d)))return;}openDay(...od.dataset.openDay.split('.').map(Number));return;}
   const flow=c('[data-flow-step]');if(flow&&viewingPos){const plan=planFor(viewingPos.week,viewingPos.dayIndex);setFlowIndex(plan,flowIndexFor(plan)+Number(flow.dataset.flowStep));render();window.scrollTo({top:0});return;}
-  if(c('[data-finish-workout]')&&viewingPos){const dk=dayKey(viewingPos.week,viewingPos.dayIndex);S.reviewed[dk]=true;stopRest();save();render();requestAnimationFrame(()=>$('.reviewcard')?.scrollIntoView({behavior:'smooth',block:'start'}));return;}
+  if(c('[data-finish-workout]')&&viewingPos){finishSession(dayKey(viewingPos.week,viewingPos.dayIndex));return;}
   const swap=c('[data-swap-ex]');if(swap){setExerciseSwap(...swap.dataset.swapEx.split('|'));return;}
   const clear=c('[data-clear-swap]');if(clear){setExerciseSwap(...clear.dataset.clearSwap.split('|'),null);return;}
   const check=c('[data-ck]');if(check){toggleSet(check.dataset.ck);return;}
@@ -2304,7 +2221,7 @@ document.addEventListener('input',e=>{
   const dk=dayKey(viewingPos.week,viewingPos.dayIndex),st=S.logs[dk]?.[ex]?.[i];if(!st)return;
   st[field]=input.value;
   // Editing a completed set makes it a draft until explicitly checked again.
-  if(st.done){st.done=false;delete S.reviewed[dk];input.closest('.set-row')?.classList.remove('done');const button=input.closest('.set-row')?.querySelector('.ck');button?.setAttribute('aria-pressed','false');button?.setAttribute('aria-label',`Complete ${EXERCISES[ex].name} set ${Number(i)+1}`);updateProgress();}
+  if(st.done){st.done=false;delete S.reviewed[dk];input.closest('.set-row')?.classList.remove('done');const button=input.closest('.set-row')?.querySelector('.ck');button?.setAttribute('aria-pressed','false');button?.setAttribute('aria-label',`Complete ${setAccessibleName(EXERCISES[ex].name,S.logs[dk][ex],Number(i))}`);updateProgress();}
   if(field==='w'&&Number.isFinite(entryNumber(input.value)))S.lastW[ex]=String(entryNumber(input.value));save();
 });
 function updateProgress(){if(!viewingPos)return;const plan=planFor(viewingPos.week,viewingPos.dayIndex),p=dayProgress(plan),time=workoutTimeEstimate(plan,dayKey(plan.week,plan.dayIndex));const bar=$('.workout-progress .bar>i');if(bar)bar.style.width=p.pct+'%';const meta=$('.workout-progress .progress-meta');if(meta)meta.innerHTML=`<span>${p.done} of ${p.tot} sets logged</span><span>${p.done===p.tot?'Session complete':`About ${time.remaining} min left`}</span>`;$('.reviewcard')?.remove();}
@@ -2312,10 +2229,10 @@ function toggleSet(token){
   if(!viewingPos)return;
   const [id,index]=token.split('|'),i=Number(index),dk=dayKey(viewingPos.week,viewingPos.dayIndex),st=S.logs[dk]?.[id]?.[i];if(!st)return;
   const plan=planFor(viewingPos.week,viewingPos.dayIndex),exercise=workoutExercises(plan,dk).find(x=>x.id===id);if(!exercise)return;
-  if(!st.done){const reps=entryNumber(st.r),weight=blank(st.w)?0:entryNumber(st.w);if(!Number.isInteger(reps)||reps<1||reps>1000){toast('Enter the reps you performed before completing this set.');return;}const bw=EXERCISES[id].equipment==='body only';if((blank(st.w)&&!bw)||!Number.isFinite(weight)||weight<0||weight>5000){toast('Enter a valid weight. Use 0 for bodyweight.');return;}st.w=String(weight);st.r=String(reps);st.done=true;st.completedAt=new Date().toISOString();navigator.vibrate?.(20);
+  if(!st.done){const reps=entryNumber(st.r),weight=blank(st.w)?0:entryNumber(st.w);if(!Number.isInteger(reps)||reps<1||reps>1000){toast('Enter the reps you performed before completing this set.');return;}const bw=EXERCISES[id].equipment==='body only';if((blank(st.w)&&!bw)||!Number.isFinite(weight)||weight<0||weight>5000){toast('Enter a valid weight. Use 0 for bodyweight.');return;}if(!S.sessions[dk]?.runningSince&&!startSession(dk))return;st.w=String(weight);st.r=String(reps);st.done=true;st.completedAt=new Date().toISOString();navigator.vibrate?.(20);
     const block=workoutBlocks(plan,dk).find(b=>b.ex.some(x=>x.id===id));
-    const roundDone=block.ex.every(x=>x.sets<=i||S.logs[dk]?.[x.id]?.[i]?.done);
-    if(block.ex.length===1||roundDone)startRest(exercise.rest||60,'Rest');else{stopRest();toast('Set saved. Move to the paired exercise.');}
+    const round=workSets(S.logs[dk][id]).indexOf(st);const roundDone=block.ex.every(x=>x.sets<=round||workSets(S.logs[dk]?.[x.id])[round]?.done);advancePair(block,dk);
+    if(st.kind!=='warmup'&&(block.ex.length===1||roundDone))startRest(exercise.rest||60,'Rest');else{stopRest();toast(st.kind==='warmup'?'Warm-up saved.':'Set saved. Move to the paired exercise.');}
   }else{st.done=false;delete st.completedAt;stopRest();}
   delete S.reviewed[dk];save();
   const y=window.scrollY,openDetails=[...document.querySelectorAll('.exextras')].map(x=>x.open);render();document.querySelectorAll('.exextras').forEach((x,j)=>x.open=!!openDetails[j]);window.scrollTo({top:y});document.querySelector(`[data-ck="${id}|${i}|${exercise.rest}"]`)?.focus({preventScroll:true});
@@ -2327,7 +2244,7 @@ document.addEventListener('visibilitychange',()=>{if(document.visibilityState===
 window.addEventListener('pagehide',()=>save());
 window.addEventListener('storage',e=>{if(e.key!==STORAGE_KEY||!e.newValue)return;try{S=normalizeState(JSON.parse(e.newValue));render();toast('Updated from another FitLab tab.');}catch{}});
 /* ---------- boot ---------- */
-render();history.replaceState(routeState(),'',location.href);
+bootCompanion();render();history.replaceState(routeState(),'',location.href);
 if(S.restTimer){tickRest();if(S.restTimer)rtInt=setInterval(tickRest,250);}
 window.matchMedia?.('(prefers-color-scheme: dark)').addEventListener?.('change',()=>{if(S.theme==='auto')applyTheme();});
-if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).then(reg=>reg.update()).catch(()=>{}));}
+if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).then(async reg=>{await navigator.serviceWorker.ready;offlineReady=true;if(view==='more')render();return reg.update();}).catch(()=>{}));}

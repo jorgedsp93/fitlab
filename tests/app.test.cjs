@@ -7,7 +7,7 @@ const {JSDOM,VirtualConsole}=require('jsdom');
 process.env.TZ='America/Toronto';
 const root=path.resolve(__dirname,'..');
 const html=fs.readFileSync(path.join(root,'index.html'),'utf8');
-const source=fs.readFileSync(path.join(root,'app.js'),'utf8');
+const source=fs.readFileSync(path.join(root,'companion.js'),'utf8')+'\n'+fs.readFileSync(path.join(root,'app.js'),'utf8');
 const bench='Barbell_Bench_Press_-_Medium_Grip';
 function app(state){
   const errors=[],vc=new VirtualConsole();vc.on('jsdomError',e=>errors.push(e));
@@ -44,7 +44,7 @@ test('invalid set entries cannot be checked, and edits to completed entries requ
 }));
 test('supersets only start rest after both moves are checked',()=>withApp(undefined,a=>{
   a.run('openDay(1,0,3)');a.input('[data-field="w"]','25');a.click('[data-ck]');assert.equal(a.run('!!S.restTimer'),false);
-  a.input('.exblock:nth-of-type(2) [data-field="w"]','25');a.click('.exblock:nth-of-type(2) [data-ck]');assert.equal(a.run('!!S.restTimer'),true);
+  a.input('[data-field="w"]','25');a.click('[data-ck]');assert.equal(a.run('!!S.restTimer'),true);
 }));
 test('rest timer uses elapsed wall time after backgrounding and persists on reload',()=>{
   let saved;
@@ -55,7 +55,7 @@ test('swapping cannot reuse a second exercise slot or hide already completed set
   assert.equal(a.run(`setExerciseSwap('w1d0','${bench}','Incline_Dumbbell_Press')`),false);
   assert.equal(a.run(`setExerciseSwap('w1d0','${bench}','Dumbbell_Bench_Press')`),true);
   a.run(`openDay(1,0);S.logs.w1d0.Dumbbell_Bench_Press[0]={w:'30',r:'8',done:true}`);
-  assert.equal(a.run(`setExerciseSwap('w1d0','${bench}',null)`),false);
+  assert.equal(a.run(`setExerciseSwap('w1d0','${bench}',null)`),true);
   assert.equal(a.run('workoutExportDetail(1,0).summary.doneSets'),1);
 }));
 test('legacy completed sets from a replaced exercise remain in exports',()=>withApp(undefined,a=>{
@@ -159,8 +159,8 @@ test('daily bodyweight, progress bodyweight, and body measurements support tap t
   a.doc.querySelector('[data-bw-form]').closest('details').open=true;
   a.click('#dailyBwIn');assert.equal(a.doc.activeElement.id,'dailyBwIn');a.input('#dailyBwIn','200,5');a.click('[data-bw-form] button[type="submit"]');assert.equal(a.run('lastBW()'),200.5);
   a.run(`go('stats')`);a.click('#bwIn');assert.equal(a.doc.activeElement.id,'bwIn');a.input('#bwIn','199.5');a.click('[data-stats-bw-form] button[type="submit"]');assert.equal(a.run('lastBW()'),199.5);
-  a.doc.querySelector('[data-bf-form]').closest('details').open=true;
-  for(const id of ['waistIn','neckIn']){a.click('#'+id);assert.equal(a.doc.activeElement.id,id);}
+  a.doc.querySelector('[data-manual-bf]').closest('details').open=true;
+  for(const id of ['manualBF']){a.click('#'+id);assert.equal(a.doc.activeElement.id,id);}
   assert.equal(a.run(`upsertMeasurement('bw',todayISO(),'1e2')`),false);
 }));
 
@@ -182,11 +182,91 @@ test('real summary clicks open and close details across the app without a rerend
   a.run(`go('more')`);a.click('button[data-theme="dark"]');assert.equal(a.doc.documentElement.dataset.theme,'dark');a.click('button[data-theme="light"]');assert.equal(a.doc.documentElement.dataset.theme,'light');
 }));
 
-test('measurement estimation submits through its real button and decimal drafts survive reload',()=>{
+test('manual body measurement submits through its real button and decimal drafts survive reload',()=>{
   let saved;
   withApp(undefined,a=>{
-    a.run(`go('stats')`);a.doc.querySelector('[data-bf-form]').closest('details').querySelector('summary').click();a.input('#waistIn','36');a.input('#neckIn','16');a.click('[data-bf-form] button[type="submit"]');assert.equal(a.run('S.bf.length'),1);assert.match(a.doc.querySelector('#bfOut').textContent,/Saved for today/);
+    a.run(`go('stats')`);a.doc.querySelector('[data-manual-bf]').closest('details').querySelector('summary').click();a.input('#manualBF','22');a.click('[data-manual-bf] button[type="submit"]');assert.equal(a.run('S.bf.length'),1);assert.equal(a.run('S.bf[0].v'),22);
     a.run('openDay(1,0)');a.input('[data-field="w"]','22,5');saved=a.w.localStorage.getItem('fitlab_v1');
   });
   withApp(saved,a=>{a.click('[data-open-day]');assert.equal(a.doc.querySelector('[data-field="w"]').value,'22.5');assert.equal(a.doc.querySelector('[data-ck]').getAttribute('aria-pressed'),'false');});
 });
+
+test('v12 migration freezes original workout dates, removes assumed measurements, and keeps logs',()=>withApp({startDate:'2026-01-01',schemaVersion:12,unit:'lb',heightCm:185.4,logs:{w1d0:{[bench]:[{w:'95',r:'8',done:true}]}},bw:[],bf:[{d:'2026-01-02',v:20}]},a=>{
+  assert.equal(a.run('S.schemaVersion'),13);assert.equal(a.run('S.heightConfirmed'),false);assert.equal(a.run('S.sessions.w1d0.performedDate'),'2026-01-01');assert.match(a.run('S.bf[0].source'),/not confirmed/);
+  a.run("setStartDate('2026-02-01')");assert.equal(a.run('ymd(dateForPos(1,0))'),'2026-01-01');assert.equal(a.run('S.logs.w1d0[Object.keys(S.logs.w1d0)[0]][0].done'),true);
+}));
+test('moving an unstarted session changes next-session order and starting records today',()=>withApp(undefined,a=>{
+  a.run("const future=new Date();future.setDate(future.getDate()+10);moveSession('w1d0',ymd(future))");assert.equal(a.run('nextSession().key'),'pull');
+  a.run("startSession('w1d0')");assert.equal(a.run('ymd(dateForPos(1,0))'),a.run('todayISO()'));assert.equal(a.run("moveSession('w1d0',todayISO())"),false);
+}));
+test('pause, resume, reload and finish preserve elapsed training time without paused time',()=>{
+  let saved;
+  withApp(undefined,a=>{a.run("startSession('w1d0');S.sessions.w1d0.runningSince=new Date(Date.now()-61000).toISOString();pauseSession('w1d0',false)");assert.equal(a.run("sessionElapsed('w1d0')"),61);a.run("startSession('w1d0');S.sessions.w1d0.runningSince=new Date(Date.now()-9000).toISOString();save()");saved=a.w.localStorage.getItem('fitlab_v1');});
+  withApp(saved,a=>{assert.ok(a.run("sessionElapsed('w1d0')")>=70);a.run("openDay(1,0);finishSession('w1d0')");assert.equal(a.run('view'),'review');assert.equal(a.run('!!S.sessions.w1d0.runningSince'),false);assert.equal(a.run('S.sessions.w1d0.status'),'finished');});
+});
+test('plan pause shifts only future unstarted work and training weekdays are honored',()=>withApp(undefined,a=>{
+  a.run(`S.logs.w1d0={'${bench}':[{w:'95',r:'8',done:true}]};freezeHistoryDates();const fixed=ymd(dateForPos(1,0));const before=calendarDay(ymd(dateForPos(1,1)));pausePlan();S.schedule.pausedAt=ymd(new Date(Date.now()-3*86400000));resumePlan();if(calendarDay(ymd(dateForPos(1,1)))-before!==3)throw Error('Pending date did not move');if(ymd(dateForPos(1,0))!==fixed)throw Error('History moved');S.preferences.weekdays=[1,3];applyTrainingDays();`);
+  assert.ok([1,3].includes(a.run('dateForPos(1,1).getDay()')));
+}));
+test('warmups do not count toward completion or progression, and work sets can be added or removed',()=>withApp(undefined,a=>{
+  a.run(`openDay(1,0);addSet('w1d0','${bench}','warmup');S.logs.w1d0['${bench}'][0]={w:'300',r:'20',kind:'warmup',done:true};render()`);
+  assert.equal(a.run('dayProgress(planFor(1,0)).done'),0);assert.equal(a.run(`currentWorkoutSuggestion('${bench}',planFor(1,0).ex[0],'w1d0')`),null);
+  a.run(`addSet('w1d0','${bench}');`);assert.equal(a.run('dayProgress(planFor(1,0)).tot'),20);
+  a.run(`removeSet('w1d0','${bench}',4)`);assert.equal(a.run('dayProgress(planFor(1,0)).tot'),19);
+}));
+test('mid-exercise swap retains completed sets, allocates remaining sets, and uses the replacement photo',()=>withApp(undefined,a=>{
+  a.run(`openDay(1,0);S.logs.w1d0['${bench}'][0]={w:'95',r:'8',done:true};setExerciseSwap('w1d0','${bench}','Dumbbell_Bench_Press');`);
+  assert.equal(a.run('dayProgress(planFor(1,0)).tot'),19);assert.equal(a.run('dayProgress(planFor(1,0)).done'),1);assert.equal(a.run("workoutExercises(planFor(1,0),'w1d0')[0].sets"),2);
+  assert.match(a.doc.querySelector('.exercise-thumb').src,/Dumbbell_Bench_Press/);assert.equal(a.run('workoutExportDetail(1,0).summary.doneSets'),1);
+  a.run("omitExercise('w1d0','Dumbbell_Bench_Press')");assert.equal(a.run("workoutExercises(planFor(1,0),'w1d0').some(e=>e.id==='Dumbbell_Bench_Press')"),false);assert.equal(a.run('dayProgress(planFor(1,0)).done'),1);
+}));
+test('short sessions preserve completed late exercises and full-session restore keeps the work',()=>withApp(undefined,a=>{
+  a.run(`S.logs.w1d0={Standing_Dumbbell_Triceps_Extension:[{w:'30',r:'12',done:true}]};shortSession('w1d0',20);`);
+  assert.ok(a.run('dayProgress(planFor(1,0)).tot')<19);assert.equal(a.run('dayProgress(planFor(1,0)).done'),1);
+  a.run("shortSession('w1d0',0)");assert.equal(a.run('dayProgress(planFor(1,0)).tot'),19);assert.equal(a.run('dayProgress(planFor(1,0)).done'),1);
+}));
+test('adding, skipping, restoring and reordering movements cannot duplicate a planned exercise',()=>withApp(undefined,a=>{
+  a.run(`omitExercise('w1d0','${bench}');addExercise('w1d0','${bench}');addExercise('w1d0','Dumbbell_Bench_Press');moveBlock('w1d0','Dumbbell_Bench_Press',-1);`);
+  assert.equal(a.run(`workoutExercises(planFor(1,0),'w1d0').filter(e=>e.id==='${bench}').length`),1);assert.equal(a.run("workoutExercises(planFor(1,0),'w1d0').length"),8);assert.equal(a.errors.length,0);
+}));
+test('new cycles preserve searchable history, notes, dates and weight units through backup restore',()=>withApp(undefined,a=>{
+  a.run(`S.logs.w1d0={'${bench}':[{w:'100',r:'8',done:true}]};sessionFor('w1d0').notes={'${bench}':'Rack 2'};freezeHistoryDates();restartScheduleFrom(todayISO(),{confirm:false});changeUnit('kg');`);
+  assert.equal(a.run('S.archives.length'),1);assert.equal(a.run('allHistory().length'),1);assert.ok(Math.abs(a.run(`lastPerf('${bench}','w1d0')[0].w`)-45.359)<.001);
+  a.run("S=validateBackup(JSON.stringify(backupPayload()));archiveSelection=S.archives[0].id+'|w1d0';go('archive')");assert.match(a.doc.querySelector('#app').textContent,/Rack 2/);assert.match(a.doc.querySelector('#app').textContent,/45.4/);assert.equal(a.errors.length,0);
+}));
+test('hard effort holds the load and custom increments survive unit conversion',()=>withApp(undefined,a=>{
+  a.run(`S.logs.w1d0={'${bench}':Array.from({length:3},()=>({w:'100',r:'8',done:true}))};sessionFor('w1d0').effort={'${bench}':'hard'};`);
+  assert.equal(a.run(`suggest('${bench}',planFor(2,0).ex[0],'w2d0').weight`),100);
+  a.run(`S.sessions.w1d0.effort['${bench}']='right';S.preferences.increments['${bench}']={value:2.5,unit:'lb'}`);assert.equal(a.run(`suggest('${bench}',planFor(2,0).ex[0],'w2d0').weight`),102.5);
+  a.run("changeUnit('kg')");assert.ok(Math.abs(a.run('incFor(planFor(2,0).ex[0])')-1.134)<.001);
+}));
+test('weekly progress distinguishes partial sessions, complete sessions, and warmups',()=>withApp(undefined,a=>{
+  a.run(`S.logs.w1d0={'${bench}':[{w:'100',r:'8',done:true}]};sessionFor('w1d0').performedDate=todayISO();S.logs.w1d1={Face_Pull:[{w:'20',r:'10',kind:'warmup',done:true}]};sessionFor('w1d1').performedDate=todayISO();go('stats')`);
+  assert.equal(a.run('weeklySummary().partial'),1);assert.equal(a.run('weeklySummary().completed'),0);assert.equal(a.run('allHistory().length'),1);assert.ok(a.doc.querySelector('.trend-awaiting'));assert.equal(a.errors.length,0);
+}));
+test('notes and effort save from their controls; habit targets are user-chosen and survive reload',()=>{
+  let saved;withApp(undefined,a=>{a.run('openDay(1,0)');a.input('#exerciseNote','Rack 3');a.click('[data-effort$="|hard"]');a.run("go('more')");a.input('[name="stepsTarget"]','7000');a.doc.querySelector('[name="rideEnabled"]').checked=false;a.doc.querySelector('[data-habit-settings]').dispatchEvent(new a.w.Event('submit',{bubbles:true,cancelable:true}));saved=a.w.localStorage.getItem('fitlab_v1');});
+  withApp(saved,a=>{assert.equal(a.run(`S.sessions.w1d0.notes['${bench}']`),'Rack 3');assert.equal(a.run(`S.sessions.w1d0.effort['${bench}']`),'hard');assert.equal(a.run('S.preferences.habits.steps.target'),7000);assert.equal(a.run('S.preferences.habits.ride.enabled'),false);});
+});
+test('actual timed exports keep synthetic sets within the recorded session window',async()=>{
+  const {Decoder,Stream}=await import('@garmin/fitsdk');withApp(undefined,a=>{
+    a.run(`S.logs.w1d0={'${bench}':Array.from({length:3},()=>({w:'100',r:'8',done:true}))};S.sessions.w1d0={startedAt:new Date(Date.now()-30000).toISOString(),endedAt:new Date().toISOString(),elapsedMs:10000};`);
+    const detail=a.run('workoutExportDetail(1,0)');assert.equal(detail.timing.estimated,false);assert.equal(detail.timing.durationSeconds,10);
+    const {messages,errors}=new Decoder(Stream.fromByteArray(Array.from(a.run('buildGarminFit(workoutExportDetail(1,0))')))).read();assert.deepEqual(errors,[]);for(const s of messages.setMesgs)assert.ok(s.timestamp<=messages.sessionMesgs[0].timestamp);
+  });
+});
+test('malformed archived entries are filtered without breaking otherwise valid history',()=>withApp(undefined,a=>{
+  a.run(`S=normalizeState({...S,archives:[{id:'old',startDate:'2026-01-01',logs:{w1d0:{'${bench}':null},bad:[]},sessions:{w1d0:null}}]});go('stats')`);assert.equal(a.errors.length,0);assert.equal(a.run('allHistory().length'),0);
+}));
+test('session artwork, exercise photos and quick cues match their intended movements',()=>withApp(undefined,a=>{
+  a.run(`for(let d=0;d<7;d++){const p=planFor(1,d);if(!artwork(p).includes('session-'+p.key+'-v13.png'))throw Error('Wrong session art');}for(const id of Object.keys(EXERCISES)){if(!QUICK_CUES[id])throw Error('Missing quick cues '+id);for(const img of EXERCISES[id].images){if(!img.includes('/'+id+'/')&&!['Barbell_Hip_Thrust','Dumbbell_Shoulder_Press','Seated_Dumbbell_Press'].includes(id))throw Error('Unexpected image mapping '+id);}}`);
+}));
+
+test('Today follows moved sessions, while explicitly browsing another day remains possible',()=>withApp(undefined,a=>{
+  a.run("const moved=new Date();moved.setDate(moved.getDate()+14);moveSession('w1d0',ymd(moved));go('today')");assert.match(a.doc.querySelector('.training-main h2').textContent,/Pull/);
+  a.click('[data-select-day="0"]');assert.match(a.doc.querySelector('.training-main h2').textContent,/Push/);a.click('[data-day-step="7"]');assert.equal(a.run('selectedDayNumber()'),7);
+}));
+test('review gives the next programmed target after successful top-of-range sets',()=>withApp(undefined,a=>{
+  a.run(`S.logs.w1d0={'${bench}':Array.from({length:3},()=>({w:'100',r:'8',done:true}))}`);assert.match(a.run(`nextExerciseAdvice('${bench}','w1d0')`),/105 lb/);
+  assert.match(a.run("exerciseImage('Plank')"),/Plank\/1.jpg/);
+}));
