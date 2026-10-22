@@ -1268,7 +1268,8 @@ function setExerciseSwap(dk,baseId,altId){
   if(exercises.some(e=>e.originalId!==baseId&&e.id===target)||exDoneCount(dk,target)){toast('That exercise already has a place or completed work in this session.');return false;}
   const completed=exDoneCount(dk,current.id),remaining=current.sets-completed;
   if(!remaining){toast('All sets are complete. Add another exercise to do more.');return false;}
-  if(completed){S.logs[dk][current.id]=S.logs[dk][current.id].filter(s=>s.done);(sessionFor(dk).counts??={})[target]=remaining;}
+  if(S.logs[dk]?.[current.id])S.logs[dk][current.id]=S.logs[dk][current.id].filter(s=>s.done);
+  (sessionFor(dk).counts??={})[target]=remaining;
   S.swaps[dk]??={};if(target===baseId)delete S.swaps[dk][baseId];else S.swaps[dk][baseId]=target;
   delete S.reviewed[dk];save();render();return true;
 }
@@ -1320,7 +1321,8 @@ function estimateSetSeconds(e,setCount){
   return setCount*45 + Math.max(0,setCount-1)*(e.rest||60) + 30;
 }
 function workoutTimeEstimate(plan,dk){
-  let total=0, remaining=0;
+  const warmup=warmupTimeEstimate(plan,dk);
+  let total=warmup.total, remaining=warmup.remaining;
   for(const e of workoutExercises(plan,dk)){
     total+=estimateSetSeconds(e,e.sets);
     const left=Math.max(0,e.sets-Math.min(exDoneCount(dk,e.id),e.sets));

@@ -270,3 +270,83 @@ test('review gives the next programmed target after successful top-of-range sets
   a.run(`S.logs.w1d0={'${bench}':Array.from({length:3},()=>({w:'100',r:'8',done:true}))}`);assert.match(a.run(`nextExerciseAdvice('${bench}','w1d0')`),/105 lb/);
   assert.match(a.run("exerciseImage('Plank')"),/Plank\/1.jpg/);
 }));
+
+test('every training day has preparation for its actual movement patterns, with no lifting warmup on rest days',()=>withApp(undefined,a=>{
+  const expected={0:['shoulders','slides'],1:['hinge','reach'],2:['ankles','squat','hinge'],4:['shoulders','slides','reach'],5:['ankles','squat','lunge','bridge']};
+  for(let w=1;w<=12;w++)for(let d=0;d<7;d++){
+    const prep=a.run(`warmupPlan(planFor(${w},${d}),'w${w}d${d}')`);
+    if([3,6].includes(d)){assert.equal(prep.drills.length,0);assert.equal(prep.practice.length,0);continue;}
+    assert.equal(prep.drills[0].id,'pulse');
+    for(const id of expected[d])assert.ok(prep.drills.some(x=>x.id===id),`Missing ${id} on day ${d}`);
+    assert.equal(new Set(prep.practice.map(e=>e.id)).size,prep.practice.length);
+  }
+  a.run('openDay(1,2)');assert.match(a.doc.querySelector('.warmup-card').textContent,/Warm up for leg day/);
+  a.run('openDay(1,3)');assert.equal(a.doc.querySelector('.warmup-card'),null);
+}));
+test('practice buttons add editable light sets once, with honest totals and no invented loads',()=>withApp(undefined,a=>{
+  a.run('openDay(1,0)');a.click(`[data-practice-sets="w1d0|${bench}"]`);
+  assert.equal(a.doc.querySelector(`[aria-label="Barbell Bench Press warm-up 1 weight in lb"]`).value,'');
+  assert.equal(a.doc.querySelector(`[aria-label="Barbell Bench Press warm-up 1 reps"]`).value,'5');
+  a.run(`addPracticeSets('w1d0','${bench}');addPracticeSets('w1d0','${bench}')`);
+  assert.equal(a.run(`S.logs.w1d0['${bench}'].filter(s=>s.kind==='warmup').length`),2);
+  assert.equal(a.run('dayProgress(planFor(1,0)).tot'),19);
+  assert.equal(a.run('dayProgress(planFor(1,0)).done'),0);
+  a.input('[data-field="w"]','45');a.click('[data-ck]');
+  assert.equal(a.run('dayProgress(planFor(1,0)).done'),0);assert.equal(a.run('!!S.restTimer'),false);
+  assert.equal(a.run(`currentWorkoutSuggestion('${bench}',planFor(1,0).ex[0],'w1d0')`),null);
+  assert.equal(a.run('allHistory().length'),0);assert.equal(a.errors.length,0);
+}));
+test('existing manual warmups are reused and bodyweight practice avoids loading prescriptions',()=>withApp(undefined,a=>{
+  a.run(`openDay(1,0);addSet('w1d0','${bench}','warmup');S.logs.w1d0['${bench}'][0].w='35';addPracticeSets('w1d0','${bench}')`);
+  assert.equal(a.run(`S.logs.w1d0['${bench}'].filter(s=>s.kind==='warmup').length`),2);
+  assert.equal(a.run(`S.logs.w1d0['${bench}'][0].w`),'35');
+  a.run("openDay(1,1);addPracticeSets('w1d1','Pullups')");
+  assert.equal(a.run("S.logs.w1d1.Pullups.filter(s=>s.kind==='warmup').length"),1);
+  assert.equal(a.run("S.logs.w1d1.Pullups[0].r"),'2');assert.match(a.doc.querySelector('.practice-guidance').textContent,/assistance/);
+  assert.equal(a.doc.querySelector('.exercise-title b').textContent,'Pull-Ups');
+}));
+test('changing a movement updates practice and its photo while completed warmups stay with the original lift',()=>withApp(undefined,a=>{
+  a.run(`openDay(1,0);addPracticeSets('w1d0','${bench}');S.logs.w1d0['${bench}'][0]={w:'45',r:'5',kind:'warmup',done:true};setExerciseSwap('w1d0','${bench}','Dumbbell_Bench_Press');addPracticeSets('w1d0','Dumbbell_Bench_Press');`);
+  assert.equal(a.run(`S.logs.w1d0['${bench}'].length`),1);assert.equal(a.run(`S.logs.w1d0['${bench}'][0].done`),true);
+  assert.equal(a.run("warmupPlan(planFor(1,0),'w1d0').practice[0].id"),'Dumbbell_Bench_Press');
+  assert.match(a.doc.querySelector('.exercise-thumb').src,/Dumbbell_Bench_Press/);
+  assert.equal(a.run('dayProgress(planFor(1,0)).tot'),19);assert.equal(a.run('dayProgress(planFor(1,0)).done'),0);
+  a.run(`setExerciseSwap('w1d0','${bench}',null);addPracticeSets('w1d0','${bench}')`);
+  assert.equal(a.run(`S.logs.w1d0['${bench}'].filter(s=>s.kind==='warmup').length`),2);
+}));
+test('warmup checklist and edited practice survive reload and backup without duplicating sets',()=>{
+  let saved;
+  withApp(undefined,a=>{
+    a.run('openDay(1,2)');a.click('[data-warmup-check="w1d2|ankles"]');
+    assert.equal(a.run('!!S.sessions.w1d2.startedAt'),true);
+    a.click('[data-practice-sets="w1d2|Barbell_Squat"]');a.input('[data-field="w"]','45');a.input('[data-field="r"]','4');
+    saved=a.w.localStorage.getItem('fitlab_v1');
+  });
+  withApp(saved,a=>{
+    a.run("S=validateBackup(JSON.stringify(backupPayload()));openDay(1,2);addPracticeSets('w1d2','Barbell_Squat')");
+    assert.equal(a.run('S.sessions.w1d2.warmupPrep.ankles'),true);assert.equal(a.run('S.sessions.w1d2.warmupExpanded'),false);
+    assert.equal(a.run('S.logs.w1d2.Barbell_Squat[0].w'),'45');assert.equal(a.run('S.logs.w1d2.Barbell_Squat[0].r'),'4');
+    assert.equal(a.run("S.logs.w1d2.Barbell_Squat.filter(s=>s.kind==='warmup').length"),2);
+  });
+});
+test('shortening, reordering, and replacing patterns keep preparation aligned with the remaining workout',()=>withApp(undefined,a=>{
+  a.run("shortSession('w1d0',20)");assert.equal(a.run("warmupPlan(planFor(1,0),'w1d0').drills.some(d=>d.id==='slides')"),false);
+  assert.equal(a.run("warmupPlan(planFor(1,0),'w1d0').drills[0].id"),'pulse');
+  a.run(`setExerciseSwap('w1d0','${bench}','Dumbbell_Bench_Press')`);assert.equal(a.run("workoutExercises(planFor(1,0),'w1d0')[0].sets"),2);
+  a.run("shortSession('w1d0',0);setExerciseSwap('w1d1','Barbell_Deadlift','Barbell_Hip_Thrust')");
+  assert.equal(a.run("warmupPlan(planFor(1,1),'w1d1').drills.some(d=>d.id==='bridge')"),true);
+  assert.equal(a.run("warmupPlan(planFor(1,1),'w1d1').drills.some(d=>d.id==='hinge')"),false);
+  a.run(`moveBlock('w1d0','Incline_Dumbbell_Press',-1)`);assert.equal(a.run("warmupPlan(planFor(1,0),'w1d0').practice[0].id"),'Incline_Dumbbell_Press');
+}));
+test('time estimates include preparation and practice but completed working sessions have no time left',()=>withApp(undefined,a=>{
+  assert.ok(a.run("workoutTimeEstimate(planFor(1,0),'w1d0').total")>a.run("Math.ceil(workoutExercises(planFor(1,0),'w1d0').reduce((s,e)=>s+estimateSetSeconds(e,e.sets),0)/60)"));
+  const estimate=a.run("workoutTimeEstimate(planFor(1,0),'w1d0').remaining");a.run("sessionFor('w1d0').warmupExpanded=false");assert.equal(a.run("workoutTimeEstimate(planFor(1,0),'w1d0').remaining"),estimate);
+  a.run(`for(const e of workoutExercises(planFor(1,0),'w1d0'))setsFor('w1d0',e.id,e.sets,'20','8').forEach(s=>s.done=true)`);
+  assert.equal(a.run("workoutTimeEstimate(planFor(1,0),'w1d0').remaining"),0);
+}));
+test('malformed preparation state is ignored and checked steps do not leak to another session',()=>withApp(undefined,a=>{
+  a.run("S.sessions.w1d0={warmupExpanded:'yes',warmupPrep:{pulse:'yes',shoulders:true,unknown:true}};S=normalizeState(S)");
+  assert.equal(a.run('S.sessions.w1d0.warmupExpanded'),undefined);
+  assert.equal(a.run('JSON.stringify(S.sessions.w1d0.warmupPrep)'),'{"shoulders":true}');
+  a.run('openDay(2,0)');assert.equal(a.doc.querySelectorAll('[data-warmup-check][aria-pressed="true"]').length,0);
+}));

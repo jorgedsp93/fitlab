@@ -7,10 +7,18 @@ Live app: https://jorgedsp93.github.io/fitlab/
 ## Features
 
 - **Today:** a weekly date strip, your session, daily habits, and bodyweight logging.
-- **Workout:** editable working sets and warm-ups, notes, effort feedback, weight increments, retained work during substitutions, compact alternating supersets, pause/resume timing, and a dedicated session review.
+- **Workout:** day-specific preparation, practice sets for the actual selected lifts, editable working sets and warm-ups, notes, effort feedback, weight increments, retained work during substitutions, compact alternating supersets, pause/resume timing, and a dedicated session review.
 - **Plan:** move or skip sessions, choose training weekdays, pause the plan, shorten a session to a 20/30-minute focus, add exercises, and reorder blocks.
 - **Progress:** exercise weight/rep trends, personal bests, complete vs partial weekly consistency, all-cycle history, optional bodyweight and measured body-fat entries, and per-session Garmin exports.
 - **More:** light/dark/system themes, lb/kg conversion, exercise search, program settings, backup and restore.
+
+## Warm-ups
+
+Each training day starts with an easy pulse-raising activity and movement preparation derived from its selected exercises. Push days prepare pressing, pull days include hinges and pulling, leg days prepare squatting and hinging, and lower days include single-leg and glute preparation. Substitutions, skipped movements and shorter sessions update this selection. Rest days do not receive lifting warm-ups.
+
+Practice sets use the exercise’s own photo and are added only when requested, with editable reps and blank loads for the user to choose. Existing warm-up rows are reused; repeated taps do not duplicate them. Completed practice remains attached to the exercise actually performed after a swap. Checklist state and practice sets survive reloads and full backups. Warm-ups contribute to the estimated session time but never to working-set completion, strength records or load progression.
+
+The general-to-specific structure follows [NSCA guidance on dynamic warm-ups](https://www.nsca.com/education/articles/kinetic-select/introduction-to-dynamic-warm-up/). The short routines and starting rep suggestions are FitLab defaults, not individualized prescriptions. Keep the movements comfortable and low-fatigue; adjust or add practice sets as needed.
 
 ## Data and upgrades
 

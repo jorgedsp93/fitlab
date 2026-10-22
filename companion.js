@@ -14,6 +14,215 @@ const HABITS = {
   protein: { name: "Protein", unit: "g", icon: "protein" },
   sleep: { name: "Sleep", unit: "hours", icon: "leaf" },
 };
+// Preparation follows the movements actually selected, including substitutions.
+const WARMUP_PATTERNS = {
+  press: [
+    "Barbell_Bench_Press_-_Medium_Grip",
+    "Incline_Dumbbell_Press",
+    "Dumbbell_Bench_Press",
+    "Pushups",
+    "Dips_-_Triceps_Version",
+  ],
+  overhead: [
+    "Standing_Military_Press",
+    "Dumbbell_Shoulder_Press",
+    "Seated_Dumbbell_Press",
+  ],
+  hinge: ["Barbell_Deadlift", "Romanian_Deadlift"],
+  pull: ["Pullups", "Wide-Grip_Lat_Pulldown"],
+  row: ["Bent_Over_Barbell_Row", "Seated_Cable_Rows"],
+  squat: ["Barbell_Squat", "Front_Barbell_Squat", "Hack_Squat", "Leg_Press"],
+  lunge: ["Dumbbell_Lunges"],
+  bridge: ["Barbell_Hip_Thrust"],
+};
+const WARMUP_DRILLS = {
+  pulse: {
+    name: "Easy walk, cycle, or march",
+    dose: "5 min",
+    cue: "Build the pace gradually. Finish warm, with plenty of energy left.",
+    seconds: 300,
+  },
+  shoulders: {
+    name: "Shoulder circles",
+    dose: "8 each direction",
+    cue: "Start small and gradually widen the circles within a comfortable range.",
+    seconds: 30,
+  },
+  slides: {
+    name: "Wall slides",
+    dose: "6 slow reps",
+    cue: "Slide your arms up a wall without arching your back. Use a comfortable range.",
+    seconds: 30,
+  },
+  reach: {
+    name: "Shoulder-blade reaches",
+    dose: "8 slow reps",
+    cue: "Reach both arms forward, then gently draw your shoulder blades back. Keep your neck relaxed.",
+    seconds: 30,
+  },
+  hinge: {
+    name: "Unloaded hip hinges",
+    dose: "8 slow reps",
+    cue: "Soften your knees, send your hips back, then stand tall. Keep your back steady.",
+    seconds: 30,
+  },
+  ankles: {
+    name: "Ankle rocks",
+    dose: "6 each side",
+    cue: "In a short split stance, move your front knee forward over your toes while keeping the heel down.",
+    seconds: 45,
+  },
+  squat: {
+    name: "Bodyweight squats",
+    dose: "6 slow reps",
+    cue: "Use a comfortable depth and keep your whole foot on the floor. Hold support if helpful.",
+    seconds: 30,
+  },
+  lunge: {
+    name: "Supported split squats",
+    dose: "4 each side",
+    cue: "Hold a stable support, take a split stance and bend both knees through a comfortable range.",
+    seconds: 45,
+  },
+  bridge: {
+    name: "Unloaded glute bridges",
+    dose: "6 slow reps",
+    cue: "Lie on your back with knees bent. Lift your hips by squeezing your glutes, without arching your back.",
+    seconds: 30,
+  },
+};
+function warmupPattern(id) {
+  return Object.keys(WARMUP_PATTERNS).find((key) =>
+    WARMUP_PATTERNS[key].includes(id),
+  );
+}
+function warmupPlan(plan, dk) {
+  if (plan.type !== "workout") return { drills: [], practice: [] };
+  const exercises = workoutExercises(plan, dk),
+    patterns = new Set(exercises.map((e) => warmupPattern(e.id))),
+    ids = new Set(["pulse"]);
+  if (!exercises.length) return { drills: [], practice: [] };
+  if (patterns.has("press") || patterns.has("overhead")) ids.add("shoulders");
+  if (patterns.has("overhead")) ids.add("slides");
+  if (patterns.has("pull") || patterns.has("row")) ids.add("reach");
+  if (patterns.has("squat") || patterns.has("lunge")) {
+    ids.add("ankles");
+    ids.add("squat");
+  }
+  if (patterns.has("hinge")) ids.add("hinge");
+  if (patterns.has("lunge")) ids.add("lunge");
+  if (patterns.has("bridge")) ids.add("bridge");
+  const seen = new Set(),
+    practice = exercises.filter((e) => {
+      const pattern = warmupPattern(e.id);
+      if (!pattern || seen.has(pattern)) return false;
+      seen.add(pattern);
+      return true;
+    });
+  // An accessory-only edited session still gets practice for its first movement.
+  if (!practice.length) practice.push(exercises[0]);
+  return {
+    drills: [...ids].map((id) => ({ id, ...WARMUP_DRILLS[id] })),
+    practice,
+  };
+}
+function practicePrescription(id) {
+  if (EXERCISES[id].equipment === "body only")
+    return [
+      {
+        r: id === "Plank" ? "10" : "2",
+        cue:
+          id === "Plank"
+            ? "A short, easy hold. Stop before shaking or straining."
+            : "A few easy reps, well short of fatigue. Use assistance if needed and record the variation in Notes; the weight field is added load only.",
+      },
+    ];
+  return [
+    {
+      r: "5",
+      cue: "Very light load. Rehearse the setup and movement with control.",
+    },
+    {
+      r: "3",
+      cue: "A little closer to your working load, only if the first set felt easy. Stay below your working weight.",
+    },
+  ];
+}
+function warmupTimeEstimate(plan, dk) {
+  const prep = warmupPlan(plan, dk),
+    m = S.sessions[dk] || {};
+  let total = prep.drills.reduce((sum, d) => sum + d.seconds, 0),
+    remaining = dayProgress(plan).done
+      ? 0
+      : prep.drills.reduce(
+          (sum, d) => sum + (m.warmupPrep?.[d.id] ? 0 : d.seconds),
+          0,
+        );
+  for (const e of prep.practice) {
+    const count = practicePrescription(e.id).length,
+      logged = (S.logs[dk]?.[e.id] || []).filter(
+        (s) => s.kind === "warmup" && s.done,
+      ).length;
+    total += count * 45;
+    if (!exDoneCount(dk, e.id)) remaining += Math.max(0, count - logged) * 45;
+  }
+  return { total, remaining };
+}
+function addPracticeSets(dk, id) {
+  const n = dayNum(dk),
+    p = planFor(Math.floor(n / 7) + 1, n % 7),
+    e = warmupPlan(p, dk).practice.find((e) => e.id === id);
+  if (!e) return;
+  const prescription = practicePrescription(id),
+    a = setsFor(dk, id, e.sets, "", parseRange(e.reps).min || ""),
+    count = a.filter((s) => s.kind === "warmup").length;
+  if (!exDoneCount(dk, id))
+    a.splice(
+      count,
+      0,
+      ...prescription.slice(count).map((s) => ({
+        w: "",
+        r: s.r,
+        kind: "warmup",
+        warmupCue: s.cue,
+        done: false,
+      })),
+    );
+  sessionFor(dk).warmupExpanded = false;
+  sessionFor(dk).pairFocus = id;
+  setFlowIndex(
+    p,
+    workoutBlocks(p, dk).findIndex((b) => b.ex.some((e) => e.id === id)),
+  );
+  save();
+  render();
+  document
+    .querySelector(".flowcard")
+    ?.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+function renderWarmup(plan, dk) {
+  const prep = warmupPlan(plan, dk);
+  if (!prep.drills.length) return "";
+  const m = S.sessions[dk] || {},
+    done = prep.drills.filter((d) => m.warmupPrep?.[d.id]).length,
+    expanded = m.warmupExpanded ?? dayProgress(plan).done === 0;
+  return `<section class="warmup-card" aria-label="${esc(plan.title)} warm-up"><button class="warmup-heading" data-warmup-expand="${dk}" aria-expanded="${expanded}" aria-controls="warmupContent"><span><span class="eyebrow">BEFORE YOU LIFT</span><b>Warm up for ${esc(plan.title.toLowerCase())}</b><small>${done}/${prep.drills.length} preparation steps · about ${Math.ceil(prep.drills.reduce((sum, d) => sum + d.seconds, 0) / 60)} min, plus practice sets</small></span><span aria-hidden="true">${expanded ? "−" : "+"}</span></button>${
+    expanded
+      ? `<div id="warmupContent"><p class="note">Prepare for today’s movements. Keep everything easy and comfortable; this should not tire you out.</p><div class="warmup-checklist">${prep.drills.map((d) => `<button class="warmup-step ${m.warmupPrep?.[d.id] ? "on" : ""}" data-warmup-check="${dk}|${d.id}" aria-pressed="${!!m.warmupPrep?.[d.id]}"><span class="prep-check" aria-hidden="true">${icon("check")}</span><span><b>${d.name}</b><small>${d.dose}</small><span>${d.cue}</span></span></button>`).join("")}</div><h3>Practice today’s lifts</h3><p class="note">Do these just before each movement. Start light, add weight gradually, and rest as needed. Add more warm-up sets if you need them. Photos show the actual selected exercise.</p><div class="warmup-practice">${prep.practice
+          .map((e) => {
+            const x = EXERCISES[e.id],
+              rows = (S.logs[dk]?.[e.id] || []).filter(
+                (s) => s.kind === "warmup",
+              ),
+              started = exDoneCount(dk, e.id) > 0;
+            return `<div class="practice-movement"><img src="${exerciseImage(e.id)}" alt="${esc(x.name)}" loading="lazy"><div><b>${esc(x.name)}</b><small>${started ? "Working sets started" : `${practicePrescription(e.id).length} easy practice ${practicePrescription(e.id).length === 1 ? "set" : "sets"}${rows.length ? ` · ${rows.filter((s) => s.done).length} logged` : ""}`}</small><button class="textlink" data-practice-sets="${dk}|${e.id}">${started ? "View exercise" : rows.length >= practicePrescription(e.id).length ? "Log warm-up sets" : "Add & log warm-up"}</button></div></div>`;
+          })
+          .join(
+            "",
+          )}</div><p class="note">Warm-ups stay separate from working sets and strength records. Weights are yours to choose.</p><button class="btn ghost" data-warmup-expand="${dk}">Continue to workout</button></div>`
+      : ""
+  }</section>`;
+}
 let archiveSelection = null,
   trendExercise = "",
   reviewingSession = false,
@@ -37,6 +246,15 @@ function normalizeCompanionState(s, original) {
       Number.isFinite(m.elapsedMs) && m.elapsedMs >= 0 ? m.elapsedMs : 0;
     for (const field of ["counts", "notes", "effort", "omitted"])
       m[field] = record(m[field]) ? m[field] : {};
+    m.warmupPrep = record(m.warmupPrep)
+      ? Object.fromEntries(
+          Object.entries(m.warmupPrep).filter(
+            ([id, checked]) =>
+              Object.hasOwn(WARMUP_DRILLS, id) && checked === true,
+          ),
+        )
+      : {};
+    if (typeof m.warmupExpanded !== "boolean") delete m.warmupExpanded;
     for (const [id, n] of Object.entries(m.counts))
       if (!EXERCISES[id] || !Number.isInteger(n) || n < 1 || n > 30)
         delete m.counts[id];
@@ -382,7 +600,7 @@ function shortSession(dk, minutes) {
     m.counts = copy(m.beforeShort.counts);
   }
   const blocks = workoutBlocks(p, dk);
-  let budget = minutes * 60,
+  let budget = minutes * 60 - warmupTimeEstimate(p, dk).total,
     kept = 0;
   m.omitted = m.omitted || {};
   m.counts = m.counts || {};
@@ -753,7 +971,7 @@ function renderDayView() {
     return `${backHead(p.title, prettyISO(ymd(dateForPos(w, d))))}<div class="card recovery-card">${artwork(p)}<h2>A little room to recover.</h2><p>${esc(p.cardio.d)}</p><button class="btn primary" data-restdone="${dk}">${S.done[dk] ? "Recovery logged · undo" : "Mark recovery complete"}</button></div>`;
   return `${backHead(p.title, `Week ${w} · ${prettyISO(ymd(dateForPos(w, d)))}`)}<div class="session-clock"><span><b data-session-clock="${dk}">${elapsedLabel(sessionElapsed(dk))}</b> ${m.runningSince ? "training" : m.startedAt ? "paused" : "not started"}</span><button class="textlink" ${m.runningSince ? `data-pause-session="${dk}"` : `data-resume-session="${dk}"`}>${m.runningSince ? "Pause" : m.startedAt ? "Resume" : "Start timer"}</button></div>
   <div class="workout-progress"><div class="progress-meta"><span>${progress.done} of ${progress.tot} sets logged</span><span>${progress.done === progress.tot ? "Session complete" : `About ${time.remaining} min left`}</span></div><div class="bar"><i style="width:${progress.pct}%"></i></div></div>
-  ${renderWorkoutFlow(p, dk)}${progress.done ? '<button class="btn ghost finish-session" data-finish-workout>Finish & review session</button>' : ""}
+  ${renderWarmup(p, dk)}${renderWorkoutFlow(p, dk)}${progress.done ? '<button class="btn ghost finish-session" data-finish-workout>Finish & review session</button>' : ""}
   ${sessionTools(p, dk)}${scheduleTools(p)}<details class="disclosure"><summary>Session overview</summary>${workoutPreview(p, dk)}</details>`;
 }
 function exBlock(e, dk) {
@@ -772,7 +990,26 @@ function exBlock(e, dk) {
     );
   html = html.replace(
     '<div class="settable">',
-    `<p class="coach-reason">${esc(exDoneCount(dk, e.id) ? "Keep the same setup for the remaining sets. Adjust if your form changes." : prior ? sug.note : "Choose a weight you can move with control. Your completed sets will guide the next session.")}</p><div class="settable">`,
+    `<p class="coach-reason">${esc(exDoneCount(dk, e.id) ? "Keep the same setup for the remaining sets. Adjust if your form changes." : prior ? sug.note : "Choose a weight you can move with control. Your completed sets will guide the next session.")}</p>${
+      (S.logs[dk]?.[e.id] || []).some((s) => s.kind === "warmup")
+        ? `<div class="practice-guidance"><b>Your warm-up sets</b><ol>${S.logs[
+            dk
+          ][e.id]
+            .filter((s) => s.kind === "warmup")
+            .map(
+              (s) =>
+                `<li>${esc(s.warmupCue || "Choose an easy load and reps. Save your energy for the working sets.")}</li>`,
+            )
+            .join(
+              "",
+            )}</ol><p>Rest as needed between practice sets. Edit reps and loads to suit you.</p></div>`
+        : warmupPlan(
+              planFor(Math.floor(dayNum(dk) / 7) + 1, dayNum(dk) % 7),
+              dk,
+            ).practice.some((x) => x.id === e.id) && !exDoneCount(dk, e.id)
+          ? `<button class="practice-prompt textlink" data-practice-sets="${dk}|${e.id}">Add warm-up sets for this movement</button>`
+          : ""
+    }<div class="settable">`,
   );
   html = html.replace(
     "</section>",
@@ -1012,7 +1249,7 @@ function renderMore() {
     )}<button class="btn primary sm">Save habits</button></form></details>
   <section class="card tight"><button class="menurow" data-go="library">${icon("book")}<span><b>Exercise library</b><small>Movement photos and quick cues</small></span>${icon("arrow")}</button><button class="menurow" data-go="guide">${icon("leaf")}<span><b>Your training companion</b><small>How your plan, timer and history work</small></span>${icon("arrow")}</button></section>
   <details class="disclosure"><summary>At the gym & offline</summary><p class="status-line">${navigator.onLine === false ? "You’re offline" : offlineReady ? "App ready for offline use" : "Online · offline setup pending"}</p><p class="note">The workout log and session illustrations work offline once setup completes. Exercise photos are saved when opened; videos require internet.</p><button class="btn ghost sm" data-cache-photos>Save all exercise photos offline</button><p id="photoCacheStatus" role="status"></p><label class="toggle-setting"><input type="checkbox" data-pref="keepAwake" ${S.preferences.keepAwake ? "checked" : ""}>Keep the screen awake during a session</label><p class="note">${"wakeLock" in navigator ? "Supported by this browser while FitLab is visible." : "This browser does not support screen wake lock."}</p><label class="toggle-setting"><input type="checkbox" data-pref="sound" ${S.preferences.sound ? "checked" : ""}>Play a sound when rest ends</label><p class="note">Sound and vibration depend on your device. Background or locked screens may delay alerts; the remaining rest time still updates when you return.</p>${installPrompt ? '<button class="btn primary" data-install>Install FitLab</button>' : "<p>To add FitLab to your phone: in Safari use Share → Add to Home Screen; in Chrome use the menu → Install app / Add to Home screen.</p>"}</details>
-  <details class="disclosure"><summary>Program settings<span class="tiny muted">12 weeks</span></summary>${scheduleCard()}</details><details class="disclosure"><summary>Your data & backups</summary><p>Saved on this device. Full backups include every cycle, your notes, preferences and measurements.</p><p><b>Last backup requested:</b> ${S.backupAt ? esc(new Date(S.backupAt).toLocaleString()) : "Not yet"}</p><p class="note">Check that the downloaded file is saved. FitLab cannot confirm that you kept it.</p><div class="exportactions"><button class="btn primary sm" data-backup>Download full backup</button><button class="btn ghost sm" data-restore>Restore a backup</button>${hasBackup ? '<button class="btn ghost sm" data-recovery-backup>Download recovery copy</button>' : ""}</div></details>${backupReminder()}<div class="local-note">${icon("shield")}<span>No account needed. Back up before changing phones or clearing browser data.</span></div><p class="footer-signature">FITLAB · VERSION 13.0.2</p>`;
+  <details class="disclosure"><summary>Program settings<span class="tiny muted">12 weeks</span></summary>${scheduleCard()}</details><details class="disclosure"><summary>Your data & backups</summary><p>Saved on this device. Full backups include every cycle, your notes, preferences and measurements.</p><p><b>Last backup requested:</b> ${S.backupAt ? esc(new Date(S.backupAt).toLocaleString()) : "Not yet"}</p><p class="note">Check that the downloaded file is saved. FitLab cannot confirm that you kept it.</p><div class="exportactions"><button class="btn primary sm" data-backup>Download full backup</button><button class="btn ghost sm" data-restore>Restore a backup</button>${hasBackup ? '<button class="btn ghost sm" data-recovery-backup>Download recovery copy</button>' : ""}</div></details>${backupReminder()}<div class="local-note">${icon("shield")}<span>No account needed. Back up before changing phones or clearing browser data.</span></div><p class="footer-signature">FITLAB · VERSION 13.1.1</p>`;
 }
 function calcBF() {
   toast("Use Body measurements to enter a measured body-fat percentage.");
@@ -1117,7 +1354,30 @@ function bootCompanion() {
     const c = (s) => t.closest(s);
     armSound();
     let el;
-    if ((el = c("[data-pause-session]"))) pauseSession(el.dataset.pauseSession);
+    if ((el = c("[data-warmup-expand]"))) {
+      const dk = el.dataset.warmupExpand,
+        m = sessionFor(dk),
+        n = dayNum(dk);
+      m.warmupExpanded = !(
+        m.warmupExpanded ??
+        dayProgress(planFor(Math.floor(n / 7) + 1, n % 7)).done === 0
+      );
+      save();
+      render();
+    } else if ((el = c("[data-warmup-check]"))) {
+      const [dk, id] = el.dataset.warmupCheck.split("|"),
+        m = sessionFor(dk);
+      if (!m.warmupPrep?.[id] && !m.startedAt && !startSession(dk)) return;
+      (m.warmupPrep ??= {})[id] = !m.warmupPrep[id];
+      save();
+      render();
+      document
+        .querySelector(`[data-warmup-check="${dk}|${id}"]`)
+        ?.focus({ preventScroll: true });
+    } else if ((el = c("[data-practice-sets]")))
+      addPracticeSets(...el.dataset.practiceSets.split("|"));
+    else if ((el = c("[data-pause-session]")))
+      pauseSession(el.dataset.pauseSession);
     else if ((el = c("[data-resume-session]"))) {
       if (startSession(el.dataset.resumeSession)) render();
     } else if (c("[data-plan-pause]")) pausePlan();
