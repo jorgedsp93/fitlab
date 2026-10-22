@@ -11,21 +11,20 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="FitLab">
   <link rel="manifest" href="manifest.webmanifest">
-  <link rel="apple-touch-icon" href="apple-touch-icon-v3.png">
-  <link rel="icon" type="image/png" href="favicon-32-v3.png">
-  <link rel="stylesheet" href="styles.css?v=12.4">
-  <script src="app.js?v=12.4" defer></script>
+  <link rel="apple-touch-icon" href="apple-touch-icon-v4.png">
+  <link rel="icon" type="image/png" href="favicon-32-v4.png">
+  <link rel="stylesheet" href="styles.css?v=13.2.2">
+  <script src="companion.js?v=13.2.2" defer></script>
+  <script src="app.js?v=13.2.2" defer></script>
 </head>
 <body>
   <a class="skip-link" href="#app">Skip to content</a>
   <div id="storageWarning" role="alert" hidden></div>
   <main id="app" tabindex="-1"></main>
   <div id="restbar" role="region" aria-label="Rest timer">
-    <span class="timer-icon" aria-hidden="true">◷</span>
-    <div class="rt" id="rtnum">0:00</div>
-    <div class="rl" id="rtlabel">Rest</div>
-    <button id="rtadd" aria-label="Add 30 seconds to rest">+30s</button>
-    <button id="rtskip">Skip</button>
+    <div class="rest-heading"><span class="timer-icon" aria-hidden="true">◷</span><div class="rt" id="rtnum">0:00</div><div class="rl"><b id="rtstate">Resting</b><span id="rtlabel">Rest</span></div></div>
+    <div id="rtannounce" role="status" aria-live="polite" aria-atomic="true"></div>
+    <div class="rest-actions"><button id="rtadd" aria-label="Add 30 seconds to rest">+30s</button><button id="rtskip">Skip rest</button><button data-rest-sound aria-pressed="false">Enable sound</button><button data-test-rest-sound>Test sound</button></div>
   </div>
   <div id="toast" role="status" aria-live="polite"></div>
   <div class="sheet-wrap" id="sheetWrap">
