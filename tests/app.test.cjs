@@ -104,3 +104,11 @@ test('FIT export passes the official Garmin decoder and all sets fit inside sess
 test('TCX export contains every completed set and is well-formed XML',()=>withApp(undefined,a=>{
   a.run(`S.logs.w1d0={'${bench}':[{w:'100',r:'8',done:true}]}`);const xml=a.run('buildGarminTcx(workoutExportDetail(1,0))'),parsed=new a.w.DOMParser().parseFromString(xml,'application/xml');assert.equal(parsed.querySelector('parsererror'),null);assert.equal(parsed.querySelectorAll('Activity').length,1);assert.match(parsed.querySelector('Notes').textContent,/100 lb/);
 }));
+
+test('legacy UTC start dates ahead of the local date are corrected without losing sets',()=>withApp(undefined,a=>{
+  a.run(`const next=new Date();next.setDate(next.getDate()+1);const migrated=normalizeState({startDate:ymd(next),unit:'lb',logs:{w1d0:{'${bench}':[{w:'95',r:'8',done:true}]}},bw:[],bf:[]});if(migrated.startDate!==todayISO()||!migrated.logs.w1d0['${bench}'][0].done)throw new Error('Migration lost local date or completed set');`);
+}));
+test('legacy duplicate swaps cannot double-count a completed set',()=>withApp(undefined,a=>{
+  a.run(`S=normalizeState({...S,swaps:{w1d1:{'Wide-Grip_Lat_Pulldown':'Pullups'}},logs:{w1d1:{Pullups:[{w:'0',r:'8',done:true}]}}});`);
+  assert.equal(a.run('dayProgress(planFor(1,1)).done'),1);
+}));
