@@ -1,4 +1,4 @@
-# FitLab v12 audit
+# FitLab v12.1 audit
 
 Scope: the complete static application, all 84 days of the program, every workout block, storage and data migration, exercise alternatives, progress views, accessibility, PWA caching, and Garmin exports.
 
@@ -7,7 +7,7 @@ Scope: the complete static application, all 84 days of the program, every workou
 | Finding | Resolution |
 | --- | --- |
 | Checking the first set throws `Cannot read properties of undefined (reading 'amrap')` | The current-session suggestion receives a valid rep range. Reproduced on the original live app and covered by a reload regression. |
-| UTC dates select tomorrow's workout in the evening | Calendar keys use the device's local date; schedule arithmetic uses calendar dates and is independent of DST. |
+| UTC dates select tomorrow's workout in the evening | Calendar keys use the device's local date; schedule arithmetic is independent of DST. Future legacy start dates are normalized without deleting logs. |
 | Changing lb/kg relabels existing numbers without converting them | Converts saved exercise loads, remembered loads, and bodyweight together. |
 | Debounced writes can be lost on immediate exit; storage failures are silent | Immediate writes, lifecycle flushes, visible failures, and preservation of unreadable original data. |
 | Start-date picker silently moves workout history | Explicit Update action and confirmation when history exists. |
@@ -21,7 +21,7 @@ Scope: the complete static application, all 84 days of the program, every workou
 | FIT header advertises protocol 0.2 rather than 2.0 | Encode `0x20`; validate checksums and records with the official Garmin SDK. |
 | FIT set timestamps can extend beyond session end | Use one duration calculation for both set timeline and session timing. |
 | FIT null numeric fields become zero instead of invalid sentinels | Encode absent values using the FIT invalid value for each field type. |
-| Service worker deletes unrelated caches, caches error responses, and serves HTML as missing assets | Restrict cache ownership, avoid failed-response writes, and limit HTML fallback to navigation. |
+| Service worker deletes unrelated caches, caches error responses, and serves HTML as missing assets | Restrict cache ownership, avoid failed-response writes, and limit HTML fallback to the app entry routes. Review pages cannot overwrite the offline shell. |
 | Zoom disabled; missing input names, focus trapping, and keyboard affordances | Restore zoom, label every set input, add visible focus, trap/restore modal focus, support reduced motion. |
 
 ## Design changes
@@ -37,6 +37,7 @@ Scope: the complete static application, all 84 days of the program, every workou
 
 ## Validation
 
+- 24 automated checks pass, including the program matrix and official FIT decoder.
 - Node's test runner with JSDOM exercises real application event handlers, rendering and persistence.
 - A matrix renders all 84 days and all workout blocks before/after logging.
 - Regression cases cover reload, local dates/DST, units, invalid input, supersets, background timers, swaps, measurements, progression, migration, backups, storage failures, schedule confirmation, theme and modal focus.
