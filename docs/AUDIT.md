@@ -1,4 +1,4 @@
-# FitLab v12.3 audit
+# FitLab v12.4 audit
 
 Scope: the complete static application, all 84 days of the program, every workout block, storage and data migration, exercise alternatives, progress views, accessibility, PWA caching, and Garmin exports.
 
@@ -30,6 +30,8 @@ The initial audit filled input values directly and therefore did not establish t
 
 Global smooth scrolling was also removed after live checks showed a tap landing on a different row while the viewport was moving. Explicit review scrolling remains available.
 
+The root cause was the delegated theme selector `[data-theme]`, which also matched the `<html data-theme="light">` ancestor. Ordinary clicks invoked theme switching and rebuilt the app. This removed focused fields, canceled native form submission, and reset disclosure toggles. Theme actions now match only `button[data-theme]`. Tests now click real submit buttons and summary elements; directly dispatching submit events had bypassed the defect.
+
 Numeric fields now use ordinary editable text inputs with decimal/numeric keyboard hints and synchronous focus in the tap handler. Validation remains in application code, including integer reps, numeric ranges, and decimal-comma normalization. Regression checks now cover direct taps, character-by-character edits, clearing and replacing completed values, reload, bodyweight, and measurements. The live desktop browser confirmed direct tap, keyboard entry of 137.5 lb and 8 reps, completion, and navigation back to the saved set. A physical iPhone keyboard still requires device verification; JSDOM does not model a virtual keyboard.
 
 ## Design changes
@@ -47,7 +49,7 @@ Numeric fields now use ordinary editable text inputs with decimal/numeric keyboa
 
 ## Validation
 
-- 28 automated checks pass, including the program matrix and official FIT decoder.
+- 31 automated checks pass, including the program matrix and official FIT decoder.
 - Node's test runner with JSDOM exercises real application event handlers, rendering and persistence.
 - A matrix renders all 84 days and all workout blocks before/after logging.
 - Regression cases cover reload, local dates/DST, units, invalid input, supersets, background timers, swaps, measurements, progression, migration, backups, storage failures, schedule confirmation, theme and modal focus.
