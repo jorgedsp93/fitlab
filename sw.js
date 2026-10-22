@@ -1,69 +1,21 @@
-/* FitLab service worker — offline app shell + opportunistic exercise-image cache */
-const SHELL = 'fitlab-shell-v11';
-const IMG = 'fitlab-img-v1';
-const SHELL_FILES = [
-  './',
-  './index.html',
-  './manifest.webmanifest',
-  './app-icon-192-v3.png',
-  './app-icon-512-v3.png',
-  './apple-touch-icon-v3.png',
-  './favicon-32-v3.png',
-  './assets/fitlab-logo-v3.png',
-  './assets/day-push.png',
-  './assets/day-pull.png',
-  './assets/day-legs.png',
-  './assets/day-recovery.png',
-  './assets/day-upper.png',
-  './assets/day-lower-v2.png',
-  './assets/day-rest.png'
-];
-
-self.addEventListener('install', (e) => {
-  e.waitUntil(caches.open(SHELL).then((c) => c.addAll(SHELL_FILES)).then(() => self.skipWaiting()));
-});
-
-self.addEventListener('activate', (e) => {
-  e.waitUntil(
-    caches.keys().then((keys) =>
-      Promise.all(keys.filter((k) => k !== SHELL && k !== IMG).map((k) => caches.delete(k)))
-    ).then(() => self.clients.claim())
-  );
-});
-
-self.addEventListener('fetch', (e) => {
-  const req = e.request;
-  if (req.method !== 'GET') return;
-  const url = new URL(req.url);
-
-  // Exercise photos from jsDelivr CDN: cache-first, fill cache as we go (so they work offline after first view).
-  if (url.hostname.includes('jsdelivr.net')) {
-    e.respondWith(
-      caches.open(IMG).then(async (cache) => {
-        const hit = await cache.match(req);
-        if (hit) return hit;
-        try {
-          const res = await fetch(req);
-          if (res.ok) cache.put(req, res.clone());
-          return res;
-        } catch (err) {
-          return hit || Response.error();
-        }
-      })
-    );
-    return;
+/* Versioned app shell. A failed network response must never poison the cache. */
+const SHELL='fitlab-shell-v12';
+const IMG='fitlab-img-v2';
+const SHELL_FILES=['./','./index.html','./styles.css?v=12','./app.js?v=12','./manifest.webmanifest','./app-icon-192-v3.png','./app-icon-512-v3.png','./apple-touch-icon-v3.png','./favicon-32-v3.png'];
+const scope=new URL('./',self.location.href);
+self.addEventListener('install',event=>{event.waitUntil(caches.open(SHELL).then(cache=>cache.addAll(SHELL_FILES)).then(()=>self.skipWaiting()));});
+self.addEventListener('activate',event=>{event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>(key.startsWith('fitlab-shell-')||key.startsWith('fitlab-img-'))&&key!==SHELL&&key!==IMG).map(key=>caches.delete(key)))).then(()=>self.clients.claim()));});
+self.addEventListener('fetch',event=>{
+  const request=event.request;if(request.method!=='GET')return;
+  const url=new URL(request.url);
+  if(url.hostname==='cdn.jsdelivr.net'&&url.pathname.startsWith('/gh/yuhonas/free-exercise-db')){
+    event.respondWith((async()=>{const cache=await caches.open(IMG),hit=await cache.match(request);if(hit)return hit;try{const response=await fetch(request);if(response.ok||response.type==='opaque'){await cache.put(request,response.clone());const keys=await cache.keys();if(keys.length>100)await cache.delete(keys[0]);}return response;}catch{return Response.error();}})());return;
   }
-
-  // App shell / same-origin: network-first, fall back to cache (so latest code loads when online).
-  if (url.origin === self.location.origin) {
-    e.respondWith(
-      fetch(req)
-        .then((res) => {
-          const copy = res.clone();
-          caches.open(SHELL).then((c) => c.put(req, copy));
-          return res;
-        })
-        .catch(() => caches.match(req).then((r) => r || caches.match('./index.html')))
-    );
+  if(url.origin!==scope.origin||!url.pathname.startsWith(scope.pathname))return;
+  if(request.mode==='navigate'){
+    event.respondWith((async()=>{const cache=await caches.open(SHELL);try{const response=await fetch(request);if(response.ok){await cache.put('./index.html',response.clone());return response;}return await cache.match('./index.html')||response;}catch{return await cache.match('./index.html')||Response.error();}})());return;
   }
+  const known=SHELL_FILES.some(path=>new URL(path,scope).href===url.href);
+  if(!known)return;
+  event.respondWith((async()=>{const cache=await caches.open(SHELL),hit=await cache.match(request);if(hit)return hit;try{const response=await fetch(request);if(response.ok)await cache.put(request,response.clone());return response;}catch{return Response.error();}})());
 });
