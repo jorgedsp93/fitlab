@@ -1,7 +1,7 @@
 /* Versioned app shell. A failed network response must never poison the cache. */
-const SHELL='fitlab-shell-v12-2';
+const SHELL='fitlab-shell-v12-3';
 const IMG='fitlab-img-v2';
-const SHELL_FILES=['./','./index.html','./styles.css?v=12.2','./app.js?v=12.2','./manifest.webmanifest','./app-icon-192-v3.png','./app-icon-512-v3.png','./apple-touch-icon-v3.png','./favicon-32-v3.png'];
+const SHELL_FILES=['./','./index.html','./styles.css?v=12.3','./app.js?v=12.3','./manifest.webmanifest','./app-icon-192-v3.png','./app-icon-512-v3.png','./apple-touch-icon-v3.png','./favicon-32-v3.png'];
 const scope=new URL('./',self.location.href);
 self.addEventListener('install',event=>{event.waitUntil(caches.open(SHELL).then(cache=>cache.addAll(SHELL_FILES)).then(()=>self.skipWaiting()));});
 self.addEventListener('activate',event=>{event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>(key.startsWith('fitlab-shell-')||key.startsWith('fitlab-img-'))&&key!==SHELL&&key!==IMG).map(key=>caches.delete(key)))).then(()=>self.clients.claim()));});
