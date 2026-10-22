@@ -157,9 +157,36 @@ test('decimal comma weights survive completion and reload; malformed numeric tex
 
 test('daily bodyweight, progress bodyweight, and body measurements support tap then type',()=>withApp(undefined,a=>{
   a.doc.querySelector('[data-bw-form]').closest('details').open=true;
-  a.click('#dailyBwIn');assert.equal(a.doc.activeElement.id,'dailyBwIn');a.input('#dailyBwIn','200,5');a.doc.querySelector('[data-bw-form]').dispatchEvent(new a.w.Event('submit',{bubbles:true,cancelable:true}));assert.equal(a.run('lastBW()'),200.5);
-  a.run(`go('stats')`);a.click('#bwIn');assert.equal(a.doc.activeElement.id,'bwIn');a.input('#bwIn','199.5');a.doc.querySelector('[data-stats-bw-form]').dispatchEvent(new a.w.Event('submit',{bubbles:true,cancelable:true}));assert.equal(a.run('lastBW()'),199.5);
+  a.click('#dailyBwIn');assert.equal(a.doc.activeElement.id,'dailyBwIn');a.input('#dailyBwIn','200,5');a.click('[data-bw-form] button[type="submit"]');assert.equal(a.run('lastBW()'),200.5);
+  a.run(`go('stats')`);a.click('#bwIn');assert.equal(a.doc.activeElement.id,'bwIn');a.input('#bwIn','199.5');a.click('[data-stats-bw-form] button[type="submit"]');assert.equal(a.run('lastBW()'),199.5);
   a.doc.querySelector('[data-bf-form]').closest('details').open=true;
   for(const id of ['waistIn','neckIn']){a.click('#'+id);assert.equal(a.doc.activeElement.id,id);}
   assert.equal(a.run(`upsertMeasurement('bw',todayISO(),'1e2')`),false);
 }));
+
+
+test('ordinary clicks never invoke the root theme attribute or replace active forms',()=>withApp(undefined,a=>{
+  const title=a.doc.querySelector('h1'),theme=a.run('S.theme');title.click();assert.equal(title.isConnected,true,'Ordinary click rebuilt the screen');assert.equal(a.run('S.theme'),theme);
+  a.run(`go('library')`);const search=a.doc.querySelector('#exerciseSearch');search.click();assert.equal(search.isConnected,true,'Search field was replaced on tap');a.input('#exerciseSearch','bench');assert.match(a.doc.querySelector('#libraryResults').textContent,/Bench/);
+  a.run(`go('stats')`);const field=a.doc.querySelector('#bwIn');field.click();a.input('#bwIn','200.5');a.doc.querySelector('h3').click();assert.equal(field.isConnected,true);assert.equal(field.value,'200.5');a.click('[data-stats-bw-form] button[type="submit"]');assert.equal(a.run('lastBW()'),200.5);
+}));
+
+test('real summary clicks open and close details across the app without a rerender',()=>withApp(undefined,a=>{
+  for(const view of ['today','more','stats','guide']){
+    a.run(`go('${view}')`);
+    for(const details of a.doc.querySelectorAll('details')){
+      const wasOpen=details.open,summary=details.querySelector(':scope > summary');summary.click();assert.equal(details.isConnected,true,`Click replaced ${view} disclosure`);assert.equal(details.open,!wasOpen);summary.click();assert.equal(details.open,wasOpen);
+    }
+  }
+  a.run('openDay(1,0)');const details=a.doc.querySelector('.exextras');details.querySelector('summary').click();assert.equal(details.isConnected,true);assert.equal(details.open,true);
+  a.run(`go('more')`);a.click('button[data-theme="dark"]');assert.equal(a.doc.documentElement.dataset.theme,'dark');a.click('button[data-theme="light"]');assert.equal(a.doc.documentElement.dataset.theme,'light');
+}));
+
+test('measurement estimation submits through its real button and decimal drafts survive reload',()=>{
+  let saved;
+  withApp(undefined,a=>{
+    a.run(`go('stats')`);a.doc.querySelector('[data-bf-form]').closest('details').querySelector('summary').click();a.input('#waistIn','36');a.input('#neckIn','16');a.click('[data-bf-form] button[type="submit"]');assert.equal(a.run('S.bf.length'),1);assert.match(a.doc.querySelector('#bfOut').textContent,/Saved for today/);
+    a.run('openDay(1,0)');a.input('[data-field="w"]','22,5');saved=a.w.localStorage.getItem('fitlab_v1');
+  });
+  withApp(saved,a=>{a.click('[data-open-day]');assert.equal(a.doc.querySelector('[data-field="w"]').value,'22.5');assert.equal(a.doc.querySelector('[data-ck]').getAttribute('aria-pressed'),'false');});
+});

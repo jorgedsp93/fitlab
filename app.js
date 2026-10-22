@@ -1048,7 +1048,7 @@ function entryNumber(value){
   const text=String(value??'').trim().replace(',', '.');
   return /^(?:[0-9]+(?:\.[0-9]*)?|\.[0-9]+)$/.test(text)?Number(text):NaN;
 }
-function cleanNumber(value,integer=false){ if(value===''||value==null) return ''; const n=Number(value); return Number.isFinite(n)&&n>=0&&(!integer||Number.isInteger(n))?String(n):''; }
+function cleanNumber(value,integer=false){ if(value===''||value==null) return ''; const n=entryNumber(value); return Number.isFinite(n)&&n>=0&&(!integer||Number.isInteger(n))?String(n):''; }
 let storageProblem='';
 // The 7-day cycle counts forward from a user-chosen start date: Day 1 = startDate.
 let S = load();
@@ -2184,7 +2184,7 @@ function renderMore(){
   <section class="card tight"><button class="menurow" data-go="library">${icon('book')}<span><b>Exercise library</b><small>Form cues, photos, and muscle maps</small></span>${icon('arrow')}</button><button class="menurow" data-go="guide">${icon('leaf')}<span><b>Your training companion</b><small>Get more out of your routine</small></span>${icon('arrow')}</button></section>
   <details class="disclosure"><summary>Program settings<span class="tiny muted">12 weeks</span></summary>${scheduleCard()}</details>
   <details class="disclosure"><summary>Your data & backups</summary><p class="small muted">Your logs live in this browser. Export a backup before changing phones, clearing browser data, or starting a new cycle.</p><div class="exportactions"><button class="btn primary sm" data-backup="1">Download full backup</button><button class="btn ghost sm" data-restore="1">Restore a backup</button>${hasBackup?'<button class="btn ghost sm" data-recovery-backup="1">Download recovery copy</button>':''}</div><p class="note">A restore replaces the current data after confirmation. A recovery copy of your current data is saved first.</p></details>
-  <div class="local-note">${icon('shield')}<span>Private by design. No account or tracking. Your workouts stay on this device unless you export them.</span></div><p class="footer-signature">FITLAB · VERSION 12.3</p>`;
+  <div class="local-note">${icon('shield')}<span>Private by design. No account or tracking. Your workouts stay on this device unless you export them.</span></div><p class="footer-signature">FITLAB · VERSION 12.4</p>`;
 }
 function setStartDate(value){
   if(!validDate(value)||value>todayISO()){toast('Choose a valid start date on or before today.');return false;}
@@ -2275,7 +2275,7 @@ document.addEventListener('click',e=>{
   const ride=c('[data-ride]');if(ride){S.rides[ride.dataset.ride]=!S.rides[ride.dataset.ride];save();render();return;}
   const daily=c('[data-daily-toggle]');if(daily){toggleDaily(daily.dataset.dailyToggle);return;}
   const unit=c('[data-unit]');if(unit){changeUnit(unit.dataset.unit);return;}
-  const theme=c('[data-theme]');if(theme){S.theme=theme.dataset.theme;save();render();return;}
+  const theme=c('button[data-theme]');if(theme){S.theme=theme.dataset.theme;save();render();return;}
   const mu=c('[data-mu]');if(mu){S.measUnit=mu.dataset.mu;save();render();requestAnimationFrame(()=>{const bf=$('[data-bf-form]');if(bf){bf.closest('details').open=true;bf.scrollIntoView({block:'center'});}});return;}
   if(c('[data-save-start]')){setStartDate($('#startIn')?.value);return;}
   if(c('[data-restart-schedule]')){restartSchedule();return;}
