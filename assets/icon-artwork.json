@@ -1,0 +1,13 @@
+{
+  "mode": "Built-in image_gen",
+  "use_case": "logo-brand",
+  "prompt": "Use case: logo-brand. Create a single production-ready square app icon for FitLab, a calm modern strength-training journal. Entire 1024x1024 canvas is an opaque full-bleed deep forest-green field (#173F32 to #2F6650) with a very subtle soft gradient. Center one bold, original warm-ivory sculptural F monogram, made from a continuous thick geometric ribbon with beautifully rounded ends and a slight forward-driving stance. The F should be instantly legible at tiny sizes, with one strong stem, a generous top arm and a shorter middle arm. Broad clean shapes, generous negative space, restrained soft edge highlights, just a hint of tactile depth, premium contemporary fitness app identity. Confident and welcoming, visually balanced. Keep the entire ivory mark inside the central 64 percent of the canvas so it is safe for circular and rounded-square app masks. Do not draw an enclosing rounded-square tile or an exterior shadow: the green background reaches all four square edges. No dumbbells, moon, circles, arrows, flames, heartbeats, photos, small details, badges, watermark, words, or additional letters. One finished icon only, no mockup sheet or device.",
+  "master": "assets/fitlab-icon-v4.png",
+  "variants": {
+    "app-icon-192-v4.png": "192px standard PWA and header icon",
+    "app-icon-512-v4.png": "512px standard and maskable PWA icon",
+    "apple-touch-icon-v4.png": "180px home-screen icon",
+    "favicon-32-v4.png": "32px browser favicon"
+  },
+  "processing": "Resized from the generated master with macOS sips. No artwork edits."
+}

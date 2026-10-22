@@ -1013,7 +1013,7 @@ const STORAGE_KEY='fitlab_v1';
 const BACKUP_KEY='fitlab_backup_v12';
 function validDate(value){ if(typeof value!=='string'||!/^\d{4}-\d{2}-\d{2}$/.test(value))return false;const date=new Date(value+'T12:00:00Z');return Number.isFinite(date.getTime())&&date.toISOString().slice(0,10)===value; }
 function calendarDay(value){ const [y,m,d]=value.split('-').map(Number); return Date.UTC(y,m-1,d)/86400000; }
-function newState(){ return {startDate:todayISO(),unit:'lb',logs:{},done:{},reviewed:{},lastW:{},bw:[],bf:[],heightCm:null,heightConfirmed:false,rides:{},flow:{},daily:{},swaps:{},sessions:{},schedule:{dates:{},pausedAt:null},archives:[],preferences:{weekdays:[],weeklyTarget:5,focus:'strength',increments:{},keepAwake:true,sound:false,habits:{ride:{enabled:true,target:null},steps:{enabled:true,target:null},protein:{enabled:true,target:null},sleep:{enabled:false,target:null}}},backupAt:null,theme:'light',schemaVersion:13}; }
+function newState(){ return {startDate:todayISO(),unit:'lb',logs:{},done:{},reviewed:{},lastW:{},bw:[],bf:[],heightCm:null,heightConfirmed:false,rides:{},flow:{},daily:{},swaps:{},sessions:{},schedule:{dates:{},pausedAt:null},archives:[],preferences:{weekdays:[],weeklyTarget:5,focus:'strength',increments:{},keepAwake:true,sound:true,habits:{ride:{enabled:true,target:null},steps:{enabled:true,target:null},protein:{enabled:true,target:null},sleep:{enabled:false,target:null}}},backupAt:null,theme:'light',schemaVersion:13}; }
 function record(value){ return value && typeof value==='object' && !Array.isArray(value); }
 function normalizeState(value){
   if(!record(value)) throw new Error('Invalid FitLab data');
@@ -1408,7 +1408,7 @@ const ICONS={
   weight:'<path d="M8 6a4 4 0 0 1 8 0M6 6h12l3 15H3Z"/>',sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1 1m12 12 1 1M5 19l1-1M18 6l1-1"/>'
 };
 function icon(name){return `<svg class="icon" viewBox="0 0 24 24" aria-hidden="true">${ICONS[name]||ICONS.train}</svg>`;}
-function header(){return `<header class="topbar"><div class="wordmark"><span class="brand-symbol">${icon('train')}</span>fitlab<span class="muted" style="font-weight:400">.</span></div><span class="topnote">Your daily practice</span></header>`;}
+function header(){return `<header class="topbar"><div class="wordmark"><span class="brand-symbol"><img src="app-icon-192-v4.png" width="34" height="34" alt=""></span>fitlab<span class="muted" style="font-weight:400">.</span></div><span class="topnote">Your daily practice</span></header>`;}
 function heading(title,subtitle){return `${header()}<div class="page-head"><h1>${esc(title)}</h1><p>${esc(subtitle)}</p></div>`;}
 function startStatusText(){const n=daysSinceStart();return n<0?`Starts ${prettyISO(S.startDate)}`:n>83?`12 weeks completed · started ${prettyISO(S.startDate)}`:`Week ${Math.floor(n/7)+1} · started ${prettyISO(S.startDate)}`;}
 function scheduleCard(){return `<div class="setupstatus">${esc(startStatusText())}</div>
@@ -1420,7 +1420,7 @@ const TABS=[['today','Today'],['plan','Plan'],['stats','Progress'],['more','More
 function displayNumber(value){return Number(value).toLocaleString(undefined,{maximumFractionDigits:1});}
 function applyTheme(){const dark=S.theme==='dark'||(S.theme==='auto'&&window.matchMedia?.('(prefers-color-scheme: dark)').matches);document.documentElement.dataset.theme=dark?'dark':'light';document.querySelector('meta[name="theme-color"]')?.setAttribute('content',dark?'#121916':'#f5f6f2');}
 function go(v,options={}){if(!['today','plan','stats','more','library','guide','day','review','archive'].includes(v))return;view=v;if(v==='today'&&!options.keepDay){dayOffset=0;browseDay=null;}render();history.pushState(routeState(),'',location.href);window.scrollTo({top:0});$('#app').focus({preventScroll:true});}
-function render(){applyTheme();const r={today:renderToday,plan:renderPlan,library:renderLibrary,stats:renderStats,more:renderMore,guide:renderGuide,day:renderDayView,review:renderReview,archive:renderArchive}[view];$('#app').innerHTML=r?r():'';renderNav();storageNotice();}
+function render(){applyTheme();const r={today:renderToday,plan:renderPlan,library:renderLibrary,stats:renderStats,more:renderMore,guide:renderGuide,day:renderDayView,review:renderReview,archive:renderArchive}[view];$('#app').innerHTML=r?r():'';renderNav();storageNotice();refreshSoundControls();}
 function renderNav(){const active=['day','review'].includes(view)?returnView:view==='archive'?'stats':['library','guide'].includes(view)?'more':view;$('#nav').innerHTML=TABS.map(([v,l])=>`<button data-go="${v}" class="${active===v?'on':''}" ${active===v?'aria-current="page"':''}><span class="ni">${icon(v)}</span>${l}</button>`).join('');}
 function selectedDayNumber(){
   if(browseDay!==null)return browseDay;
@@ -1437,8 +1437,9 @@ function baseExBlock(e,dk){
   return `<section class="exblock" aria-label="${esc(x.name)}"><div class="eh"><img class="exercise-thumb" src="${exerciseImage(e.id)}" alt="" loading="lazy"><button class="exercise-title" data-ex="${e.id}" aria-label="How to do ${esc(x.name)}"><b>${esc(x.name)}</b><small>${e.sets} sets · ${e.reps} reps</small></button><button class="iconbtn" data-ex="${e.id}" aria-label="${esc(x.name)} form guide">${icon('info')}</button></div>
   <div class="sugg">${esc(compactSuggestion(e.id,e,sug))}</div><div class="settable"><div class="set-hd"><div>Set</div><div>${loadMeta(e.id).mult>1?'Each ':''}${S.unit}</div><div>${e.id==='Plank'?'Seconds':'Reps'}</div><div>Done</div></div>
   ${sets.map((st,i)=>`<div class="set-row ${st.done?'done':''}" data-row="${e.id}|${i}"><span class="sn">${String(i+1).padStart(2,'0')}</span><input type="text" data-number="1" autocomplete="off" autocapitalize="off" spellcheck="false" inputmode="decimal" data-field="w" data-ex="${e.id}" data-i="${i}" aria-label="${esc(setAccessibleName(x.name,sets,i))} weight in ${S.unit}${loadMeta(e.id).mult>1?' per dumbbell':''}" value="${esc(st.w)}" placeholder="${bodyweight?'0':'—'}"><input type="text" data-number="1" autocomplete="off" autocapitalize="off" spellcheck="false" inputmode="numeric" data-field="r" data-ex="${e.id}" data-i="${i}" aria-label="${esc(setAccessibleName(x.name,sets,i))} reps" value="${esc(st.r)}" placeholder="—"><button class="ck" data-ck="${e.id}|${i}|${e.rest}" aria-label="${st.done?'Undo':'Complete'} ${esc(setAccessibleName(x.name,sets,i))}" aria-pressed="${st.done}">${icon('check')}</button></div>`).join('')}</div>
+  <div class="rest-controls"><button class="restbtn" data-rest="${e.rest}|${esc(x.name)}">${icon('clock')}Start rest · ${Math.floor(e.rest/60)}:${String(e.rest%60).padStart(2,'0')}</button><div class="rest-options"><button class="textlink" data-rest-sound aria-pressed="false">Enable sound</button><button class="textlink" data-test-rest-sound>Test sound</button></div><p class="note">A chime and an on-screen message tell you when to continue.</p></div>
   <details class="exextras"><summary>Guidance & alternatives</summary><div class="exdetails"><p>${esc(sug.note)}</p><p data-load-hint="${e.id}">${esc(weightHint(e.id,sets))}</p>${e.note?`<p>${esc(e.note)}</p>`:''}${swapControl(e,dk)}<a href="${videoLink(e.id,x.name)}" target="_blank" rel="noopener noreferrer">Watch demonstration ↗</a></div></details>
-  <button class="restbtn" data-rest="${e.rest}|${esc(x.name)}">${icon('clock')}Rest ${e.rest>=60?`${Math.floor(e.rest/60)}:${String(e.rest%60).padStart(2,'0')}`:`${e.rest}s`}</button></section>`;
+  </section>`;
 }
 function libraryResults(){const query=libraryQuery.toLowerCase().trim(),groups={};for(const id in EXERCISES){const x=EXERCISES[id];if(query&&!`${x.name} ${x.equipment} ${x.primary.join(' ')}`.toLowerCase().includes(query))continue;const g=REGION[x.primary[0]]||'Other';(groups[g]??=[]).push(id);}return Object.keys(groups).length?Object.entries(groups).map(([g,ids])=>`<h2 class="libgroup-title">${g}</h2>${ids.map(id=>{const x=EXERCISES[id];return `<button class="librow" data-ex="${id}"><img src="${exerciseImage(id)}" alt="" loading="lazy"><span><b>${esc(x.name)}</b><small>${esc(cap(x.equipment||'bodyweight'))}</small></span>${icon('arrow')}</button>`;}).join('')}`).join(''):'<p class="empty">No matching exercises. Try a muscle group or equipment name.</p>';}
 function renderLibrary(){return `${heading('Find your form.','Every exercise, with photos and step-by-step cues.')}<input class="searchfield" id="exerciseSearch" type="search" aria-label="Search exercises" placeholder="Search exercises, muscles, equipment…" value="${esc(libraryQuery)}"><div id="libraryResults">${libraryResults()}</div>`;}
@@ -2162,13 +2163,44 @@ document.addEventListener('keydown',e=>{
 /* ---------- rest timer: deadlines survive background throttling ---------- */
 let rtInt=null;
 function restSecondsLeft(){return S.restTimer?Math.max(0,Math.ceil((S.restTimer.endsAt-Date.now())/1000)):0;}
-function tickRest(){const left=restSecondsLeft();if(!left){const hadTimer=!!S.restTimer;stopRest();if(hadTimer){toast('Rest complete. Ready when you are.');navigator.vibrate?.([120,60,120]);playRestSound();}return;}$('#restbar').classList.add('show');$('#rtnum').textContent=`${Math.floor(left/60)}:${String(left%60).padStart(2,'0')}`;$('#rtlabel').textContent=S.restTimer.label||'Rest';}
-function startRest(sec,label){if(!Number.isFinite(sec)||sec<=0)return;clearInterval(rtInt);S.restTimer={endsAt:Date.now()+sec*1000,label:label||'Rest'};save();tickRest();rtInt=setInterval(tickRest,250);}
-function stopRest(){clearInterval(rtInt);rtInt=null;delete S.restTimer;$('#restbar').classList.remove('show');save();}
+function renderRestBar(){
+  const active=S.restTimer, ready=!active&&S.restReady, shown=!!(active||ready), left=restSecondsLeft();
+  $('#restbar').classList.toggle('show',shown);$('#restbar').classList.toggle('ready',!!ready);document.body.classList.toggle('has-rest-alert',shown);
+  $('#rtnum').textContent=ready?'✓':`${Math.floor(left/60)}:${String(left%60).padStart(2,'0')}`;
+  $('#rtstate').textContent=ready?'Rest complete':'Resting';
+  $('#rtlabel').textContent=(active||ready)?.label||'Rest';
+  const announcement=ready?'Ready for your next set. Continue when you’re ready.':'';
+  if($('#rtannounce').textContent!==announcement)$('#rtannounce').textContent=announcement;
+  $('#rtskip').textContent=ready?'Continue':'Skip rest';
+  $('#rtadd').textContent=ready?'Rest 30s more':'+30s';
+  refreshSoundControls();
+}
+function tickRest(){
+  if(S.restTimer&&restSecondsLeft()===0){
+    const timer=S.restTimer;delete S.restTimer;S.restReady=timer;
+    clearInterval(rtInt);rtInt=null;save();renderRestBar();
+    try{navigator.vibrate?.([180,90,180]);}catch{}
+    playRestSound(timer.id);return;
+  }
+  renderRestBar();
+}
+function syncRestTimer(){
+  clearInterval(rtInt);rtInt=null;tickRest();
+  if(S.restTimer)rtInt=setInterval(tickRest,250);
+}
+function startRest(sec,label){
+  if(!Number.isFinite(sec)||sec<=0||sec>3600)return;
+  stopRestSound();armSound();delete S.restReady;
+  S.restTimer={id:`rest-${Date.now()}-${Math.random().toString(36).slice(2,8)}`,endsAt:Date.now()+sec*1000,label:label||'Rest'};
+  save();syncRestTimer();
+}
+function stopRest(){
+  clearInterval(rtInt);rtInt=null;stopRestSound();delete S.restTimer;delete S.restReady;renderRestBar();save();
+}
 let toastTimer;
 function toast(message){const el=$('#toast');el.textContent=message;el.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('show'),3500);}
 $('#rtskip').onclick=()=>stopRest();
-$('#rtadd').onclick=()=>{if(S.restTimer){S.restTimer.endsAt+=30000;save();tickRest();}};
+$('#rtadd').onclick=()=>{if(S.restTimer){S.restTimer.endsAt+=30000;save();tickRest();}else if(S.restReady)startRest(30,S.restReady.label);};
 function openDay(w,d,block){if(!Number.isInteger(w)||w<1||w>12||!Number.isInteger(d)||d<0||d>6)return;if(view!=='day')returnView=['stats','plan'].includes(view)?view:'today';viewingPos={week:w,dayIndex:d};if(block==null)primeWorkoutFlow(w,d);else setFlowIndex(planFor(w,d),block);go('day');}
 document.addEventListener('click',e=>{
   const t=e.target;if(!(t instanceof Element))return;const c=s=>t.closest(s);
@@ -2189,7 +2221,7 @@ document.addEventListener('click',e=>{
   const clear=c('[data-clear-swap]');if(clear){setExerciseSwap(...clear.dataset.clearSwap.split('|'),null);return;}
   const check=c('[data-ck]');if(check){toggleSet(check.dataset.ck);return;}
   const ex=c('button[data-ex]');if(ex){openSheet(ex.dataset.ex);return;}
-  const rest=c('[data-rest]');if(rest){const [seconds]=rest.dataset.rest.split('|');startRest(+seconds,'Rest');return;}
+  const rest=c('[data-rest]');if(rest){const [seconds,...label]=rest.dataset.rest.split('|');startRest(+seconds,label.join('|'));return;}
   const recovery=c('[data-restdone]');if(recovery){const dk=recovery.dataset.restdone;S.done[dk]=!S.done[dk];save();render();return;}
   const ride=c('[data-ride]');if(ride){S.rides[ride.dataset.ride]=!S.rides[ride.dataset.ride];save();render();return;}
   const daily=c('[data-daily-toggle]');if(daily){toggleDaily(daily.dataset.dailyToggle);return;}
@@ -2234,7 +2266,7 @@ function toggleSet(token){
   if(!st.done){const reps=entryNumber(st.r),weight=blank(st.w)?0:entryNumber(st.w);if(!Number.isInteger(reps)||reps<1||reps>1000){toast('Enter the reps you performed before completing this set.');return;}const bw=EXERCISES[id].equipment==='body only';if((blank(st.w)&&!bw)||!Number.isFinite(weight)||weight<0||weight>5000){toast('Enter a valid weight. Use 0 for bodyweight.');return;}if(!S.sessions[dk]?.runningSince&&!startSession(dk))return;st.w=String(weight);st.r=String(reps);st.done=true;st.completedAt=new Date().toISOString();navigator.vibrate?.(20);
     const block=workoutBlocks(plan,dk).find(b=>b.ex.some(x=>x.id===id));
     const round=workSets(S.logs[dk][id]).indexOf(st);const roundDone=block.ex.every(x=>x.sets<=round||workSets(S.logs[dk]?.[x.id])[round]?.done);advancePair(block,dk);
-    if(st.kind!=='warmup'&&(block.ex.length===1||roundDone))startRest(exercise.rest||60,'Rest');else{stopRest();toast(st.kind==='warmup'?'Warm-up saved.':'Set saved. Move to the paired exercise.');}
+    if(st.kind!=='warmup'&&(block.ex.length===1||roundDone))startRest(exercise.rest||60,block.ex.length>1?block.title:EXERCISES[id].name);else{stopRest();toast(st.kind==='warmup'?'Warm-up saved.':'Set saved. Move to the paired exercise.');}
   }else{st.done=false;delete st.completedAt;stopRest();}
   delete S.reviewed[dk];save();
   const y=window.scrollY,openDetails=[...document.querySelectorAll('.exextras')].map(x=>x.open);render();document.querySelectorAll('.exextras').forEach((x,j)=>x.open=!!openDetails[j]);window.scrollTo({top:y});document.querySelector(`[data-ck="${id}|${i}|${exercise.rest}"]`)?.focus({preventScroll:true});
@@ -2244,9 +2276,9 @@ document.addEventListener('error',e=>{const img=e.target;if(img.tagName!=='IMG'|
 let lastLocalDay=todayISO();
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden'){save();return;}if(S.restTimer)tickRest();if(lastLocalDay!==todayISO()){lastLocalDay=todayISO();if(view==='today')render();}});
 window.addEventListener('pagehide',()=>save());
-window.addEventListener('storage',e=>{if(e.key!==STORAGE_KEY||!e.newValue)return;try{S=normalizeState(JSON.parse(e.newValue));render();toast('Updated from another FitLab tab.');}catch{}});
+window.addEventListener('storage',e=>{if(e.key!==STORAGE_KEY||!e.newValue)return;try{S=normalizeState(JSON.parse(e.newValue));render();syncRestTimer();toast('Updated from another FitLab tab.');}catch{}});
 /* ---------- boot ---------- */
 bootCompanion();render();history.replaceState(routeState(),'',location.href);
-if(S.restTimer){tickRest();if(S.restTimer)rtInt=setInterval(tickRest,250);}
+syncRestTimer();
 window.matchMedia?.('(prefers-color-scheme: dark)').addEventListener?.('change',()=>{if(S.theme==='auto')applyTheme();});
 if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).then(async reg=>{await navigator.serviceWorker.ready;offlineReady=true;if(view==='more')render();return reg.update();}).catch(()=>{}));}

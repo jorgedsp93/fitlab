@@ -45,9 +45,19 @@ GitHub Pages publishes the repository's main branch. Update the service-worker c
 
 Open a current-cycle session, select **Finish & review**, and expand **Export this session** for FIT, TCX or JSON. Full backups include all archived cycles. Open Garmin Connect Web's Import Data page and upload the downloaded file. Do not import these files as courses in the mobile app. Recorded session timers provide active duration (pauses excluded); older untimed logs use estimates. Per-set export timing and calories remain estimates. FIT validation uses Garmin's official JavaScript SDK; actual acceptance by Garmin Connect can depend on the service.
 
+Automatic uploads are not connected. Garmin's personal access currently provides data retrieval, and its public Training API describes publishing planned workouts rather than finished activities. Automatic completed-session uploads need Garmin to confirm and grant the appropriate integration access. See [Garmin integration status](docs/GARMIN_SYNC.md) for the verified boundary and next step.
+
+## Rest alerts
+
+Tap **Start rest** under the set table to use that exercise’s rest duration. Completed working sets also start rest automatically, after both movements for supersets. The floating countdown includes **+30s**, **Skip rest**, sound on/off, and **Test sound**. Finishing plays a three-tone chime and requests vibration where supported; a persistent **Rest complete** banner stays until **Continue** or another rest. Continue never logs a set. The deadline and completion banner survive reloads.
+
+Sound defaults on for new or unset preferences; an existing explicit mute is preserved. Use **Enable & test sound** to turn it on, unlock playback, and check media volume/headphones. If audio is unavailable, the visible alert still works. The timer is based on a saved deadline, but a locked or backgrounded browser can delay its alert. Keep FitLab visible for timely alerts; this is not a native background alarm. See [browser audio gesture requirements](https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API/Best_practices#autoplay_policy) and [background timer throttling](https://developer.mozilla.org/en-US/docs/Web/API/Page_Visibility_API#policies_in_place_to_aid_background_page_performance).
+
 ## Offline and installation
 
 Add the HTTPS app to your home screen. The service worker saves the app shell for offline use and caches exercise photos after successful viewing. Form instructions and muscle maps work without remote photos. More includes install help, offline readiness, optional sound/screen wake lock, and a button to save all exercise photos. Rest timers reconcile elapsed time on resume; this web app cannot guarantee background alarms while the phone is locked.
+
+The forest-green and ivory F mark is used for the header, browser tab, home-screen icon and maskable installed icon. The generated master is `assets/fitlab-icon-v4.png`; its prompt and size mappings are recorded in `assets/icon-artwork.json`.
 
 ## Files
 

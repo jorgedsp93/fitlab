@@ -289,6 +289,23 @@ function normalizeCompanionState(s, original) {
     : null;
   const pref = record(s.preferences) ? s.preferences : {};
   s.preferences = { ...defaults.preferences, ...pref };
+  s.preferences.sound = typeof pref.sound === "boolean" ? pref.sound : true;
+  for (const field of ["restTimer", "restReady"]) {
+    const timer = s[field];
+    if (!record(timer) || !Number.isFinite(timer.endsAt) || timer.endsAt <= 0) {
+      delete s[field];
+      continue;
+    }
+    s[field] = {
+      endsAt: timer.endsAt,
+      label: String(timer.label || "Rest").slice(0, 120),
+      id:
+        typeof timer.id === "string"
+          ? timer.id.slice(0, 100)
+          : `rest-${timer.endsAt}`,
+    };
+  }
+  if (s.restTimer) delete s.restReady;
   s.preferences.weekdays = Array.isArray(pref.weekdays)
     ? [
         ...new Set(
@@ -1249,35 +1266,119 @@ function renderMore() {
     )}<button class="btn primary sm">Save habits</button></form></details>
   <section class="card tight"><button class="menurow" data-go="library">${icon("book")}<span><b>Exercise library</b><small>Movement photos and quick cues</small></span>${icon("arrow")}</button><button class="menurow" data-go="guide">${icon("leaf")}<span><b>Your training companion</b><small>How your plan, timer and history work</small></span>${icon("arrow")}</button></section>
   <details class="disclosure"><summary>At the gym & offline</summary><p class="status-line">${navigator.onLine === false ? "You’re offline" : offlineReady ? "App ready for offline use" : "Online · offline setup pending"}</p><p class="note">The workout log and session illustrations work offline once setup completes. Exercise photos are saved when opened; videos require internet.</p><button class="btn ghost sm" data-cache-photos>Save all exercise photos offline</button><p id="photoCacheStatus" role="status"></p><label class="toggle-setting"><input type="checkbox" data-pref="keepAwake" ${S.preferences.keepAwake ? "checked" : ""}>Keep the screen awake during a session</label><p class="note">${"wakeLock" in navigator ? "Supported by this browser while FitLab is visible." : "This browser does not support screen wake lock."}</p><label class="toggle-setting"><input type="checkbox" data-pref="sound" ${S.preferences.sound ? "checked" : ""}>Play a sound when rest ends</label><p class="note">Sound and vibration depend on your device. Background or locked screens may delay alerts; the remaining rest time still updates when you return.</p>${installPrompt ? '<button class="btn primary" data-install>Install FitLab</button>' : "<p>To add FitLab to your phone: in Safari use Share → Add to Home Screen; in Chrome use the menu → Install app / Add to Home screen.</p>"}</details>
-  <details class="disclosure"><summary>Program settings<span class="tiny muted">12 weeks</span></summary>${scheduleCard()}</details><details class="disclosure"><summary>Your data & backups</summary><p>Saved on this device. Full backups include every cycle, your notes, preferences and measurements.</p><p><b>Last backup requested:</b> ${S.backupAt ? esc(new Date(S.backupAt).toLocaleString()) : "Not yet"}</p><p class="note">Check that the downloaded file is saved. FitLab cannot confirm that you kept it.</p><div class="exportactions"><button class="btn primary sm" data-backup>Download full backup</button><button class="btn ghost sm" data-restore>Restore a backup</button>${hasBackup ? '<button class="btn ghost sm" data-recovery-backup>Download recovery copy</button>' : ""}</div></details>${backupReminder()}<div class="local-note">${icon("shield")}<span>No account needed. Back up before changing phones or clearing browser data.</span></div><p class="footer-signature">FITLAB · VERSION 13.1.1</p>`;
+  <details class="disclosure"><summary>Program settings<span class="tiny muted">12 weeks</span></summary>${scheduleCard()}</details><details class="disclosure"><summary>Your data & backups</summary><p>Saved on this device. Full backups include every cycle, your notes, preferences and measurements.</p><p><b>Last backup requested:</b> ${S.backupAt ? esc(new Date(S.backupAt).toLocaleString()) : "Not yet"}</p><p class="note">Check that the downloaded file is saved. FitLab cannot confirm that you kept it.</p><div class="exportactions"><button class="btn primary sm" data-backup>Download full backup</button><button class="btn ghost sm" data-restore>Restore a backup</button>${hasBackup ? '<button class="btn ghost sm" data-recovery-backup>Download recovery copy</button>' : ""}</div></details>${backupReminder()}<div class="local-note">${icon("shield")}<span>No account needed. Back up before changing phones or clearing browser data.</span></div><p class="footer-signature">FITLAB · VERSION 13.2.2</p>`;
 }
 function calcBF() {
   toast("Use Body measurements to enter a measured body-fat percentage.");
 }
 let audioContext = null;
-function armSound() {
-  if (!S.preferences.sound) return;
-  try {
-    audioContext ??= new (window.AudioContext || window.webkitAudioContext)();
-    audioContext.resume().catch(() => {});
-  } catch {}
+const restSoundNodes = new Set();
+let restSoundGeneration = 0;
+function restSoundLabel() {
+  if (!S.preferences.sound) return "Sound off";
+  if (!(window.AudioContext || window.webkitAudioContext))
+    return "Sound unavailable";
+  return audioContext?.state === "running" ? "Sound on" : "Enable sound";
 }
-function playRestSound() {
-  if (!S.preferences.sound || !audioContext) return;
-  try {
-    const osc = audioContext.createOscillator(),
-      gain = audioContext.createGain();
-    osc.connect(gain);
-    gain.connect(audioContext.destination);
-    osc.frequency.value = 660;
-    gain.gain.setValueAtTime(0.12, audioContext.currentTime);
-    gain.gain.exponentialRampToValueAtTime(
-      0.001,
-      audioContext.currentTime + 0.3,
+function refreshSoundControls() {
+  for (const el of document.querySelectorAll('[data-pref="sound"]'))
+    el.checked = S.preferences.sound;
+  for (const el of document.querySelectorAll("[data-rest-sound]")) {
+    el.textContent = restSoundLabel();
+    el.setAttribute(
+      "aria-pressed",
+      String(S.preferences.sound && audioContext?.state === "running"),
     );
-    osc.start();
-    osc.stop(audioContext.currentTime + 0.3);
-  } catch {}
+  }
+  for (const el of document.querySelectorAll("[data-test-rest-sound]"))
+    el.textContent = S.preferences.sound ? "Test sound" : "Enable & test sound";
+}
+async function armSound() {
+  if (!S.preferences.sound) return false;
+  try {
+    if (!audioContext || audioContext.state === "closed") {
+      audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      audioContext.onstatechange = refreshSoundControls;
+    }
+    if (audioContext.state !== "running") await audioContext.resume();
+    refreshSoundControls();
+    return audioContext.state === "running";
+  } catch {
+    refreshSoundControls();
+    return false;
+  }
+}
+function stopRestSound() {
+  restSoundGeneration++;
+  for (const osc of restSoundNodes) {
+    try {
+      osc.stop();
+    } catch {}
+  }
+  restSoundNodes.clear();
+}
+async function playRestSound(restId = null) {
+  if (!S.preferences.sound || !audioContext) return false;
+  const generation = restSoundGeneration;
+  try {
+    if (audioContext.state !== "running") await audioContext.resume();
+    if (
+      generation !== restSoundGeneration ||
+      !S.preferences.sound ||
+      audioContext.state !== "running" ||
+      (restId && S.restReady?.id !== restId)
+    )
+      return false;
+    // Three distinct tones, with short gaps, are easier to notice than one click.
+    [660, 880, 1046].forEach((frequency, i) => {
+      const osc = audioContext.createOscillator(),
+        gain = audioContext.createGain(),
+        at = audioContext.currentTime + i * 0.35;
+      osc.connect(gain);
+      gain.connect(audioContext.destination);
+      osc.frequency.value = frequency;
+      gain.gain.setValueAtTime(0.001, at);
+      gain.gain.exponentialRampToValueAtTime(0.16, at + 0.015);
+      gain.gain.exponentialRampToValueAtTime(0.001, at + 0.27);
+      restSoundNodes.add(osc);
+      osc.onended = () => {
+        restSoundNodes.delete(osc);
+        osc.disconnect();
+        gain.disconnect();
+      };
+      osc.start(at);
+      osc.stop(at + 0.28);
+    });
+    return true;
+  } catch {
+    return false;
+  }
+}
+async function testRestSound() {
+  S.preferences.sound = true;
+  save();
+  stopRestSound();
+  if ((await armSound()) && (await playRestSound()))
+    toast(
+      "Test chime played. If silent, check media volume or your headphones.",
+    );
+  else
+    toast(
+      "Sound is unavailable right now. The rest-complete message will still appear.",
+    );
+  refreshSoundControls();
+}
+async function toggleRestSound() {
+  if (S.preferences.sound && audioContext?.state === "running") {
+    S.preferences.sound = false;
+    stopRestSound();
+  } else {
+    S.preferences.sound = true;
+    if (!(await armSound()))
+      toast("Sound is unavailable right now. The on-screen alert stays on.");
+  }
+  save();
+  refreshSoundControls();
 }
 async function requestWakeLock() {
   if (
@@ -1352,9 +1453,13 @@ function bootCompanion() {
     const t = event.target;
     if (!(t instanceof Element)) return;
     const c = (s) => t.closest(s);
-    armSound();
+    if (!c("[data-rest-sound], [data-test-rest-sound]")) armSound();
     let el;
-    if ((el = c("[data-warmup-expand]"))) {
+    if (c("[data-rest-sound]")) {
+      await toggleRestSound();
+    } else if (c("[data-test-rest-sound]")) {
+      await testRestSound();
+    } else if ((el = c("[data-warmup-expand]"))) {
       const dk = el.dataset.warmupExpand,
         m = sessionFor(dk),
         n = dayNum(dk);
@@ -1486,8 +1591,11 @@ function bootCompanion() {
     } else if (el.dataset.pref) {
       S.preferences[el.dataset.pref] = el.checked;
       save();
-      if (el.dataset.pref === "sound") armSound();
-      else if (
+      if (el.dataset.pref === "sound") {
+        if (el.checked) armSound();
+        else stopRestSound();
+        refreshSoundControls();
+      } else if (
         el.checked &&
         Object.values(S.sessions).some((m) => m.runningSince)
       )

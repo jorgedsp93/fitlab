@@ -48,7 +48,7 @@ test('supersets only start rest after both moves are checked',()=>withApp(undefi
 }));
 test('rest timer uses elapsed wall time after backgrounding and persists on reload',()=>{
   let saved;
-  withApp(undefined,a=>{a.run("startRest(120,'Rest')");saved=a.w.localStorage.getItem('fitlab_v1');a.run('S.restTimer.endsAt=Date.now()-1000;tickRest()');assert.equal(a.run('!!S.restTimer'),false);assert.equal(a.doc.querySelector('#restbar').classList.contains('show'),false);});
+  withApp(undefined,a=>{a.run("startRest(120,'Rest')");saved=a.w.localStorage.getItem('fitlab_v1');a.run('S.restTimer.endsAt=Date.now()-1000;tickRest()');assert.equal(a.run('!!S.restTimer'),false);assert.equal(a.doc.querySelector('#restbar').classList.contains('ready'),true);assert.match(a.doc.querySelector('#rtannounce').textContent,/Ready for your next set/);});
   withApp(saved,a=>assert.ok(a.run('restSecondsLeft()')>100));
 });
 test('swapping cannot reuse a second exercise slot or hide already completed sets',()=>withApp(undefined,a=>{
@@ -350,3 +350,76 @@ test('malformed preparation state is ignored and checked steps do not leak to an
   assert.equal(a.run('JSON.stringify(S.sessions.w1d0.warmupPrep)'),'{"shoulders":true}');
   a.run('openDay(2,0)');assert.equal(a.doc.querySelectorAll('[data-warmup-check][aria-pressed="true"]').length,0);
 }));
+
+test('the visible Start rest button starts the exercise countdown and +30s extends its deadline',()=>withApp(undefined,a=>{
+  a.run('openDay(1,0)');assert.match(a.doc.querySelector('[data-rest]').textContent,/Start rest · 2:00/);a.click('[data-rest]');
+  assert.equal(a.doc.querySelector('#rtnum').textContent,'2:00');assert.equal(a.doc.querySelector('#rtlabel').textContent,'Barbell Bench Press');
+  const ends=a.run('S.restTimer.endsAt');a.click('#rtadd');assert.equal(a.run('S.restTimer.endsAt'),ends+30000);
+  a.click('#rtskip');assert.equal(a.run('!!S.restTimer'),false);assert.equal(a.doc.querySelector('#restbar').classList.contains('show'),false);assert.equal(a.run('dayProgress(planFor(1,0)).done'),0);
+}));
+test('rest completion alerts once, remains visible through reload, and Continue does not log a set',()=>{
+  let saved;
+  withApp(undefined,a=>{
+    a.run("let alerts=[];playRestSound=id=>alerts.push(id);startRest(30,'Squat');S.restTimer.endsAt=Date.now()-1000;tickRest();tickRest()");
+    assert.equal(a.run('alerts.length'),1);assert.equal(a.run('rtInt'),null);assert.equal(a.doc.querySelector('#rtstate').textContent,'Rest complete');
+    assert.equal(a.doc.querySelector('#rtskip').textContent,'Continue');saved=a.w.localStorage.getItem('fitlab_v1');
+  });
+  withApp(saved,a=>{
+    assert.equal(a.doc.querySelector('#restbar').classList.contains('ready'),true);
+    a.click('#rtskip');assert.equal(a.doc.querySelector('#restbar').classList.contains('show'),false);assert.equal(a.run('!!S.restReady'),false);assert.equal(a.run('dayProgress(planFor(1,0)).done'),0);
+  });
+});
+test('a finished rest can be extended and an expired restored timer immediately shows completion',()=>{
+  let saved;
+  withApp(undefined,a=>{a.run("startRest(30,'Pull-ups');S.restTimer.endsAt=Date.now()-1000;save()");saved=a.w.localStorage.getItem('fitlab_v1');});
+  withApp(saved,a=>{
+    assert.equal(a.doc.querySelector('#restbar').classList.contains('ready'),true);a.click('#rtadd');
+    assert.equal(a.run('!!S.restReady'),false);assert.ok(a.run('restSecondsLeft()')>=29);assert.equal(a.doc.querySelector('#rtlabel').textContent,'Pull-ups');
+  });
+});
+function fakeAudio(a){
+  a.run(`let tones=[],resumes=0;window.AudioContext=class{
+    constructor(){this.state='suspended';this.currentTime=10;this.destination={};}
+    resume(){resumes++;this.state='running';return Promise.resolve();}
+    createOscillator(){const tone={frequency:null,starts:[],stops:[],ramps:[]};tones.push(tone);return {frequency:{set value(v){tone.frequency=v;}},connect(){},disconnect(){},start(t){tone.starts.push(t);},stop(t){tone.stops.push(t);}};}
+    createGain(){return {connect(){},disconnect(){},gain:{setValueAtTime(){},exponentialRampToValueAtTime(){}}};}
+  };`);
+}
+test('enabled rest sound creates a three-tone chime and mute cancels it while preserving visual alerts',async()=>{
+  const a=app();try{
+    fakeAudio(a);await a.run('armSound()');assert.equal(a.run('resumes'),1);
+    a.run("startRest(30,'Bench');S.restTimer.endsAt=Date.now()-1000;tickRest();tickRest()");
+    assert.equal(a.run('tones.length'),3);assert.equal(a.run('JSON.stringify(tones.map(t=>t.frequency))'),'[660,880,1046]');
+    assert.ok(a.run('tones.every(t=>t.stops[0]>t.starts[0])'));assert.ok(a.run('tones[2].starts[0]>tones[1].starts[0]'));
+    await a.run('toggleRestSound()');assert.equal(a.run('S.preferences.sound'),false);assert.ok(a.run('tones.every(t=>t.stops.length===2)'));
+    a.run("startRest(30,'Bench');S.restTimer.endsAt=Date.now()-1000;tickRest()");assert.equal(a.run('tones.length'),3);assert.equal(a.doc.querySelector('#restbar').classList.contains('ready'),true);
+  }finally{a.close();}
+});
+test('the sound-test control enables a muted preference, plays the chime and survives reload',async()=>{
+  const a=app({preferences:{sound:false}});let saved;
+  try{
+    fakeAudio(a);a.run('openDay(1,0)');assert.match(a.doc.querySelector('.rest-options [data-test-rest-sound]').textContent,/Enable & test/);
+    a.click('.rest-options [data-test-rest-sound]');await new Promise(resolve=>setImmediate(resolve));
+    assert.equal(a.run('tones.length'),3);assert.equal(a.doc.querySelector('.rest-options [data-rest-sound]').textContent,'Sound on');saved=a.w.localStorage.getItem('fitlab_v1');
+  }finally{a.close();}
+  withApp(saved,a=>assert.equal(a.run('S.preferences.sound'),true));
+});
+test('sound failures and unsupported vibration do not break the countdown or completion banner',async()=>{
+  const a=app();try{
+    a.run("window.AudioContext=class{constructor(){throw Error('unsupported')}};navigator.vibrate=()=>{throw Error('blocked')}");
+    await a.run('testRestSound()');assert.match(a.doc.querySelector('#toast').textContent,/unavailable/);
+    a.run("startRest(1,'Bench');S.restTimer.endsAt=Date.now()-1;tickRest()");assert.equal(a.doc.querySelector('#restbar').classList.contains('ready'),true);assert.equal(a.errors.length,0);
+  }finally{a.close();}
+});
+test('malformed saved timers are discarded, defaults enable sound, and an explicit mute is preserved',()=>{
+  withApp({restTimer:{endsAt:'bad'},restReady:{endsAt:null}},a=>{assert.equal(a.run('!!S.restTimer||!!S.restReady'),false);assert.equal(a.run('S.preferences.sound'),true);});
+  withApp({preferences:{sound:false}},a=>assert.equal(a.run('S.preferences.sound'),false));
+});
+test('dismissing a completed rest cancels a chime waiting for audio to resume',async()=>{
+  const a=app();try{
+    fakeAudio(a);await a.run('armSound()');
+    a.run("let resumeAudio;audioContext.state='suspended';audioContext.resume=()=>new Promise(resolve=>{resumeAudio=()=>{audioContext.state='running';resolve();}});S.restReady={id:'pending',endsAt:Date.now()-1,label:'Bench'}");
+    const pending=a.run("playRestSound('pending')");
+    a.run('stopRest();resumeAudio()');assert.equal(await pending,false);assert.equal(a.run('tones.length'),0);
+  }finally{a.close();}
+});

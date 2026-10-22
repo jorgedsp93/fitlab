@@ -1,7 +1,7 @@
 /* Versioned app shell. A failed network response must never poison the cache. */
-const SHELL='fitlab-shell-v13-1-1';
+const SHELL='fitlab-shell-v13-2-2';
 const IMG='fitlab-img-v2';
-const SHELL_FILES=['./','./index.html','./styles.css?v=13.1.1','./app.js?v=13.1.1','./companion.js?v=13.1.1','./assets/session-push-v13.png','./assets/session-pull-v13.png','./assets/session-legs-v13.png','./assets/session-upper-v13.png','./assets/session-lower-v13.png','./assets/session-recovery-v13.png','./assets/session-rest-v13.png','./manifest.webmanifest','./app-icon-192-v3.png','./app-icon-512-v3.png','./apple-touch-icon-v3.png','./favicon-32-v3.png'];
+const SHELL_FILES=['./','./index.html','./styles.css?v=13.2.2','./app.js?v=13.2.2','./companion.js?v=13.2.2','./assets/session-push-v13.png','./assets/session-pull-v13.png','./assets/session-legs-v13.png','./assets/session-upper-v13.png','./assets/session-lower-v13.png','./assets/session-recovery-v13.png','./assets/session-rest-v13.png','./manifest.webmanifest','./app-icon-192-v4.png','./app-icon-512-v4.png','./apple-touch-icon-v4.png','./favicon-32-v4.png'];
 const scope=new URL('./',self.location.href);
 self.addEventListener('install',event=>{event.waitUntil(caches.open(SHELL).then(cache=>cache.addAll(SHELL_FILES)).then(()=>self.skipWaiting()));});
 self.addEventListener('activate',event=>{event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>(key.startsWith('fitlab-shell-')||key.startsWith('fitlab-img-'))&&key!==SHELL&&key!==IMG).map(key=>caches.delete(key)))).then(()=>self.clients.claim()));});
