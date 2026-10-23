@@ -1,20 +1,26 @@
 # FitLab
 
-A calm, mobile-first training journal for a 12-week program. A static PWA with no runtime dependencies, no account, and local progress storage.
+An offline workout journal with an eight-week return-to-training plan: four lifting sessions, one easy cardio/mobility session, and two rest days per seven-day cycle.
 
-Live app: https://jorgedsp93.github.io/fitlab/
+## Current release: 13.0
+
+- Today leads with one workout card; exercises and daily habits expand on demand.
+- Plan contains all eight weeks, gradual set progression, training guidance, and food/recovery notes. The cycle starts on the device’s current local date; its days follow that start date rather than fixed weekdays.
+- Existing 12-week schedules and logs are archived before the comeback program starts. More lets users reopen either program with its own schedule and logs. Body measurements and appearance settings are shared. Full backups include both programs.
+- More includes a network update check. Updates never automatically replace an active input; an available update offers Save & reload.
+- Workouts save locally in the current browser. Use More → Your data & backups before switching devices or clearing browser data.
 
 ## Features
 
 - **Today:** a weekly date strip, your session, daily habits, and bodyweight logging.
 - **Workout:** set-by-set logging, exercise demonstrations, supported alternatives, superset-aware rest timers, and a session review.
-- **Plan:** all 12 weeks, browsable one week at a time.
+- **Plan:** eight comeback weeks, or the classic 12-week program, browsable one week at a time.
 - **Progress:** session history, bodyweight trends, optional body-fat estimates, and Garmin exports.
 - **More:** light/dark/system themes, lb/kg conversion, exercise search, program settings, backup and restore.
 
 ## Data and upgrades
 
-Progress stays in the browser's `fitlab_v1` localStorage record. Version 12 reads the existing format and saves a recovery copy during migration. A full backup is available in **More → Your data & backups**. Restoring replaces current data after confirmation and saves a recovery copy first. Starting a new cycle clears current workouts/check-ins but retains body measurements and a downloadable recovery copy.
+Progress stays in the browser's `fitlab_v1` localStorage record. Version 13 archives the previous schedule and saves a recovery copy before opening the comeback plan. A full backup is available in **More → Your data & backups**. Restoring replaces current data after confirmation and saves a recovery copy first. Starting a new cycle clears current workouts/check-ins but retains body measurements and a downloadable recovery copy.
 
 Changing devices or clearing browser storage does not automatically transfer history. Export a full backup first. Workout-only JSON and Garmin exports are not restorable FitLab backups.
 
@@ -48,6 +54,6 @@ Add the HTTPS app to your home screen. The service worker saves the app shell fo
 - `app.js`: exercise data, program logic, state, views, exports and events
 - `sw.js`, `manifest.webmanifest`: offline/install support
 - `tests/`: regression suite and responsive review fixture
-- `docs/AUDIT.md`: v12 findings and verification scope
+- `docs/AUDIT.md`: audit findings and verification scope
 
 Exercise data and photos: [free-exercise-db](https://github.com/yuhonas/free-exercise-db), public domain. Existing FitLab artwork is retained in `assets/`.
