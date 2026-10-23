@@ -9,11 +9,13 @@ const root=path.resolve(__dirname,'..');
 const html=fs.readFileSync(path.join(root,'index.html'),'utf8');
 const source=fs.readFileSync(path.join(root,'app.js'),'utf8');
 const bench='Barbell_Bench_Press_-_Medium_Grip';
-function app(state){
+function app(state,productionDefaults=false,setup){
   const errors=[],vc=new VirtualConsole();vc.on('jsdomError',e=>errors.push(e));
   const dom=new JSDOM(html,{url:'https://fitlab.test/fitlab/',runScripts:'outside-only',pretendToBeVisual:true,virtualConsole:vc});
   const w=dom.window;w.TextEncoder=TextEncoder;w.scrollTo=()=>{};w.HTMLElement.prototype.scrollIntoView=()=>{};w.confirm=()=>true;w.alert=()=>{};
+  if(!productionDefaults){if(state===undefined)state={program:'classic12'};else if(state&&typeof state==='object'&&!state.program)state={...state,program:'classic12'};}
   if(state!==undefined)w.localStorage.setItem('fitlab_v1',typeof state==='string'?state:JSON.stringify(state));
+  setup?.(w);
   const context=dom.getInternalVMContext();vm.runInContext(source,context);
   return {w,doc:w.document,errors,run:s=>vm.runInContext(s,context),close:()=>w.close(),click:s=>{const e=w.document.querySelector(s);assert.ok(e,`Missing control ${s}`);e.click();},input:(s,value)=>{const e=w.document.querySelector(s);assert.ok(e,`Missing input ${s}`);e.value=value;e.dispatchEvent(new w.Event('input',{bubbles:true}));}};
 }
@@ -189,4 +191,87 @@ test('measurement estimation submits through its real button and decimal drafts 
     a.run('openDay(1,0)');a.input('[data-field="w"]','22,5');saved=a.w.localStorage.getItem('fitlab_v1');
   });
   withApp(saved,a=>{a.click('[data-open-day]');assert.equal(a.doc.querySelector('[data-field="w"]').value,'22.5');assert.equal(a.doc.querySelector('[data-ck]').getAttribute('aria-pressed'),'false');});
+});
+
+test('new installs start the eight-week program, with four lifting days and gradual volume',()=>{
+  const a=app(undefined,true);try{
+    assert.equal(a.run('S.program'),'comeback8');assert.match(a.doc.querySelector('.topnote').textContent,/8-week/);
+    assert.equal(a.run("programSplit().filter(d=>d.type==='workout').length"),4);
+    assert.equal(a.run("programSplit().filter(d=>d.key==='recovery').length"),1);
+    assert.equal(a.run("programSplit().filter(d=>d.key==='rest').length"),2);
+    assert.equal(a.run('planFor(1,0).ex.reduce((n,e)=>n+e.sets,0)'),10);
+    assert.equal(a.run('planFor(3,0).ex.reduce((n,e)=>n+e.sets,0)'),12);
+    assert.equal(a.run('planFor(8,0).ex.reduce((n,e)=>n+e.sets,0)'),10);
+    a.click('[data-go="plan"]');assert.equal(a.doc.querySelectorAll('#planWeek option').length,8);
+    a.run('openDay(9,0)');assert.equal(a.run('view'),'plan');
+    a.run('S.startDate=ymd(new Date(Date.now()-56*86400000));view="today";render()');assert.match(a.doc.querySelector('#app').textContent,/8-week schedule has reached its end/);
+  }finally{a.close();}
+});
+
+test('all 56 comeback days and their workout blocks render, accept typed sets and survive completion',()=>{
+  const a=app(undefined,true);try{
+    a.run(`for(let w=1;w<=8;w++)for(let d=0;d<7;d++){openDay(w,d);const p=planFor(w,d);for(let b=0;b<workoutBlocks(p,dayKey(w,d)).length;b++){setFlowIndex(p,b);render();const e=workoutBlocks(p,dayKey(w,d))[b].ex[0];if(!EXERCISES[e.id])throw new Error('Missing exercise '+e.id);const weight=document.querySelector('[data-field="w"]');weight.click();weight.value=EXERCISES[e.id].equipment==='body only'?'0':'25';weight.dispatchEvent(new Event('input',{bubbles:true}));document.querySelector('[data-ck]').click();if(!S.logs[dayKey(w,d)][e.id][0].done)throw new Error('Set did not complete');}}`);
+    assert.equal(a.errors.length,0);
+  }finally{a.close();}
+});
+
+test('legacy upgrade archives the complete old program once and both programs reopen after reload',()=>{
+  const legacy={schemaVersion:12,startDate:'2026-10-01',unit:'lb',bw:[{d:'2026-10-01',v:200}],bf:[],logs:{w1d0:{[bench]:[{w:'95',r:'8',done:true}]},w12d4:{Incline_Dumbbell_Press:[{w:'30',r:'10',done:true}]}},swaps:{},rides:{w1d1:true},daily:{'2026-10-01':{protein:true}},restTimer:{endsAt:Date.now()+60000}};
+  const a=app(legacy,true);let saved;try{
+    assert.equal(a.run('S.program'),'comeback8');assert.equal(a.run('Object.keys(S.logs).length'),0);assert.equal(a.run('S.restTimer'),undefined);
+    assert.equal(a.run(`S.archives.classic12.logs.w1d0['${bench}'][0].w`),'95');
+    assert.equal(a.run('S.archives.classic12.startDate'),'2026-10-01');assert.equal(a.run('lastBW()'),200);
+    assert.deepEqual(JSON.parse(a.w.localStorage.getItem('fitlab_backup_v12')),legacy);
+    a.click('[data-open-day]');a.input('[data-field="w"]','25');a.click('[data-ck]');
+    a.run("go('more')");a.click('[data-program="classic12"]');assert.equal(a.run('workoutHistory().length'),2);
+    assert.equal(a.run("S.daily['2026-10-01'].protein"),true);a.run("go('more')");a.click('[data-program="comeback8"]');
+    assert.equal(a.run('S.logs.w1d0.Dumbbell_Bench_Press[0].done'),true);
+    saved=a.w.localStorage.getItem('fitlab_v1');
+    assert.equal(a.run('JSON.stringify(validateBackup(JSON.stringify(backupPayload())))===JSON.stringify(S)'),true);
+  }finally{a.close();}
+  const b=app(saved,true);try{assert.equal(b.run('S.program'),'comeback8');assert.equal(b.run('S.logs.w1d0.Dumbbell_Bench_Press[0].done'),true);assert.equal(b.run(`S.archives.classic12.logs.w12d4.Incline_Dumbbell_Press[0].w`),'30');}finally{b.close();}
+});
+
+test('unit conversion includes archived programs and program switches cannot discard drafts',()=>{
+  const a=app(undefined,true);try{
+    a.click('[data-open-day]');a.input('[data-field="w"]','100');a.run("switchTrainingProgram('classic12');changeUnit('kg');switchTrainingProgram('comeback8')");
+    assert.ok(Math.abs(a.run('Number(S.logs.w1d0.Dumbbell_Bench_Press[0].w)')-45.359)<.001);
+    a.run("changeUnit('lb');switchTrainingProgram('classic12');switchTrainingProgram('comeback8')");assert.ok(Math.abs(a.run('Number(S.logs.w1d0.Dumbbell_Bench_Press[0].w)')-100)<.005);
+    assert.equal(a.run('S.logs.w1d0.Dumbbell_Bench_Press[0].done'),false);
+  }finally{a.close();}
+});
+
+test('failed upgrade or program save leaves the existing program and stored history intact',()=>{
+  const legacy={startDate:'2026-10-01',unit:'lb',bw:[],bf:[],logs:{w1d0:{[bench]:[{w:'95',r:'8',done:true}]}}};
+  const a=app(legacy,true,w=>{w.Storage.prototype.setItem=()=>{throw new Error('quota');};});try{
+    assert.equal(a.run('S.program'),'classic12');assert.match(a.doc.querySelector('#storageWarning').textContent,/new plan could not be saved/);
+    assert.deepEqual(JSON.parse(a.w.localStorage.getItem('fitlab_v1')),legacy);
+    assert.equal(a.run("switchTrainingProgram('comeback8')"),false);assert.equal(a.run('S.program'),'classic12');assert.equal(a.run(`S.logs.w1d0['${bench}'][0].w`),'95');
+  }finally{a.close();}
+});
+
+test('plank entry logs seconds, and Garmin exports retain actual hold duration',()=>{
+  const a=app(undefined,true);try{
+    a.run('openDay(1,1,4)');assert.match(a.doc.querySelector('.set-hd').textContent,/Seconds/);
+    a.input('[data-field="r"]','35');a.click('[data-ck]');
+    const detail=a.run('workoutExportDetail(1,1)'),set=detail.exercises[0].sets[0];assert.equal(set.reps,null);assert.equal(set.durationSeconds,35);assert.equal(a.run('activeSetSeconds(workoutExportDetail(1,1).exercises[0].sets[0])'),35);
+    const {Decoder,Stream}=require('@garmin/fitsdk');const decoder=new Decoder(Stream.fromByteArray(Array.from(a.run('buildGarminFit(workoutExportDetail(1,1))'))));const decoded=decoder.read();assert.equal(decoded.errors.length,0);
+  }finally{a.close();}
+});
+
+test('update notices preserve active input nodes, and checks report current or offline status without touching logs',async()=>{
+  const a=app(undefined,true);try{
+    a.click('[data-open-day]');a.input('[data-field="w"]','25');const field=a.doc.querySelector('[data-field="w"]');field.click();a.run('showUpdateReady()');assert.equal(a.doc.querySelector('#appUpdate').hidden,false);assert.equal(field.isConnected,true);assert.equal(a.doc.activeElement,field);
+    a.run("updateReady=false;go('more')");const saved=a.w.localStorage.getItem('fitlab_v1');let opts;
+    a.w.fetch=async(url,options)=>{opts=options;return new Response('<script src="app.js?v=13.0"></script>');};await a.run('checkAppUpdate()');assert.equal(opts.cache,'no-store');assert.match(a.doc.querySelector('#updateStatus').textContent,/up to date/);assert.equal(a.w.localStorage.getItem('fitlab_v1'),saved);
+    a.w.fetch=async()=>{throw new Error('offline');};await a.run('checkAppUpdate()');assert.match(a.doc.querySelector('#updateStatus').textContent,/online/);assert.equal(a.w.localStorage.getItem('fitlab_v1'),saved);
+  }finally{a.close();}
+});
+
+test('replacing a timed hold with a repetition exercise changes the input and export units',()=>{
+  const a=app(undefined,true);try{
+    a.run('openDay(1,1,4)');assert.equal(a.run("setExerciseSwap('w1d1','Plank','Dead_Bug')"),true);
+    assert.match(a.doc.querySelector('.set-hd').textContent,/Reps/);assert.doesNotMatch(a.doc.querySelector('.set-hd').textContent,/Seconds/);
+    a.input('[data-field="r"]','8');a.click('[data-ck]');const set=a.run('workoutExportDetail(1,1).exercises[0].sets[0]');assert.equal(set.reps,8);assert.equal(set.durationSeconds,null);
+  }finally{a.close();}
 });

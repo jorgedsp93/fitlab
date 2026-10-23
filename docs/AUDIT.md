@@ -1,6 +1,16 @@
-# FitLab v12.4 audit
+# FitLab v13.0 audit
 
-Scope: the complete static application, all 84 days of the program, every workout block, storage and data migration, exercise alternatives, progress views, accessibility, PWA caching, and Garmin exports.
+Scope: the complete static application, all 56 comeback days and 84 classic program days, every workout block, storage and data migration, exercise alternatives, progress views, accessibility, PWA caching, and Garmin exports.
+
+## Eight-week comeback release
+
+The previous eight-week recommendation existed only in chat. It is now implemented as a real program with four lifting days, one recovery session, and two rest days. Weeks 1–2 use two sets; weeks 3–7 use three sets for the first two lifts and two for the remainder; week 8 returns to two sets for a controlled check-in. Plank holds log seconds, including duration in Garmin exports.
+
+Today now has a distinct primary workout card, a week-of-eight indicator, a compact weekly completion count, and expandable exercises/check-ins. Plan contains all eight weeks and training/recovery guidance.
+
+Old schedules and logs are copied into a separate program archive before the active comeback plan starts. More can reopen either program. Switching programs preserves drafts, dates, completed sets and swaps. Unit conversion and full backups include archived programs. If saving an upgrade fails, the original program remains active.
+
+More provides Check for updates. A new service worker displays a Save & reload notice without replacing active inputs. Shell installation revalidates HTTP cache entries, and online navigation revalidates the entry document. Phone-local cache state cannot be inspected from the test browser.
 
 ## Confirmed defects corrected
 
@@ -43,15 +53,15 @@ Numeric fields now use ordinary editable text inputs with decimal/numeric keyboa
 - Progress separates bodyweight trends, session history, optional body-fat estimates, and exports.
 - More provides appearance, unit conversion, program settings, exercise search, practical usage guidance, and backups.
 - The exercise library is accessible again. Failed remote photos receive a useful fallback; text instructions remain available.
-- Removed unsupported calorie-burn guarantees and aggressive body-fat messaging from the UI. Existing exercise programming is preserved.
+- Removed unsupported calorie-burn guarantees and aggressive body-fat messaging from the UI. The classic exercise program remains available alongside the new comeback plan.
 
 ![Deployed FitLab v12.1 Today screen with synthetic test data](preview.jpg)
 
 ## Validation
 
-- 31 automated checks pass, including the program matrix and official FIT decoder.
+- 40 automated checks pass, including the program matrix and official FIT decoder.
 - Node's test runner with JSDOM exercises real application event handlers, rendering and persistence.
-- A matrix renders all 84 days and all workout blocks before/after logging.
+- Matrices render all 56 comeback days and all 84 classic days, including every workout block before/after logging.
 - Regression cases cover reload, local dates/DST, units, invalid input, supersets, background timers, swaps, measurements, progression, migration, backups, storage failures, schedule confirmation, theme and modal focus.
 - FIT files are decoded with `@garmin/fitsdk`; TCX is parsed as XML.
 - Service-worker tests cover offline navigation, cache ownership, HTTP errors, scope, and missing assets.
