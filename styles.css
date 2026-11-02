@@ -32,3 +32,55 @@ input[data-number]{appearance:none;-webkit-appearance:none;touch-action:manipula
 .hour-card .section-row { flex-wrap: wrap; gap: 8px; }
 .hour-card strong { font-variant-numeric: tabular-nums; white-space: nowrap; }
 .hour-message { font-weight: 700; }
+
+/* Picture and scale check-ins: all answers are tap targets, never typed. */
+.fb-launch { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:18px 0; }
+.fb-launch .btn { font-size:13px; padding:12px 8px; }
+.fb-launch .fb-face { width:26px; height:26px; }
+.fb-icon { width:24px; height:24px; flex:none; vertical-align:middle; }
+.feedback-view h2 { font-size:20px; display:flex; align-items:center; gap:8px; }
+.feedback-view .card { margin:20px 0; }
+.fb-face-scale,.fb-rir-scale { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:6px; }
+.fb-face-scale button,.fb-rir-scale button,.fb-kind button,.fb-number-scale button { border:1px solid var(--line); border-radius:13px; background:var(--surface2); min-height:48px; padding:6px 2px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; }
+.feedback-view button[aria-pressed=true] { background:var(--accent); color:var(--accent-ink); border-color:var(--accent); box-shadow:inset 0 0 0 2px var(--accent-ink); }
+.fb-face { width:44px; height:44px; display:block; flex:none; }
+.fb-scale-ends { display:flex; justify-content:space-between; font-size:11px; color:var(--muted); margin-top:8px; }
+.fb-exercise-head { display:flex; align-items:center; gap:14px; margin-bottom:18px; }
+.fb-exercise-head img { width:92px; height:80px; object-fit:contain; border-radius:12px; background:#fff; }
+.fb-exercise-head h3 { margin-bottom:5px; }
+.fb-body-map { display:block; width:100%; max-width:420px; margin:18px auto; overflow:visible; }
+.fb-body-base { fill:var(--map-base); }
+.fb-body-area { fill:var(--map-base); stroke:var(--surface); stroke-width:1; cursor:pointer; }
+.fb-body-area.low { fill:var(--map-2); }
+.fb-body-area.medium { fill:var(--warn); }
+.fb-body-area.high { fill:var(--hot); stroke-dasharray:2 1; }
+.fb-body-area.selected,.fb-body-area:focus-visible { stroke:var(--text); stroke-width:2.5; outline:none; }
+.fb-body-map text { fill:var(--muted); font-size:9px; }
+.fb-clear { width:100%; }
+.fb-muscle-rating { margin-top:22px; padding-top:18px; border-top:1px solid var(--line); }
+.fb-kind { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:14px 0; }
+.fb-kind button { min-height:68px; font-size:12px; gap:6px; }
+.fb-number-scale { display:grid; grid-template-columns:repeat(auto-fit,minmax(44px,1fr)); gap:5px; }
+.fb-pain-note { color:var(--hot); border-left:3px solid currentColor; padding:10px; margin-top:16px; font-size:13px; }
+.fb-extra-muscles { margin-top:20px; }
+.fb-extra-muscles summary { min-height:44px; padding:10px 0; color:var(--muted); font-size:13px; cursor:pointer; }
+.fb-muscle-picks { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.fb-muscle-picks button { border:1px solid var(--line); border-radius:14px; padding:8px; font-size:12px; }
+.fb-muscle-picks svg { width:100%; height:80px; }
+.fb-muscle-picks span { display:block; }
+.fb-next-row { display:flex; align-items:center; gap:12px; padding:14px 0; border-top:1px solid var(--line); }
+.fb-next-row img { width:48px; height:48px; object-fit:contain; border-radius:8px; background:white; }
+.fb-next-row>div { flex:1; min-width:0; }
+.fb-next-row b,.fb-next-row span { display:block; font-size:13px; }
+.fb-next-row div>span { color:var(--muted); margin-top:3px; }
+.fb-direction { color:var(--accent); }
+.fb-direction.pause { color:var(--hot); }
+.fb-direction.down { color:var(--warn); }
+.fb-save { display:flex; align-items:center; justify-content:space-between; gap:12px; position:sticky; bottom:calc(var(--nav-h) + var(--safe-bot) + 8px); padding:12px; background:var(--surface); border:1px solid var(--line); border-radius:16px; box-shadow:0 5px 24px #0001; }
+.fb-save .btn { width:auto; min-width:100px; }
+.fb-science { font-size:13px; color:var(--muted); }
+.fb-science summary { color:var(--text); min-height:44px; cursor:pointer; padding:8px 0; }
+.fb-science p { margin-top:12px; }
+.fb-training-note { display:flex; flex-wrap:wrap; align-items:center; gap:8px; font-size:13px; padding:12px; background:var(--surface2); border-radius:12px; margin:10px 0; }
+.fb-training-note span { flex:1; min-width:150px; }
+@media(max-width:360px) { .feedback-view .card { padding:14px; } .fb-face { width:36px; height:36px; } .fb-face-scale,.fb-rir-scale { gap:4px; } .fb-launch { grid-template-columns:1fr; } .fb-exercise-head img { width:76px; height:72px; } }

@@ -2,7 +2,7 @@
 
 An offline workout journal with an eight-week, four-day Push / Pull plan. Full sessions include legs, warm-up, rest and cooldown within a one-hour budget.
 
-## Current release: 13.4
+## Current release: 13.5
 
 - **Day 1 / Monday: Push A** — chest, shoulders, triceps, quads and calves.
 - **Day 2 / Tuesday: Pull A** — back, biceps, hamstrings and glutes.
@@ -18,13 +18,21 @@ Rest two minutes after each round. For a three-set lift paired with a two-set ex
 
 ## Start on your device
 
-[Open Push / Pull setup](https://jorgedsp93.github.io/fitlab/?setup=pushpull&release=13.4) and tap **Start Push / Pull today**. This starts Push A on the device’s current local date. Opening the link alone never resets progress. The current program is archived, a full recovery copy is saved, and body measurements remain. Existing comeback and classic programs stay available in **More** with their own schedules and logs; an update never silently reinterprets those sessions as push/pull.
+[Open Push / Pull setup](https://jorgedsp93.github.io/fitlab/?setup=pushpull&release=13.5) and tap **Start Push / Pull today**. This starts Push A on the device’s current local date. Opening the link alone never resets progress. The current program is archived, a full recovery copy is saved, and body measurements remain. Existing comeback and classic programs stay available in **More** with their own schedules and logs; an update never silently reinterprets those sessions as push/pull.
 
 New installs open Push / Pull by default. **More → Program settings → Restart at Day 1 today** restarts the currently selected program. Progress is local to each browser/device, and full backups include all saved programs.
 
+## Visual workout feedback
+
+Open **Workout check-in** from Today or a workout you already finished. Rate your overall feeling with faces, each exercise with its photo and a 0–4+ good-reps-left scale, and discomfort by tapping a muscle on the body map and a 0–10 number. Choose muscle ache or sharp/joint pain. All answers are taps; no written response is required. **Readiness now** lets you update energy and discomfort before another session.
+
+Push / Pull and comeback use these ratings alongside logged sets to adjust each exercise: build reps when easier, increase one equipment step after completing the top of the rep range, hold when very hard or moderately uncomfortable, and suggest a lighter step after reaching failure. Severe or sharp/joint pain pauses affected recommendations until rechecked. No automatic exercises or sets are added or removed. Sources, limitations and exact product rules are in [Training science](docs/TRAINING-SCIENCE.md) and the check-in's **Why these adjustments?** panel.
+
+The update keeps your schedule and completed workouts. Feedback saves on this device, survives reloads and is included in full backups. Historical session ratings stay with their program; current readiness remains across programs. Previously entered set values stay intact; **Use suggestion for unfinished sets** applies the updated recommendation.
+
 ## Automatic weight suggestions
 
-Push / Pull and the comeback program now prefill a specific suggested weight and rep count from the latest earlier session for that same exercise in the active program. Complete all required sets at a consistent weight and the top of the rep range to receive a higher weight with reps reset to the bottom of the range. Until then, build reps at the same load. Incomplete sessions, missed rep targets, mixed loads and increases in the prescribed number of sets do not trigger heavier recommendations. The app cannot measure effort or form: treat the number as a suggestion and keep a couple of good reps in reserve.
+Push / Pull and the comeback program now prefill a specific suggested weight and rep count from the latest earlier session for that same exercise in the active program. Complete all required sets at a consistent weight and the top of the rep range to receive a higher weight with reps reset to the bottom of the range. Until then, build reps at the same load. Incomplete sessions, missed rep targets, mixed loads and increases in the prescribed number of sets do not trigger heavier recommendations. The app cannot directly measure effort or form: treat the number as a suggestion and keep a couple of good reps in reserve.
 
 For example, three completed bench sets of 30 lb per dumbbell × 12 lead to a suggestion of 35 lb per dumbbell × 8. Default increases are 5 lb / 2.5 kg for most lifts, 10 lb / 5 kg for the listed main leg lifts, and 2.5 lb / 1 kg for dumbbell accessories. Change **Weight increase** under an exercise's **Guidance & alternatives** to match your equipment. Preferences are stored by exercise and unit, included in backups, and retained when switching programs.
 
@@ -78,6 +86,7 @@ Add the HTTPS app to your home screen. The service worker saves the app shell fo
 - `index.html`: accessible app shell
 - `styles.css`: responsive light/dark design system
 - `app.js`: exercise data, program logic, state, views, exports and events
+- `feedback.js`: visual feedback, readiness checks and source-linked guidance
 - `sw.js`, `manifest.webmanifest`: offline/install support
 - `tests/`: regression suite and responsive review fixture
 - `docs/AUDIT.md`: audit findings and verification scope

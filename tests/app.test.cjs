@@ -7,7 +7,7 @@ const {JSDOM,VirtualConsole}=require('jsdom');
 process.env.TZ='America/Toronto';
 const root=path.resolve(__dirname,'..');
 const html=fs.readFileSync(path.join(root,'index.html'),'utf8');
-const source=fs.readFileSync(path.join(root,'app.js'),'utf8');
+const source=['feedback.js','app.js'].map(file=>fs.readFileSync(path.join(root,file),'utf8')).join('\n');
 const bench='Barbell_Bench_Press_-_Medium_Grip';
 function app(state,productionDefaults=false,setup){
   const errors=[],vc=new VirtualConsole();vc.on('jsdomError',e=>errors.push(e));
@@ -17,7 +17,7 @@ function app(state,productionDefaults=false,setup){
   if(state!==undefined)w.localStorage.setItem('fitlab_v1',typeof state==='string'?state:JSON.stringify(state));
   setup?.(w);
   const context=dom.getInternalVMContext();vm.runInContext(source,context);
-  return {w,doc:w.document,errors,run:s=>vm.runInContext(s,context),close:()=>w.close(),click:s=>{const e=w.document.querySelector(s);assert.ok(e,`Missing control ${s}`);e.click();},input:(s,value)=>{const e=w.document.querySelector(s);assert.ok(e,`Missing input ${s}`);e.value=value;e.dispatchEvent(new w.Event('input',{bubbles:true}));}};
+  return {w,doc:w.document,errors,run:s=>vm.runInContext(s,context),close:()=>w.close(),click:s=>{const e=w.document.querySelector(s);assert.ok(e,`Missing control ${s}`);if(e.click)e.click();else e.dispatchEvent(new w.MouseEvent('click',{bubbles:true}));},input:(s,value)=>{const e=w.document.querySelector(s);assert.ok(e,`Missing input ${s}`);e.value=value;e.dispatchEvent(new w.Event('input',{bubbles:true}));}};
 }
 function withApp(state,fn){const a=app(state);try{return fn(a);}finally{a.close();}}
 test('first checked set, next block, back, and reload retain the session without crashing',()=>{
@@ -263,7 +263,7 @@ test('update notices preserve active input nodes, and checks report current or o
   const a=app({program:'comeback8'},true);try{
     a.click('[data-open-day]');a.input('[data-field="w"]','25');const field=a.doc.querySelector('[data-field="w"]');field.click();a.run('showUpdateReady()');assert.equal(a.doc.querySelector('#appUpdate').hidden,false);assert.equal(field.isConnected,true);assert.equal(a.doc.activeElement,field);
     a.run("updateReady=false;go('more')");const saved=a.w.localStorage.getItem('fitlab_v1');let opts;
-    a.w.fetch=async(url,options)=>{opts=options;return new Response('<script src="app.js?v=13.4"></script>');};await a.run('checkAppUpdate()');assert.equal(opts.cache,'no-store');assert.match(a.doc.querySelector('#updateStatus').textContent,/up to date/);assert.equal(a.w.localStorage.getItem('fitlab_v1'),saved);
+    a.w.fetch=async(url,options)=>{opts=options;return new Response('<script src="app.js?v=13.5"></script>');};await a.run('checkAppUpdate()');assert.equal(opts.cache,'no-store');assert.match(a.doc.querySelector('#updateStatus').textContent,/up to date/);assert.equal(a.w.localStorage.getItem('fitlab_v1'),saved);
     a.w.fetch=async()=>{throw new Error('offline');};await a.run('checkAppUpdate()');assert.match(a.doc.querySelector('#updateStatus').textContent,/online/);assert.equal(a.w.localStorage.getItem('fitlab_v1'),saved);
   }finally{a.close();}
 });
@@ -499,4 +499,74 @@ test('invalid increase preferences are discarded and failed saves leave settings
   a.w.Storage.prototype.setItem=()=>{throw new Error('full');};
   assert.equal(a.run("setLoadStep('Dumbbell_Bench_Press','2.5')"),false);assert.equal(a.run('S.loadSteps.Dumbbell_Bench_Press.lb'),undefined);
   assert.equal(a.run("applySuggestion('Dumbbell_Bench_Press')"),false);assert.equal(a.run('S.logs.w2d0.Dumbbell_Bench_Press[0].w'),'40');
+}));
+
+// Visual check-ins use real logging and click paths; synthetic data never reaches a live account.
+function completedPush(a,reps=12){a.run(`{S.startDate=todayISO();const plan=planFor(1,0);S.logs.w1d0=Object.fromEntries(workoutExercises(plan,'w1d0').map(e=>[e.id,Array.from({length:e.sets},()=>({w:e.id==='Leg_Press'?'100':'30',r:String(Math.min(${reps},parseRange(e.reps).max)),done:true}))]));save();render();}`);}
+function nextBench(a){return a.run("suggest('Dumbbell_Bench_Press',planFor(2,0).ex[0],'w2d0')");}
+test('completed Day 1 opens a photo and scale check-in with no text entry; taps survive reload',()=>{
+  let saved;
+  withApp({program:'pushpull8'},a=>{completedPush(a);a.click('[data-open-feedback="w1d0"]');assert.equal(a.doc.querySelectorAll('.fb-exercise').length,6);assert.equal(a.doc.querySelectorAll('.feedback-view input,.feedback-view textarea,.feedback-view select').length,0);assert.equal(a.doc.querySelectorAll('.fb-exercise-head img').length,6);
+    a.click('[data-feedback-overall="4"]');a.click('[data-feedback-rir="Dumbbell_Bench_Press|3"]');a.click('[data-body-muscle="quadriceps"]');a.click('[data-body-score="5"]');
+    assert.equal(a.run('S.feedback.w1d0.overall'),4);assert.equal(a.run("exerciseEffort('w1d0','Dumbbell_Bench_Press')"),3);assert.equal(a.run('S.recovery.muscles.quadriceps.score'),5);assert.equal(nextBench(a).weight,35);
+    assert.equal(a.run("suggest('Leg_Press',planFor(2,0).ex[4],'w2d0').weight"),100);assert.match(a.doc.querySelector('[data-next-ex="Dumbbell_Bench_Press"]').textContent,/35 lb each/);
+    assert.equal(a.run('dayProgress(planFor(1,0)).done'),14);assert.equal(a.errors.length,0);saved=a.w.localStorage.getItem('fitlab_v1');
+  });
+  withApp(saved,a=>{a.click('[data-open-feedback="w1d0"]');assert.equal(a.doc.querySelector('[data-feedback-rir="Dumbbell_Bench_Press|3"]').getAttribute('aria-pressed'),'true');assert.equal(a.run('S.feedback.w1d0.muscles.quadriceps.score'),5);a.click('[data-feedback-save]');assert.equal(a.run('view'),'today');});
+});
+test('finish opens feedback, ends the clock, and preserves all logged work',()=>withApp({program:'pushpull8'},a=>{
+  completedPush(a);a.run('openDay(1,0);S.sessionClocks.w1d0={startedAt:Date.now()-2000000};');a.click('[data-finish-workout]');assert.equal(a.run('view'),'feedback');assert.ok(a.run('S.sessionClocks.w1d0.endedAt'));assert.equal(a.run('dayProgress(planFor(1,0)).done'),14);a.click('[data-feedback-save]');assert.equal(a.run('view'),'day');
+}));
+test('effort selectively lowers, holds or advances load, and easy sets build reps within the range',()=>withApp({program:'pushpull8'},a=>{
+  completedPush(a);a.click('[data-open-feedback]');
+  for(const [rir,weight] of [[0,25],[1,30],[2,35],[3,35],[4,35]]){a.click(`[data-feedback-rir="Dumbbell_Bench_Press|${rir}"]`);assert.equal(nextBench(a).weight,weight);}
+  completedPush(a,9);a.run("openFeedback('w1d0')");a.click('[data-feedback-rir="Dumbbell_Bench_Press|4"]');assert.equal(nextBench(a).weight,30);assert.equal(nextBench(a).reps,11);
+  a.run('S.logs.w1d0.Dumbbell_Bench_Press[2].done=false');a.click('[data-feedback-rir="Dumbbell_Bench_Press|4"]');assert.equal(nextBench(a).weight,30);
+  a.run('S.logs.w1d0.Dumbbell_Bench_Press.forEach(s=>s.w="2.5")');a.click('[data-feedback-rir="Dumbbell_Bench_Press|0"]');assert.ok(nextBench(a).weight>0);
+  assert.equal(a.run('planFor(2,0).ex.length'),6);assert.equal(a.run('dayProgress(planFor(2,0)).tot'),14);assert.ok(a.run("workoutTimeEstimate(planFor(2,0),'w2d0').total")<=60);
+}));
+test('sharp pain blocks primary and secondary muscles even mid-workout, while unrelated legs progress',()=>withApp({program:'pushpull8'},a=>{
+  completedPush(a);a.click('[data-open-feedback]');a.click('[data-body-muscle="shoulders"]');a.click('[data-body-kind="pain"]');assert.equal(nextBench(a).blocked,true);assert.equal(nextBench(a).weight,'');
+  assert.equal(a.run("suggest('Dumbbell_Shoulder_Press',planFor(2,0).ex[2],'w2d0').blocked"),true);
+  assert.equal(a.run("suggest('Leg_Press',planFor(2,0).ex[4],'w2d0').weight"),110);
+  a.run('openDay(2,0)');assert.ok(a.doc.querySelector('.fb-training-note'));assert.equal(a.doc.querySelector('[data-apply-suggestion="Dumbbell_Bench_Press"]'),null);
+  a.run("S.logs.w2d0.Dumbbell_Bench_Press[0]={w:'30',r:'8',done:true}");assert.equal(nextBench(a).blocked,true);
+  a.click('[data-open-recovery]');a.click('[data-body-muscle="shoulders"]');a.click('[data-body-score="0"]');assert.equal(nextBench(a).blocked,undefined);
+  assert.equal(a.run('S.feedback.w1d0.muscles.shoulders.pain'),true);assert.equal(a.run('S.recovery.muscles.shoulders.pain'),false);
+}));
+test('moderate and old discomfort hold until rechecked; severe discomfort pauses regardless of pain type',()=>withApp({program:'pushpull8'},a=>{
+  completedPush(a);a.run("S.recovery.muscles.chest={score:4,pain:false,at:Date.now()-72*3600000}");assert.equal(nextBench(a).weight,30);assert.match(nextBench(a).note,/older than 48/);
+  a.run('S.recovery.muscles.chest.score=7');assert.equal(nextBench(a).blocked,true);
+  a.run('S.recovery.muscles.chest.score=0');assert.equal(nextBench(a).weight,35);
+}));
+test('readiness uses fresh energy only; post-workout feeling is not assumed to be future readiness',()=>withApp({program:'pushpull8'},a=>{
+  completedPush(a);a.click('[data-open-feedback]');a.click('[data-feedback-overall="1"]');assert.equal(nextBench(a).weight,35);
+  a.run("openFeedback(null,'recovery')");a.click('[data-feedback-overall="1"]');assert.equal(nextBench(a).weight,30);
+  a.run('S.recovery.energy.at=Date.now()-25*3600000');assert.equal(nextBench(a).weight,35);
+}));
+test('editing old session effort does not make historical discomfort current',()=>withApp({program:'pushpull8'},a=>{
+  completedPush(a);a.run("S.startDate='2026-01-01';openFeedback('w1d0')");a.click('[data-body-muscle="chest"]');a.click('[data-body-kind="pain"]');assert.equal(a.run('S.feedback.w1d0.muscles.chest.pain'),true);assert.equal(a.run('S.recovery.muscles.chest'),undefined);
+}));
+test('effort requires actual sets, survives unit conversion, and is invalidated by edited logs',()=>withApp({program:'pushpull8'},a=>{
+  a.click('[data-open-feedback]');assert.equal(a.doc.querySelector('[data-feedback-rir]').disabled,true);assert.equal(a.run("setExerciseEffort('Dumbbell_Bench_Press',4)"),false);
+  completedPush(a);a.run("openFeedback('w1d0')");a.click('[data-feedback-rir="Dumbbell_Bench_Press|1"]');a.run("changeUnit('kg')");assert.equal(a.run("exerciseEffort('w1d0','Dumbbell_Bench_Press')"),1);
+  a.run("S.logs.w1d0.Dumbbell_Bench_Press[0].r='11'");assert.equal(a.run("exerciseEffort('w1d0','Dumbbell_Bench_Press')"),null);
+}));
+test('feedback archives with programs and reset recovery copy, while unresolved current pain persists',()=>withApp({program:'pushpull8'},a=>{
+  completedPush(a);a.click('[data-open-feedback]');a.click('[data-feedback-rir="Dumbbell_Bench_Press|1"]');a.click('[data-body-muscle="chest"]');a.click('[data-body-kind="pain"]');
+  a.run("switchTrainingProgram('comeback8')");assert.equal(a.run('Object.keys(S.feedback).length'),0);assert.equal(a.run('S.recovery.muscles.chest.pain'),true);
+  a.run("switchTrainingProgram('pushpull8')");assert.equal(a.run("exerciseEffort('w1d0','Dumbbell_Bench_Press')"),1);
+  a.run('restartScheduleFrom(todayISO(),{confirm:false})');assert.equal(a.run('Object.keys(S.feedback).length'),0);assert.equal(a.run('S.recovery.muscles.chest.pain'),true);assert.equal(JSON.parse(a.w.localStorage.getItem('fitlab_backup_v12')).feedback.w1d0.effort.Dumbbell_Bench_Press.rir,1);
+}));
+test('failed feedback saves roll back the tap and keep the stored workout unchanged',()=>withApp({program:'pushpull8'},a=>{
+  completedPush(a);a.click('[data-open-feedback]');const before=a.w.localStorage.getItem('fitlab_v1');a.run("Storage.prototype.setItem=function(){throw new Error('full')}");a.click('[data-feedback-overall="5"]');assert.equal(a.run('S.feedback.w1d0'),undefined);assert.equal(a.doc.querySelector('#storageWarning').hidden,false);assert.equal(a.w.localStorage.getItem('fitlab_v1'),before);
+}));
+test('restore discards invalid ratings and muscle keys; keyboard body-map selection works',()=>withApp({program:'pushpull8',feedback:{bad:{overall:3},w1d0:{overall:9,effort:{Dumbbell_Bench_Press:{rir:9,signature:'x'}},muscles:{chest:{score:99,at:Date.now()},fake:{score:3,at:Date.now()}}}},recovery:{energy:{value:8,at:Date.now()},muscles:{shoulders:{score:5,pain:false,at:Date.now()}}}},a=>{
+  assert.equal(a.run('Object.keys(S.feedback).length'),1);assert.equal(a.run('S.feedback.w1d0.overall'),undefined);assert.equal(a.run('Object.keys(S.feedback.w1d0.effort).length'),0);assert.equal(a.run('Object.keys(S.feedback.w1d0.muscles).length'),0);assert.equal(a.run('S.recovery.energy'),undefined);
+  a.click('[data-open-feedback]');a.doc.querySelector('g[data-body-muscle="chest"]').dispatchEvent(new a.w.KeyboardEvent('keydown',{key:'Enter',bubbles:true}));assert.ok(a.doc.querySelector('[data-body-score="5"]'));
+}));
+test('feedback navigation restores session versus readiness views through browser history',()=>withApp({program:'pushpull8'},a=>{
+  completedPush(a);a.click('[data-open-feedback]');const session=a.w.history.state;a.run("openFeedback(null,'recovery')");const recovery=a.w.history.state;
+  a.w.dispatchEvent(new a.w.PopStateEvent('popstate',{state:session}));assert.equal(a.doc.querySelectorAll('.fb-exercise').length,6);
+  a.w.dispatchEvent(new a.w.PopStateEvent('popstate',{state:recovery}));assert.equal(a.doc.querySelectorAll('.fb-exercise').length,0);assert.match(a.doc.querySelector('h1').textContent,/Ready/);
 }));

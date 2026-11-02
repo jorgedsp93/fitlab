@@ -1110,10 +1110,10 @@ const STORAGE_KEY='fitlab_v1';
 const BACKUP_KEY='fitlab_backup_v12';
 function validDate(value){ if(typeof value!=='string'||!/^\d{4}-\d{2}-\d{2}$/.test(value))return false;const date=new Date(value+'T12:00:00Z');return Number.isFinite(date.getTime())&&date.toISOString().slice(0,10)===value; }
 function calendarDay(value){ const [y,m,d]=value.split('-').map(Number); return Date.UTC(y,m-1,d)/86400000; }
-const APP_VERSION='13.4';
-const PROGRAM_FIELDS=['startDate','logs','done','reviewed','lastW','rides','flow','daily','swaps','sessionClocks'];
+const APP_VERSION='13.5';
+const PROGRAM_FIELDS=['startDate','logs','done','reviewed','lastW','rides','flow','daily','swaps','sessionClocks','feedback'];
 function programSnapshot(state){return JSON.parse(JSON.stringify(Object.fromEntries(PROGRAM_FIELDS.map(key=>[key,state[key]]))));}
-function newState(){ return {program:'pushpull8',archives:{},sessionClocks:{},loadSteps:{},startDate:todayISO(),unit:'lb',logs:{},done:{},reviewed:{},lastW:{},bw:[],bf:[],heightCm:185.4,rides:{},flow:{},daily:{},swaps:{},theme:'light',schemaVersion:13}; }
+function newState(){ return {program:'pushpull8',archives:{},sessionClocks:{},feedback:{},recovery:{muscles:{}},loadSteps:{},startDate:todayISO(),unit:'lb',logs:{},done:{},reviewed:{},lastW:{},bw:[],bf:[],heightCm:185.4,rides:{},flow:{},daily:{},swaps:{},theme:'light',schemaVersion:13}; }
 function record(value){ return value && typeof value==='object' && !Array.isArray(value); }
 function normalizeState(value,withArchives=true){
   if(!record(value)) throw new Error('Invalid FitLab data');
@@ -1123,7 +1123,9 @@ function normalizeState(value,withArchives=true){
   s.unit=s.unit==='kg'?'kg':'lb';
   s.theme=['light','dark','auto'].includes(s.theme)?s.theme:'light';
   s.heightCm=Number.isFinite(+s.heightCm)&&+s.heightCm>50?+s.heightCm:185.4;
-  for(const key of ['logs','done','reviewed','lastW','rides','flow','daily','swaps','sessionClocks']) if(!record(s[key])) s[key]={};
+  for(const key of ['logs','done','reviewed','lastW','rides','flow','daily','swaps','sessionClocks','feedback']) if(!record(s[key])) s[key]={};
+  s.feedback=normalizeFeedback(value.feedback);
+  s.recovery=normalizeRecovery(value.recovery);
   s.loadSteps={};
   if(record(value.loadSteps))for(const [id,steps] of Object.entries(value.loadSteps)){
     if(!EXERCISES[id]||!record(steps))continue;
@@ -1189,7 +1191,9 @@ function changeUnit(unit){
   const factor=unit==='kg'?1/2.2046226218:2.2046226218;
   const convert=n=>blank(n)?'':String(Math.round(Number(n)*factor*1000)/1000);
   for(const data of [S,...Object.values(S.archives)]){
+    const rated=Object.entries(data.feedback||{}).flatMap(([dk,f])=>Object.entries(f.effort||{}).filter(([id,r])=>r.signature===JSON.stringify((data.logs[dk]?.[id]||[]).map(s=>[cleanNumber(s.w),cleanNumber(s.r,true),s.done===true]))).map(([id])=>[dk,id]));
     for(const log of Object.values(data.logs))for(const sets of Object.values(log))for(const set of sets)set.w=convert(set.w);
+    for(const [dk,id] of rated)data.feedback[dk].effort[id].signature=JSON.stringify(data.logs[dk][id].map(s=>[cleanNumber(s.w),cleanNumber(s.r,true),s.done===true]));
     for(const id of Object.keys(data.lastW))data.lastW[id]=convert(data.lastW[id]);
   }
   S.bw.forEach(x=>x.v=Number(convert(x.v)));
@@ -1434,7 +1438,14 @@ function modernSuggestion(exId,e,curDk,rng){
   const prev=lastExerciseSession(exId,curDk),done=prev?.sets.filter(validCompletedSet)||[];
   if(!done.length)return {weight:'',reps:rng.amrap?'':rng.min,note:`First complete a set with a weight you can control for ${e.reps} reps. FitLab will use this exercise's logged sets for future suggestions. ${weightHint(exId,[])}`};
   const weights=done.map(s=>entryNumber(s.w)),weight=Math.min(...weights),reps=done.map(s=>entryNumber(s.r));
-  const hold={weight,reps:rng.min};
+  const hold={weight,reps:rng.min},guard=recoveryGuard(e),rir=exerciseEffort(prev.dk,exId);
+  const repeatReps=rng.amrap?'':Math.max(rng.min,Math.min(rng.max,Math.min(...reps)));
+  if(guard.hold)return {...hold,reps:repeatReps,note:guard.note,status:'hold'};
+  if(rir===0&&supportsLoadProgression(e)&&weight>0){
+    const lighter=Math.round((weight-loadStepFor(e))*1000)/1000;
+    return {...hold,weight:lighter>0?lighter:weight,status:lighter>0?'down':'hold',note:lighter>0?`You reported no good reps left. Try one lighter equipment step, ${formatEntryWeight(exId,lighter)}, and keep 2–3 good reps in reserve.`:'No good reps were left. Keep this load, stop earlier, or choose a lighter setup that you can control.'};
+  }
+  if(rir===1)return {...hold,reps:repeatReps,status:'hold',note:'Only one good rep was left. Repeat your load and reps before progressing; aim for 2–3 good reps in reserve.'};
   if(rng.amrap)return {...hold,reps:'',note:'Repeat your previous load and log controlled repetitions.'};
   if(!supportsLoadProgression(e)||weight===0)return {...hold,note:'Repeat this setup. Bodyweight, assistance and added weight need your choice of resistance; FitLab does not automatically increase them.'};
   const required=Math.max(e.sets,prev.exercise?.sets||0),target=Math.max(rng.max,parseRange(prev.exercise?.reps||e.reps).max);
@@ -1447,7 +1458,7 @@ function modernSuggestion(exId,e,curDk,rng){
     if(next>5000)return {...hold,note:'Keep your previous load; the next increase exceeds the supported weight range.'};
     return {weight:next,reps:rng.min,note:`Every required set reached ${target} reps at ${formatEntryWeight(exId,weight)}. Try ${formatEntryWeight(exId,next)} for ${rng.min} reps. Keep 2–3 good reps in reserve; repeat the previous load if needed.`};
   }
-  return {weight,reps:Math.min(rng.max,Math.min(...reps)+1),note:`Keep ${formatEntryWeight(exId,weight)} and build repetitions. The weight increases after every required set reaches ${target} reps.`};
+  return {weight,reps:Math.min(rng.max,Math.min(...reps)+(rir===4?2:1)),note:`Keep ${formatEntryWeight(exId,weight)} and build repetitions. The weight increases after every required set reaches ${target} reps.`};
 }
 function currentWorkoutSuggestion(exId,e,curDk,rng=parseRange(e.reps)){
   const done=((S.logs[curDk]||{})[exId]||[]).filter(s=>s.done&&(!blank(s.w)||!blank(s.r)));
@@ -1471,14 +1482,16 @@ function currentWorkoutSuggestion(exId,e,curDk,rng=parseRange(e.reps)){
 }
 // double-progression suggestion: pre-fill weight + target reps, with a coaching note
 function suggest(exId,e,curDk){
-  const rng=parseRange(e.reps);
-  if(e.timed)return {weight:0,reps:rng.min,note:`Hold for ${e.reps} seconds with steady breathing. Log seconds in the Seconds column.`};
+  const rng=parseRange(e.reps),guard=recoveryGuard(e);
+  if(guard.blocked)return {...guard,weight:'',reps:rng.amrap?'':rng.min};
+  if(e.timed)return {weight:0,reps:rng.min,note:`Hold for ${e.reps} seconds with steady breathing. Log seconds in the Seconds column.`,...guard};
   const current=currentWorkoutSuggestion(exId,e,curDk);
-  if(current) return current;
-  if(isModern())return modernSuggestion(exId,e,curDk,rng);
+  if(current) return guard.hold?{...current,...guard}:current;
+  if(isModern()){const result=modernSuggestion(exId,e,curDk,rng);return guard.hold?{...result,...guard}:result;}
   const prev=lastPerf(exId,curDk);
   if(!prev){ return {weight:'', reps: rng.amrap?'':rng.min, note:`First time — pick a weight you can control for ${e.reps} reps. ${weightHint(exId,[])}`}; }
   const w=parseFloat(prev[0].w)||''; const reps=prev.map(s=>parseInt(s.r)||0); const repsStr=reps.join(', ');
+  if(guard.hold)return {weight:w,reps:rng.amrap?'':rng.min,...guard};
   if(rng.amrap){ const tot=reps.reduce((a,b)=>a+b,0); return {weight:w, reps:'', note:`Last time: ${repsStr} reps (${tot} total). Beat it.`}; }
   const inc=incFor(e);
   if(w && prev.length>=e.sets && prev.every(s=>Number(s.w)===w) && reps.every(r=>r>=rng.max)){ const nw=Math.round((w+inc)*10)/10; return {weight:nw, reps:rng.min, note:`You maxed the reps at ${formatEntryWeight(exId,w)} — go up to ${formatEntryWeight(exId,nw)} × ${rng.min}.`}; }
@@ -1663,9 +1676,9 @@ let view='today',viewingPos=null,dayOffset=0,returnView='today',selectedWeek=nul
 const TABS=[['today','Today'],['plan','Plan'],['stats','Progress'],['more','More']];
 function displayNumber(value){return Number(value).toLocaleString(undefined,{maximumFractionDigits:1});}
 function applyTheme(){const dark=S.theme==='dark'||(S.theme==='auto'&&window.matchMedia?.('(prefers-color-scheme: dark)').matches);document.documentElement.dataset.theme=dark?'dark':'light';document.querySelector('meta[name="theme-color"]')?.setAttribute('content',dark?'#121916':'#f5f6f2');}
-function go(v,options={}){if(!['today','plan','stats','more','library','guide','day'].includes(v))return;view=v;if(v==='today'&&!options.keepDay)dayOffset=0;render();history.pushState(routeState(),'',location.href);window.scrollTo({top:0});$('#app').focus({preventScroll:true});}
-function render(){applyTheme();const r={today:renderToday,plan:renderPlan,library:renderLibrary,stats:renderStats,more:renderMore,guide:renderGuide,day:renderDayView}[view];$('#app').innerHTML=r?r():'';renderNav();storageNotice();tickHourClock();}
-function renderNav(){const active=view==='day'?returnView:['library','guide'].includes(view)?'more':view;$('#nav').innerHTML=TABS.map(([v,l])=>`<button data-go="${v}" class="${active===v?'on':''}" ${active===v?'aria-current="page"':''}><span class="ni">${icon(v)}</span>${l}</button>`).join('');}
+function go(v,options={}){if(!['today','plan','stats','more','library','guide','day','feedback'].includes(v))return;view=v;if(v==='today'&&!options.keepDay)dayOffset=0;render();history.pushState(routeState(),'',location.href);window.scrollTo({top:0});$('#app').focus({preventScroll:true});}
+function render(){applyTheme();const r={today:renderToday,plan:renderPlan,library:renderLibrary,stats:renderStats,more:renderMore,guide:renderGuide,day:renderDayView,feedback:renderFeedback}[view];$('#app').innerHTML=r?r():'';renderNav();storageNotice();tickHourClock();}
+function renderNav(){const active=view==='feedback'?(feedbackFrom==='day'?returnView:'today'):view==='day'?returnView:['library','guide'].includes(view)?'more':view;$('#nav').innerHTML=TABS.map(([v,l])=>`<button data-go="${v}" class="${active===v?'on':''}" ${active===v?'aria-current="page"':''}><span class="ni">${icon(v)}</span>${l}</button>`).join('');}
 function selectedDayNumber(){return Math.min(programDays()-1,Math.max(0,Math.max(0,daysSinceStart())+dayOffset));}
 function weekStrip(week,day){return `<div class="weekstrip" aria-label="This week">${programSplit().map((_,d)=>{const date=dateForPos(week,d),done=isWorkoutComplete(planFor(week,d));return `<button data-select-day="${(week-1)*7+d}" class="${d===day?'selected':''} ${ymd(date)===todayISO()?'istoday':''}" aria-label="${esc(fmtDate(date))}, ${programSplit()[d].title}${done?', complete':''}" aria-pressed="${d===day}"><span class="weekday">${date.toLocaleDateString(undefined,{weekday:'short'})}</span><span class="date">${date.getDate()}</span>${done?'<span class="weekdot"></span>':''}</button>`;}).join('')}</div>`;}
 function renderToday(){
@@ -1698,6 +1711,7 @@ function renderComebackToday(){
   <section class="comeback-hero" aria-label="Your workout"><div class="hero-label"><span>${ymd(date)===todayISO()?'TODAY':esc(fmtDate(date))}</span><span>${rest?'RECOVER':`${p.tot} SETS · 60 MIN MAX`}</span></div><h2>${esc(plan.title)}</h2><p>${rest?esc(plan.cardio.d):`${plan.ex.length} exercises · ${esc(plan.focus.map(x=>REGION[x]||cap(x)).filter((x,i,a)=>a.indexOf(x)===i).join(' / '))}`}</p>
   ${rest?`<button class="btn hero-action" data-restdone="${dk}" aria-pressed="${complete}">${complete?'Recovery logged':'Mark recovery complete'}${icon(complete?'check':'leaf')}</button>`:`${p.done?`<div class="hero-progress">${p.done} of ${p.tot} sets logged</div>`:''}<button class="btn hero-action" data-open-day="${w}.${d}">${complete?'View workout':p.done?'Continue workout':'Start workout'}${icon('arrow')}</button>`}</section>
   ${!rest?`<p class="note">Full workout · about ${workoutTimeEstimate(plan,dk).total} minutes with supersets, warm-up, rests and cooldown. Every planned set included · 60-minute maximum.</p>`:''}
+  ${!rest?feedbackLaunch(dk):`<button class="btn ghost" data-open-recovery="1">${feedbackIcon('body')}Readiness now</button>`}
   <div class="week-summary"><span><b>${weekDone} / ${programSplit().filter(day=>day.type==='workout').length}</b> lifting sessions this week</span><button class="textlink" data-go="plan">View plan ${icon('arrow')}</button></div>
   <details class="disclosure"><summary>${rest?'Recovery notes':'Today’s exercises'}<span class="tiny muted">${rest?'Easy effort':`${plan.ex.length} moves`}</span></summary>${rest?`<p class="small muted">${esc(plan.cardio.d)}</p>`:workoutPreview(plan,dk)}</details>
   <details class="disclosure"><summary>Daily check-in<span class="tiny muted">Movement · food · weight</span></summary>${dailyLogCard(date,w,d,plan)}</details>
@@ -1714,7 +1728,7 @@ function renderDayView(){
   ${hourCard(plan,dk)}
   <div class="workout-progress"><div class="progress-meta"><span>${p.done} of ${p.tot} sets logged</span><span>${p.done===p.tot?'Session complete':isModern()?`${p.tot-p.done} sets remaining`:`About ${time.remaining} min left`}</span></div><div class="bar"><i style="width:${p.pct}%"></i></div></div>
   ${renderWorkoutFlow(plan,dk)}
-  <div class="workout-footer"><details class="disclosure"><summary>Session overview</summary>${workoutPreview(plan,dk)}</details>
+  <div class="workout-footer">${feedbackLaunch(dk)}<details class="disclosure"><summary>Session overview</summary>${workoutPreview(plan,dk)}</details>
   ${p.done?`<button class="textlink" data-finish-workout="1">${S.reviewed[dk]?'View workout review':'Finish & review session'}</button>`:''}
   ${(isWorkoutComplete(plan)||S.reviewed[dk])?`${workoutEvaluationCard(plan,dk)}<details class="disclosure"><summary>Export this workout</summary>${workoutExportCard(plan,dk,p)}</details>`:''}</div>`;
 }
@@ -1751,6 +1765,7 @@ function applySuggestion(id){
 function exBlock(e,dk){
   const x=EXERCISES[e.id],sug=suggest(e.id,e,dk),sets=setsFor(dk,e.id,e.sets,sug.weight,sug.reps),bodyweight=x.equipment==='body only';
   return `<section class="exblock" aria-label="${esc(x.name)}"><div class="eh"><img class="exercise-thumb" src="${x.images[0]}" alt="" loading="lazy"><button class="exercise-title" data-ex="${e.id}" aria-label="How to do ${esc(x.name)}"><b>${esc(x.name)}</b><small>${e.sets} sets · ${e.reps} ${e.timed?'seconds':'reps'}</small></button><button class="iconbtn" data-ex="${e.id}" aria-label="${esc(x.name)} form guide">${icon('info')}</button></div>
+  ${sug.blocked||sug.hold?`<div class="fb-training-note ${sug.blocked?'fb-pain-note':''}" role="status">${feedbackIcon(sug.blocked?'pause':'hold')}<span>${esc(sug.note)}</span><button class="textlink" data-open-recovery="1">Recheck</button></div>`:''}
   <div class="sugg">${esc(compactSuggestion(e.id,e,sug))}${isModern()&&!blank(sug.weight)&&sets.some(s=>!s.done)?`<br><button class="textlink" data-apply-suggestion="${e.id}">Use suggestion for unfinished sets</button>`:''}</div><div class="settable"><div class="set-hd"><div>Set</div><div>${loadMeta(e.id).mult>1?'Each ':''}${S.unit}</div><div>${e.timed?'Seconds':'Reps'}</div><div>Done</div></div>
   ${sets.map((st,i)=>`<div class="set-row ${st.done?'done':''}" data-row="${e.id}|${i}"><span class="sn">${String(i+1).padStart(2,'0')}</span><input type="text" data-number="1" autocomplete="off" autocapitalize="off" spellcheck="false" inputmode="decimal" data-field="w" data-ex="${e.id}" data-i="${i}" aria-label="${esc(x.name)} set ${i+1} weight in ${S.unit}${loadMeta(e.id).mult>1?' per dumbbell':''}" value="${esc(st.w)}" placeholder="${bodyweight?'0':'—'}"><input type="text" data-number="1" autocomplete="off" autocapitalize="off" spellcheck="false" inputmode="numeric" data-field="r" data-ex="${e.id}" data-i="${i}" aria-label="${esc(x.name)} set ${i+1} ${e.timed?'seconds':'reps'}" value="${esc(st.r)}" placeholder="—"><button class="ck" data-ck="${e.id}|${i}|${e.rest}" aria-label="${st.done?'Undo':'Complete'} ${esc(x.name)} set ${i+1}" aria-pressed="${st.done}">${icon('check')}</button></div>`).join('')}</div>
   <details class="exextras"><summary>Guidance & alternatives</summary><div class="exdetails"><p>${esc(sug.note)}</p><p data-load-hint="${e.id}">${esc(weightHint(e.id,sets))}</p>${e.note?`<p>${esc(e.note)}</p>`:''}${loadStepControl(e)}${swapControl(e,dk)}<a href="${videoLink(e.id,x.name)}" target="_blank" rel="noopener noreferrer">Watch demonstration ↗</a></div></details>
@@ -2484,7 +2499,7 @@ async function checkAppUpdate(){
   finally{clearTimeout(timeout);if(button?.isConnected)button.disabled=false;}
 }
 function hasScheduleProgress(){return Object.values(S.logs).some(log=>Object.values(log).some(a=>a.some(s=>s.done||s.w!=='')))||Object.values(S.rides).some(Boolean)||Object.keys(S.daily).length>0;}
-function clearScheduleProgress(){for(const k of ['logs','done','reviewed','rides','flow','daily','swaps','lastW','sessionClocks'])S[k]={};delete S.restTimer;stopRest();}
+function clearScheduleProgress(){for(const k of ['logs','done','reviewed','rides','flow','daily','swaps','lastW','sessionClocks','feedback'])S[k]={};delete S.restTimer;stopRest();}
 function makeRecoveryCopy(){try{localStorage.setItem(BACKUP_KEY,JSON.stringify(S));return true;}catch{toast('Could not save a recovery copy. Download a backup first.');return false;}}
 function restartScheduleFrom(value,opts={}){
   if(opts.program&&!Object.hasOwn(PROGRAMS,opts.program))return false;
@@ -2493,7 +2508,7 @@ function restartScheduleFrom(value,opts={}){
   if(!makeRecoveryCopy())return false;
   const previous=JSON.parse(JSON.stringify(S));
   if(opts.program&&opts.program!==S.program){S.archives[S.program]=programSnapshot(S);S.program=opts.program;}
-  for(const key of ['logs','done','reviewed','rides','flow','daily','swaps','lastW','sessionClocks'])S[key]={};
+  for(const key of ['logs','done','reviewed','rides','flow','daily','swaps','lastW','sessionClocks','feedback'])S[key]={};
   delete S.restTimer;S.startDate=date;
   if(!save()){S=previous;return false;}
   stopRest();dayOffset=0;viewingPos=null;selectedWeek=null;
@@ -2528,10 +2543,10 @@ function openSheet(id){
   if(!sheetHistoryOpen){history.pushState({...history.state,fitlabSheet:id},'',location.href);sheetHistoryOpen=true;}
 }
 function closeSheet(opts={}){const wasOpen=$('#sheetWrap').classList.contains('open');$('#sheetWrap').classList.remove('open');$('#app').inert=false;document.querySelector('nav').inert=false;document.body.style.overflow='';if(sheetReturnFocus?.isConnected)sheetReturnFocus.focus({preventScroll:true});if(wasOpen&&sheetHistoryOpen&&!opts.fromPop)history.back();sheetHistoryOpen=false;}
-function routeState(){return {fitlab:true,program:S.program,view,viewingPos,returnView,dayOffset,selectedWeek};}
+function routeState(){return {fitlab:true,program:S.program,view,viewingPos,returnView,dayOffset,selectedWeek,feedbackMode,feedbackFrom};}
 window.addEventListener('popstate',event=>{
   if($('#sheetWrap').classList.contains('open'))closeSheet({fromPop:true});
-  const state=event.state;if(state?.fitlab){if(state.program&&state.program!==S.program){view='today';viewingPos=null;dayOffset=0;selectedWeek=null;render();return;}view=state.view;viewingPos=state.viewingPos;returnView=state.returnView||'today';dayOffset=state.dayOffset||0;selectedWeek=state.selectedWeek;render();}
+  const state=event.state;if(state?.fitlab){if(state.program&&state.program!==S.program){view='today';viewingPos=null;dayOffset=0;selectedWeek=null;render();return;}view=state.view;viewingPos=state.viewingPos;returnView=state.returnView||'today';dayOffset=state.dayOffset||0;selectedWeek=state.selectedWeek;feedbackMode=state.feedbackMode==='recovery'?'recovery':'session';feedbackFrom=state.feedbackFrom==='day'?'day':'today';feedbackMuscle=null;render();}
 });
 document.addEventListener('keydown',e=>{
   if(!$('#sheetWrap').classList.contains('open'))return;
@@ -2568,7 +2583,7 @@ document.addEventListener('click',e=>{
   const ob=c('[data-open-block]');if(ob){openDay(...ob.dataset.openBlock.split('.').map(Number));return;}
   const od=c('[data-open-day]');if(od){openDay(...od.dataset.openDay.split('.').map(Number));return;}
   const flow=c('[data-flow-step]');if(flow&&viewingPos){const plan=planFor(viewingPos.week,viewingPos.dayIndex);setFlowIndex(plan,flowIndexFor(plan)+Number(flow.dataset.flowStep));render();window.scrollTo({top:0});return;}
-  if(c('[data-finish-workout]')&&viewingPos){const dk=dayKey(viewingPos.week,viewingPos.dayIndex);S.reviewed[dk]=true;if(S.sessionClocks[dk]&&!S.sessionClocks[dk].endedAt)S.sessionClocks[dk].endedAt=Date.now();stopRest();save();render();requestAnimationFrame(()=>$('.reviewcard')?.scrollIntoView({behavior:'smooth',block:'start'}));return;}
+  if(c('[data-finish-workout]')&&viewingPos){const dk=dayKey(viewingPos.week,viewingPos.dayIndex);S.reviewed[dk]=true;if(S.sessionClocks[dk]&&!S.sessionClocks[dk].endedAt)S.sessionClocks[dk].endedAt=Date.now();stopRest();if(save())openFeedback(dk);return;}
   const swap=c('[data-swap-ex]');if(swap){setExerciseSwap(...swap.dataset.swapEx.split('|'));return;}
   const clear=c('[data-clear-swap]');if(clear){setExerciseSwap(...clear.dataset.clearSwap.split('|'),null);return;}
   const check=c('[data-ck]');if(check){toggleSet(check.dataset.ck);return;}
