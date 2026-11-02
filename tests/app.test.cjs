@@ -263,7 +263,7 @@ test('update notices preserve active input nodes, and checks report current or o
   const a=app(undefined,true);try{
     a.click('[data-open-day]');a.input('[data-field="w"]','25');const field=a.doc.querySelector('[data-field="w"]');field.click();a.run('showUpdateReady()');assert.equal(a.doc.querySelector('#appUpdate').hidden,false);assert.equal(field.isConnected,true);assert.equal(a.doc.activeElement,field);
     a.run("updateReady=false;go('more')");const saved=a.w.localStorage.getItem('fitlab_v1');let opts;
-    a.w.fetch=async(url,options)=>{opts=options;return new Response('<script src="app.js?v=13.0"></script>');};await a.run('checkAppUpdate()');assert.equal(opts.cache,'no-store');assert.match(a.doc.querySelector('#updateStatus').textContent,/up to date/);assert.equal(a.w.localStorage.getItem('fitlab_v1'),saved);
+    a.w.fetch=async(url,options)=>{opts=options;return new Response('<script src="app.js?v=13.1"></script>');};await a.run('checkAppUpdate()');assert.equal(opts.cache,'no-store');assert.match(a.doc.querySelector('#updateStatus').textContent,/up to date/);assert.equal(a.w.localStorage.getItem('fitlab_v1'),saved);
     a.w.fetch=async()=>{throw new Error('offline');};await a.run('checkAppUpdate()');assert.match(a.doc.querySelector('#updateStatus').textContent,/online/);assert.equal(a.w.localStorage.getItem('fitlab_v1'),saved);
   }finally{a.close();}
 });
@@ -273,5 +273,65 @@ test('replacing a timed hold with a repetition exercise changes the input and ex
     a.run('openDay(1,1,4)');assert.equal(a.run("setExerciseSwap('w1d1','Plank','Dead_Bug')"),true);
     assert.match(a.doc.querySelector('.set-hd').textContent,/Reps/);assert.doesNotMatch(a.doc.querySelector('.set-hd').textContent,/Seconds/);
     a.input('[data-field="r"]','8');a.click('[data-ck]');const set=a.run('workoutExportDetail(1,1).exercises[0].sets[0]');assert.equal(set.reps,8);assert.equal(set.durationSeconds,null);
+  }finally{a.close();}
+});
+
+test('all comeback lifting days fit within 55 planned minutes including preparation and cooldown',()=>{
+  const a=app(undefined,true);try{
+    for(let week=1;week<=8;week++)for(let day=0;day<7;day++){
+      const p=a.run(`planFor(${week},${day})`);if(p.type!=='workout')continue;
+      const minutes=a.run(`workoutTimeEstimate(planFor(${week},${day}),'w${week}d${day}').total`);
+      assert.ok(minutes<=55,`Week ${week} day ${day}: ${minutes} minutes`);
+      assert.ok(minutes>=30,'Warm-up, practice, rests and cooldown are counted');
+    }
+  }finally{a.close();}
+});
+test('hour clock survives reloads and counts breaks; 50 and 55 minute prompts preserve partial work',()=>{
+  let saved;const a=app(undefined,true);try{
+    a.run('openDay(1,0)');a.click('[data-start-hour]');
+    const began=a.run('S.sessionClocks.w1d0.startedAt');a.run("startHourClock('w1d0')");assert.equal(a.run('S.sessionClocks.w1d0.startedAt'),began);
+    a.run('S.sessionClocks.w1d0.startedAt=Date.now()-50*60000;tickHourClock();save()');
+    assert.match(a.doc.querySelector('[data-hour-message]').textContent,/Ten minutes left/);
+    saved=a.w.localStorage.getItem('fitlab_v1');
+  }finally{a.close();}
+  const b=app(saved,true);try{
+    b.run('openDay(1,0)');assert.match(b.doc.querySelector('[data-hour-message]').textContent,/Ten minutes left/);
+    b.run('S.sessionClocks.w1d0.startedAt=Date.now()-55*60000;tickHourClock()');assert.match(b.doc.querySelector('[data-hour-message]').textContent,/Five minutes left/);
+    b.run('S.sessionClocks.w1d0.startedAt=Date.now()-61*60000;tickHourClock()');assert.equal(b.doc.querySelector('[data-hour-clock]').textContent,'0:00 left');
+    b.click('[data-finish-workout]');assert.ok(b.run('S.sessionClocks.w1d0.endedAt'));assert.equal(b.run('dayProgress(planFor(1,0)).done'),0);
+  }finally{b.close();}
+});
+test('restart today preserves a recovery copy and measurements, resets the clock and persists Day 1',()=>{
+  const a=app({program:'comeback8',startDate:'2026-10-23',bw:[{d:'2026-10-23',v:200}],logs:{w1d0:{Dumbbell_Bench_Press:[{w:'25',r:'10',done:true}]}},sessionClocks:{w1d0:{startedAt:12345}}},true);try{
+    a.run("restartScheduleFrom(todayISO(),{confirm:false,program:'comeback8'})");
+    assert.equal(a.run('S.startDate'),a.run('todayISO()'));assert.equal(a.run('todayPos().dayIndex'),0);assert.equal(a.run('S.bw.length'),1);
+    assert.equal(a.run('Object.keys(S.logs).length'),0);assert.equal(a.run('Object.keys(S.sessionClocks).length'),0);
+    const recovery=JSON.parse(a.w.localStorage.getItem('fitlab_backup_v12'));assert.equal(recovery.startDate,'2026-10-23');assert.equal(recovery.logs.w1d0.Dumbbell_Bench_Press[0].done,true);
+    assert.equal(JSON.parse(a.w.localStorage.getItem('fitlab_v1')).startDate,a.run('todayISO()'));
+  }finally{a.close();}
+});
+test('failed restart save keeps the original schedule and logs in memory and storage',()=>{
+  const a=app({program:'comeback8',startDate:'2026-10-23',logs:{w1d0:{Dumbbell_Bench_Press:[{w:'25',r:'10',done:true}]}}},true);try{
+    a.run("save();const originalSet=Storage.prototype.setItem;Storage.prototype.setItem=function(k,v){if(k==='fitlab_v1')throw new Error('full');return originalSet.call(this,k,v);}");
+    assert.equal(a.run("restartScheduleFrom(todayISO(),{confirm:false})"),false);assert.equal(a.run('S.startDate'),'2026-10-23');assert.equal(a.run('S.logs.w1d0.Dumbbell_Bench_Press[0].done'),true);
+  }finally{a.close();}
+});
+test('supersets retain every original comeback exercise, set and rep target for all eight weeks',()=>{
+  const a=app(undefined,true);try{
+    for(let week=1;week<=8;week++)for(const day of [0,1,3,4]){
+      const result=a.run(`(()=>{const p=planFor(${week},${day});return {base:COMEBACK_SPLIT[${day}].ex,ex:p.ex,blocks:workoutBlocks(p,'w${week}d${day}')};})()`);
+      assert.deepEqual(Array.from(result.ex,e=>e.id),Array.from(result.base,e=>e.id));
+      result.ex.forEach((e,i)=>{assert.equal(e.reps,result.base[i].reps);assert.equal(e.sets,week<=2||week===8?2:i<2?3:2);});
+      assert.ok(result.blocks.some(b=>b.ex.length===2));
+      if(day===1||day===4)assert.equal(result.blocks[0].ex.length,1,'Lower main lift retains its own rest');
+    }
+  }finally{a.close();}
+});
+test('Day 1 superset rests only after the press and row are both completed',()=>{
+  const a=app(undefined,true);try{
+    a.run('openDay(1,0)');assert.match(a.doc.querySelector('.superset-note').textContent,/Press \+ row/);
+    a.input('[data-ex="Dumbbell_Bench_Press"][data-field="w"]','25');a.click('[data-ck^="Dumbbell_Bench_Press|0|"]');assert.equal(a.run('!!S.restTimer'),false);
+    a.input('[data-ex="Seated_Cable_Rows"][data-field="w"]','50');a.click('[data-ck^="Seated_Cable_Rows|0|"]');assert.ok(a.run('restSecondsLeft()')>115);
+    assert.equal(a.run('dayProgress(planFor(1,0)).tot'),10);assert.equal(a.run('dayProgress(planFor(1,0)).done'),2);
   }finally{a.close();}
 });

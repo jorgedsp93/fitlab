@@ -2,13 +2,23 @@
 
 An offline workout journal with an eight-week return-to-training plan: four lifting sessions, one easy cardio/mobility session, and two rest days per seven-day cycle.
 
-## Current release: 13.0
+## Current release: 13.1
 
 - Today leads with one workout card; exercises and daily habits expand on demand.
 - Plan contains all eight weeks, gradual set progression, training guidance, and food/recovery notes. The cycle starts on the device’s current local date; its days follow that start date rather than fixed weekdays.
 - Existing 12-week schedules and logs are archived before the comeback program starts. More lets users reopen either program with its own schedule and logs. Body measurements and appearance settings are shared. Full backups include both programs.
 - More includes a network update check. Updates never automatically replace an active input; an available update offers Save & reload.
 - Workouts save locally in the current browser. Use More → Your data & backups before switching devices or clearing browser data.
+
+## One hour, including warm-up
+
+The comeback plan includes preparation, light practice, working sets, rest, equipment changes and cooldown in its estimates. The 32 lifting sessions across eight weeks are planned within 55 minutes, with a 60-minute maximum. Every exercise, prescribed set and repetition target is retained. Upper days pair the press and row and the last two accessories; lower days pair accessories while keeping the main lifts separate. Rest two minutes after a press/row round and 75 seconds after an accessory round. The estimate includes 30 seconds to switch between paired movements.
+
+Open a workout and tap **Start 60-minute clock & warm-up** when you begin. The clock includes breaks and survives reloads. At minute 50 it prompts you to finish the planned sets and cool down; at minute 55 it reminds you of the final five minutes. The planned full workout fits inside 55 minutes. It does not mark unfinished sets complete. Keep the app visible for prompts; background or locked-phone alerts are not guaranteed.
+
+**More → Program settings → Restart at Day 1 today** starts the comeback on the device’s current local date, saves a recovery copy first, and retains body measurements. [Open the restart screen](https://jorgedsp93.github.io/fitlab/?setup=day1&release=13.1) on the device you train with. Opening the link does not change progress until you press Restart and confirm.
+
+The warm-up allowance follows the general-to-specific approach described by [NSCA](https://www.nsca.com/education/articles/kinetic-select/introduction-to-dynamic-warm-up/); the superset structure is informed by [NSCA’s time-efficient training guidance](https://www.nsca.com/education/articles/ptq/time-efficient-training). The time budget is a FitLab scheduling estimate, not a guarantee against equipment delays.
 
 ## Features
 
