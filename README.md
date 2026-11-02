@@ -2,7 +2,7 @@
 
 An offline workout journal with an eight-week, four-day Push / Pull plan. Full sessions include legs, warm-up, rest and cooldown within a one-hour budget.
 
-## Current release: 13.3
+## Current release: 13.4
 
 - **Day 1 / Monday: Push A** — chest, shoulders, triceps, quads and calves.
 - **Day 2 / Tuesday: Pull A** — back, biceps, hamstrings and glutes.
@@ -18,9 +18,17 @@ Rest two minutes after each round. For a three-set lift paired with a two-set ex
 
 ## Start on your device
 
-[Open Push / Pull setup](https://jorgedsp93.github.io/fitlab/?setup=pushpull&release=13.3) and tap **Start Push / Pull today**. This starts Push A on the device’s current local date. Opening the link alone never resets progress. The current program is archived, a full recovery copy is saved, and body measurements remain. Existing comeback and classic programs stay available in **More** with their own schedules and logs; an update never silently reinterprets those sessions as push/pull.
+[Open Push / Pull setup](https://jorgedsp93.github.io/fitlab/?setup=pushpull&release=13.4) and tap **Start Push / Pull today**. This starts Push A on the device’s current local date. Opening the link alone never resets progress. The current program is archived, a full recovery copy is saved, and body measurements remain. Existing comeback and classic programs stay available in **More** with their own schedules and logs; an update never silently reinterprets those sessions as push/pull.
 
 New installs open Push / Pull by default. **More → Program settings → Restart at Day 1 today** restarts the currently selected program. Progress is local to each browser/device, and full backups include all saved programs.
+
+## Automatic weight suggestions
+
+Push / Pull and the comeback program now prefill a specific suggested weight and rep count from the latest earlier session for that same exercise in the active program. Complete all required sets at a consistent weight and the top of the rep range to receive a higher weight with reps reset to the bottom of the range. Until then, build reps at the same load. Incomplete sessions, missed rep targets, mixed loads and increases in the prescribed number of sets do not trigger heavier recommendations. The app cannot measure effort or form: treat the number as a suggestion and keep a couple of good reps in reserve.
+
+For example, three completed bench sets of 30 lb per dumbbell × 12 lead to a suggestion of 35 lb per dumbbell × 8. Default increases are 5 lb / 2.5 kg for most lifts, 10 lb / 5 kg for the listed main leg lifts, and 2.5 lb / 1 kg for dumbbell accessories. Change **Weight increase** under an exercise's **Guidance & alternatives** to match your equipment. Preferences are stored by exercise and unit, included in backups, and retained when switching programs.
+
+New exercise entries are prefilled; existing drafts and completed sets are preserved. **Use suggestion for unfinished sets** explicitly replaces only that exercise's unfinished entries. Once a session has started, suggestions follow the weight actually lifted without automatically raising it mid-session. First-time movements still require an initial weight; other exercises and archived programs are not used to guess it. Bodyweight, ambiguous assistance and timed holds do not receive automatic weight increases. The classic program keeps its existing progression rules.
 
 ## One hour, including warm-up
 

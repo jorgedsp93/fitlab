@@ -1110,10 +1110,10 @@ const STORAGE_KEY='fitlab_v1';
 const BACKUP_KEY='fitlab_backup_v12';
 function validDate(value){ if(typeof value!=='string'||!/^\d{4}-\d{2}-\d{2}$/.test(value))return false;const date=new Date(value+'T12:00:00Z');return Number.isFinite(date.getTime())&&date.toISOString().slice(0,10)===value; }
 function calendarDay(value){ const [y,m,d]=value.split('-').map(Number); return Date.UTC(y,m-1,d)/86400000; }
-const APP_VERSION='13.3';
+const APP_VERSION='13.4';
 const PROGRAM_FIELDS=['startDate','logs','done','reviewed','lastW','rides','flow','daily','swaps','sessionClocks'];
 function programSnapshot(state){return JSON.parse(JSON.stringify(Object.fromEntries(PROGRAM_FIELDS.map(key=>[key,state[key]]))));}
-function newState(){ return {program:'pushpull8',archives:{},sessionClocks:{},startDate:todayISO(),unit:'lb',logs:{},done:{},reviewed:{},lastW:{},bw:[],bf:[],heightCm:185.4,rides:{},flow:{},daily:{},swaps:{},theme:'light',schemaVersion:13}; }
+function newState(){ return {program:'pushpull8',archives:{},sessionClocks:{},loadSteps:{},startDate:todayISO(),unit:'lb',logs:{},done:{},reviewed:{},lastW:{},bw:[],bf:[],heightCm:185.4,rides:{},flow:{},daily:{},swaps:{},theme:'light',schemaVersion:13}; }
 function record(value){ return value && typeof value==='object' && !Array.isArray(value); }
 function normalizeState(value,withArchives=true){
   if(!record(value)) throw new Error('Invalid FitLab data');
@@ -1124,6 +1124,12 @@ function normalizeState(value,withArchives=true){
   s.theme=['light','dark','auto'].includes(s.theme)?s.theme:'light';
   s.heightCm=Number.isFinite(+s.heightCm)&&+s.heightCm>50?+s.heightCm:185.4;
   for(const key of ['logs','done','reviewed','lastW','rides','flow','daily','swaps','sessionClocks']) if(!record(s[key])) s[key]={};
+  s.loadSteps={};
+  if(record(value.loadSteps))for(const [id,steps] of Object.entries(value.loadSteps)){
+    if(!EXERCISES[id]||!record(steps))continue;
+    const valid=Object.fromEntries(['lb','kg'].filter(unit=>validLoadStep(steps[unit])).map(unit=>[unit,entryNumber(steps[unit])]));
+    if(Object.keys(valid).length)s.loadSteps[id]=valid;
+  }
   if(!Object.keys(s.rides).length && record(value.commute)) s.rides={...value.commute};
   for(const key of ['bw','bf']) s[key]=(Array.isArray(s[key])?s[key]:[]).filter(x=>record(x)&&validDate(x.d)&&Number.isFinite(+x.v)&&+x.v>0).map(x=>({...x,v:+x.v})).sort((a,b)=>a.d.localeCompare(b.d));
   for(const dk of Object.keys(s.logs)){
@@ -1230,6 +1236,14 @@ function exDoneCount(dk,id){ const a=(S.logs[dk]||{})[id]||[]; return a.filter(x
 const LEG_IDS=['Barbell_Squat','Front_Barbell_Squat','Hack_Squat','Leg_Press','Romanian_Deadlift','Barbell_Deadlift','Barbell_Hip_Thrust'];
 function parseRange(reps){ if(/amrap/i.test(reps)) return {amrap:true}; const n=(reps.match(/\d+/g)||[]).map(Number); if(n.length>=2) return {min:n[0],max:n[1]}; if(n.length===1) return {min:n[0],max:n[0]}; return {min:8,max:12}; }
 function incFor(e){ const big=e.comp&&LEG_IDS.includes(e.id); return S.unit==='kg'?(big?5:2.5):(big?10:5); }
+function validLoadStep(value){return !blank(value)&&Number.isFinite(entryNumber(value))&&entryNumber(value)>=0.25&&entryNumber(value)<=100;}
+function loadStepFor(e){
+  const saved=S.loadSteps[e.id]?.[S.unit];if(validLoadStep(saved))return entryNumber(saved);
+  const small=(EXERCISES[e.id]?.equipment||'').includes('dumbbell')&&!e.comp;
+  return small?(S.unit==='kg'?1:2.5):incFor(e);
+}
+function supportsLoadProgression(e){return !e.timed&&EXERCISES[e.id]?.equipment!=='body only'&&loadMeta(e.id).label!=='added or assist';}
+function nextLoad(weight,step){return Math.round((weight+step)*1000)/1000;}
 const LOAD_META = {
   "Incline_Dumbbell_Press": { label:'per dumbbell', mult:2 },
   "Dumbbell_Bench_Press": { label:'per dumbbell', mult:2 },
@@ -1405,6 +1419,36 @@ function setExerciseSwap(dk,baseId,altId){
 function dayNum(dk){ const m=String(dk).match(/^w(\d+)d(\d+)$/); return m?(+m[1]-1)*7+(+m[2]):-1; }
 // most recent earlier session that logged this exercise (done sets) → array of {w,r}
 function lastPerf(exId,curDk){ const cur=dayNum(curDk); let best=-1,res=null; for(const dk in S.logs){ if(dk===curDk) continue; const n=dayNum(dk); if(n<0||n>=cur) continue; const arr=S.logs[dk][exId]; if(!arr) continue; const done=arr.filter(s=>s.done&&s.w!==''); if(!done.length) continue; if(n>best){best=n;res=done;} } return res; }
+function lastExerciseSession(exId,curDk){
+  let latest=null;
+  for(const [dk,log] of Object.entries(S.logs)){
+    const n=dayNum(dk),sets=log[exId];
+    if(n<0||n>=dayNum(curDk)||!sets?.some(s=>s.done)||latest&&n<=dayNum(latest.dk))continue;
+    const plan=planFor(Math.floor(n/7)+1,n%7);
+    latest={dk,sets,exercise:workoutExercises(plan,dk).find(e=>e.id===exId)};
+  }
+  return latest;
+}
+function validCompletedSet(s){return s?.done&&!blank(s.w)&&Number.isFinite(entryNumber(s.w))&&entryNumber(s.w)>=0&&entryNumber(s.w)<=5000&&Number.isInteger(entryNumber(s.r))&&entryNumber(s.r)>0&&entryNumber(s.r)<=1000;}
+function modernSuggestion(exId,e,curDk,rng){
+  const prev=lastExerciseSession(exId,curDk),done=prev?.sets.filter(validCompletedSet)||[];
+  if(!done.length)return {weight:'',reps:rng.amrap?'':rng.min,note:`First complete a set with a weight you can control for ${e.reps} reps. FitLab will use this exercise's logged sets for future suggestions. ${weightHint(exId,[])}`};
+  const weights=done.map(s=>entryNumber(s.w)),weight=Math.min(...weights),reps=done.map(s=>entryNumber(s.r));
+  const hold={weight,reps:rng.min};
+  if(rng.amrap)return {...hold,reps:'',note:'Repeat your previous load and log controlled repetitions.'};
+  if(!supportsLoadProgression(e)||weight===0)return {...hold,note:'Repeat this setup. Bodyweight, assistance and added weight need your choice of resistance; FitLab does not automatically increase them.'};
+  const required=Math.max(e.sets,prev.exercise?.sets||0),target=Math.max(rng.max,parseRange(prev.exercise?.reps||e.reps).max);
+  const complete=!!prev.exercise&&prev.sets.length>=required&&prev.sets.slice(0,required).every(validCompletedSet);
+  if(!complete)return {...hold,note:`Keep ${formatEntryWeight(exId,weight)}. Complete all ${e.sets} planned sets before a weight increase; the latest session does not yet establish enough completed sets.`};
+  if(weights.some(w=>w!==weight))return {...hold,note:`Last time you used different weights. Start with ${formatEntryWeight(exId,weight)} and complete the planned sets consistently before increasing.`};
+  if(reps.some(r=>r<rng.min))return {...hold,note:`Keep ${formatEntryWeight(exId,weight)} and reach at least ${rng.min} controlled reps on every set before progressing.`};
+  if(reps.every(r=>r>=target)){
+    const step=loadStepFor(e),next=nextLoad(weight,step);
+    if(next>5000)return {...hold,note:'Keep your previous load; the next increase exceeds the supported weight range.'};
+    return {weight:next,reps:rng.min,note:`Every required set reached ${target} reps at ${formatEntryWeight(exId,weight)}. Try ${formatEntryWeight(exId,next)} for ${rng.min} reps. Keep 2–3 good reps in reserve; repeat the previous load if needed.`};
+  }
+  return {weight,reps:Math.min(rng.max,Math.min(...reps)+1),note:`Keep ${formatEntryWeight(exId,weight)} and build repetitions. The weight increases after every required set reaches ${target} reps.`};
+}
 function currentWorkoutSuggestion(exId,e,curDk,rng=parseRange(e.reps)){
   const done=((S.logs[curDk]||{})[exId]||[]).filter(s=>s.done&&(!blank(s.w)||!blank(s.r)));
   if(!done.length) return null;
@@ -1431,11 +1475,11 @@ function suggest(exId,e,curDk){
   if(e.timed)return {weight:0,reps:rng.min,note:`Hold for ${e.reps} seconds with steady breathing. Log seconds in the Seconds column.`};
   const current=currentWorkoutSuggestion(exId,e,curDk);
   if(current) return current;
+  if(isModern())return modernSuggestion(exId,e,curDk,rng);
   const prev=lastPerf(exId,curDk);
   if(!prev){ return {weight:'', reps: rng.amrap?'':rng.min, note:`First time — pick a weight you can control for ${e.reps} reps. ${weightHint(exId,[])}`}; }
   const w=parseFloat(prev[0].w)||''; const reps=prev.map(s=>parseInt(s.r)||0); const repsStr=reps.join(', ');
   if(rng.amrap){ const tot=reps.reduce((a,b)=>a+b,0); return {weight:w, reps:'', note:`Last time: ${repsStr} reps (${tot} total). Beat it.`}; }
-  if(isModern())return {weight:w,reps:Math.max(rng.min,Math.min(rng.max,Math.min(...reps)+1)),note:reps.every(r=>r>=rng.max)?'If every set felt controlled with two good reps left, choose the smallest available weight increase. Otherwise repeat this weight.':'Repeat a controlled load and add a repetition when you can. Leave 2–3 good reps.'};
   const inc=incFor(e);
   if(w && prev.length>=e.sets && prev.every(s=>Number(s.w)===w) && reps.every(r=>r>=rng.max)){ const nw=Math.round((w+inc)*10)/10; return {weight:nw, reps:rng.min, note:`You maxed the reps at ${formatEntryWeight(exId,w)} — go up to ${formatEntryWeight(exId,nw)} × ${rng.min}.`}; }
   if(w && reps.some(r=>r<rng.min)) return {weight:w, reps:rng.min, note:`Hold ${formatEntryWeight(exId,w)}. Last: ${repsStr}. Get ${rng.min}+ clean reps on every set.`};
@@ -1681,12 +1725,35 @@ function swapControl(e,dk){
   if(exDoneCount(dk,e.id))return '<p class="note">This exercise has logged sets. Undo those checkmarks before changing the exercise.</p>';
   return `<div class="swapbuttons">${choices.map(x=>`<button class="swapbtn" data-swap-ex="${dk}|${baseId}|${x.id}">${esc(EXERCISES[x.id].name)}</button>`).join('')}${e.swapped?`<button class="swapbtn" data-clear-swap="${dk}|${baseId}">Use ${esc(EXERCISES[baseId].name)}</button>`:''}</div>${!choices.length&&!e.swapped?'<p class="note">No other supported substitute is available for this session.</p>':''}`;
 }
+function loadStepControl(e){
+  if(!isModern()||!supportsLoadProgression(e))return '';
+  return `<form class="inlineform" data-load-step-form="${e.id}"><label><span class="field-label">Weight increase (${S.unit}${loadMeta(e.id).mult>1?' per dumbbell':''})</span><input type="text" data-number="1" name="step" inputmode="decimal" autocomplete="off" aria-label="${esc(EXERCISES[e.id].name)} weight increase in ${S.unit}" value="${loadStepFor(e)}" required></label><button class="btn ghost sm" type="submit">Save increase</button></form><p>Set this to the smallest weight increase available on your equipment. Saved separately for lb and kg.</p>`;
+}
+function setLoadStep(id,value){
+  if(!EXERCISES[id]||!validLoadStep(value)){toast('Enter a weight increase from 0.25 to 100.');return false;}
+  const before=S.loadSteps[id];
+  S.loadSteps[id]={...before,[S.unit]:entryNumber(value)};
+  if(!save()){if(before)S.loadSteps[id]=before;else delete S.loadSteps[id];return false;}
+  render();const form=document.querySelector(`[data-load-step-form="${id}"]`);if(form)form.closest('details').open=true;
+  toast('Weight increase saved. Your entered sets stay unchanged.');return true;
+}
+function applySuggestion(id){
+  if(!viewingPos)return false;
+  const plan=planFor(viewingPos.week,viewingPos.dayIndex),dk=dayKey(plan.week,plan.dayIndex),e=workoutExercises(plan,dk).find(x=>x.id===id);
+  if(!e)return false;
+  const sug=suggest(id,e,dk);if(blank(sug.weight)||!Number.isFinite(Number(sug.weight)))return false;
+  const before=JSON.parse(JSON.stringify(S.logs[dk]?.[id]||[]));
+  const sets=setsFor(dk,id,e.sets,sug.weight,sug.reps);
+  for(const set of sets.slice(0,e.sets))if(!set.done){set.w=String(sug.weight);if(!blank(sug.reps))set.r=String(sug.reps);}
+  if(!save()){S.logs[dk][id]=before;return false;}
+  render();toast('Suggestion applied to unfinished sets.');return true;
+}
 function exBlock(e,dk){
   const x=EXERCISES[e.id],sug=suggest(e.id,e,dk),sets=setsFor(dk,e.id,e.sets,sug.weight,sug.reps),bodyweight=x.equipment==='body only';
   return `<section class="exblock" aria-label="${esc(x.name)}"><div class="eh"><img class="exercise-thumb" src="${x.images[0]}" alt="" loading="lazy"><button class="exercise-title" data-ex="${e.id}" aria-label="How to do ${esc(x.name)}"><b>${esc(x.name)}</b><small>${e.sets} sets · ${e.reps} ${e.timed?'seconds':'reps'}</small></button><button class="iconbtn" data-ex="${e.id}" aria-label="${esc(x.name)} form guide">${icon('info')}</button></div>
-  <div class="sugg">${esc(compactSuggestion(e.id,e,sug))}</div><div class="settable"><div class="set-hd"><div>Set</div><div>${loadMeta(e.id).mult>1?'Each ':''}${S.unit}</div><div>${e.timed?'Seconds':'Reps'}</div><div>Done</div></div>
+  <div class="sugg">${esc(compactSuggestion(e.id,e,sug))}${isModern()&&!blank(sug.weight)&&sets.some(s=>!s.done)?`<br><button class="textlink" data-apply-suggestion="${e.id}">Use suggestion for unfinished sets</button>`:''}</div><div class="settable"><div class="set-hd"><div>Set</div><div>${loadMeta(e.id).mult>1?'Each ':''}${S.unit}</div><div>${e.timed?'Seconds':'Reps'}</div><div>Done</div></div>
   ${sets.map((st,i)=>`<div class="set-row ${st.done?'done':''}" data-row="${e.id}|${i}"><span class="sn">${String(i+1).padStart(2,'0')}</span><input type="text" data-number="1" autocomplete="off" autocapitalize="off" spellcheck="false" inputmode="decimal" data-field="w" data-ex="${e.id}" data-i="${i}" aria-label="${esc(x.name)} set ${i+1} weight in ${S.unit}${loadMeta(e.id).mult>1?' per dumbbell':''}" value="${esc(st.w)}" placeholder="${bodyweight?'0':'—'}"><input type="text" data-number="1" autocomplete="off" autocapitalize="off" spellcheck="false" inputmode="numeric" data-field="r" data-ex="${e.id}" data-i="${i}" aria-label="${esc(x.name)} set ${i+1} ${e.timed?'seconds':'reps'}" value="${esc(st.r)}" placeholder="—"><button class="ck" data-ck="${e.id}|${i}|${e.rest}" aria-label="${st.done?'Undo':'Complete'} ${esc(x.name)} set ${i+1}" aria-pressed="${st.done}">${icon('check')}</button></div>`).join('')}</div>
-  <details class="exextras"><summary>Guidance & alternatives</summary><div class="exdetails"><p>${esc(sug.note)}</p><p data-load-hint="${e.id}">${esc(weightHint(e.id,sets))}</p>${e.note?`<p>${esc(e.note)}</p>`:''}${swapControl(e,dk)}<a href="${videoLink(e.id,x.name)}" target="_blank" rel="noopener noreferrer">Watch demonstration ↗</a></div></details>
+  <details class="exextras"><summary>Guidance & alternatives</summary><div class="exdetails"><p>${esc(sug.note)}</p><p data-load-hint="${e.id}">${esc(weightHint(e.id,sets))}</p>${e.note?`<p>${esc(e.note)}</p>`:''}${loadStepControl(e)}${swapControl(e,dk)}<a href="${videoLink(e.id,x.name)}" target="_blank" rel="noopener noreferrer">Watch demonstration ↗</a></div></details>
   <button class="restbtn" data-rest="${e.rest}|${esc(x.name)}">${icon('clock')}Rest ${e.rest>=60?`${Math.floor(e.rest/60)}:${String(e.rest%60).padStart(2,'0')}`:`${e.rest}s`}</button></section>`;
 }
 function renderWorkoutFlow(plan,dk){const blocks=workoutBlocks(plan,dk),idx=flowIndexFor(plan),b=blocks[idx],atEnd=idx===blocks.length-1,p=dayProgress(plan);if(!b)return '';
@@ -2505,6 +2572,7 @@ document.addEventListener('click',e=>{
   const swap=c('[data-swap-ex]');if(swap){setExerciseSwap(...swap.dataset.swapEx.split('|'));return;}
   const clear=c('[data-clear-swap]');if(clear){setExerciseSwap(...clear.dataset.clearSwap.split('|'),null);return;}
   const check=c('[data-ck]');if(check){toggleSet(check.dataset.ck);return;}
+  const apply=c('[data-apply-suggestion]');if(apply){applySuggestion(apply.dataset.applySuggestion);return;}
   const ex=c('button[data-ex]');if(ex){openSheet(ex.dataset.ex);return;}
   const rest=c('[data-rest]');if(rest){const [seconds]=rest.dataset.rest.split('|');startRest(+seconds,'Rest');return;}
   const recovery=c('[data-restdone]');if(recovery){const dk=recovery.dataset.restdone;S.done[dk]=!S.done[dk];save();render();return;}
@@ -2531,7 +2599,7 @@ document.addEventListener('change',e=>{const el=e.target;
   if(el.id==='planWeek'){selectedWeek=Number(el.value);render();}
   if(el.id==='restoreFile'){restoreBackup(el.files[0]);el.value='';}
 });
-document.addEventListener('submit',e=>{const form=e.target;if(form.matches('[data-bw-form]')){e.preventDefault();logDailyBW(form.dataset.bwForm);}else if(form.matches('[data-stats-bw-form]')){e.preventDefault();logBW();}else if(form.matches('[data-bf-form]')){e.preventDefault();calcBF();}});
+document.addEventListener('submit',e=>{const form=e.target;if(form.matches('[data-bw-form]')){e.preventDefault();logDailyBW(form.dataset.bwForm);}else if(form.matches('[data-stats-bw-form]')){e.preventDefault();logBW();}else if(form.matches('[data-bf-form]')){e.preventDefault();calcBF();}else if(form.matches('[data-load-step-form]')){e.preventDefault();setLoadStep(form.dataset.loadStepForm,form.elements.step.value);}});
 document.addEventListener('input',e=>{
   const input=e.target;
   if(input.id==='exerciseSearch'){libraryQuery=input.value;$('#libraryResults').innerHTML=libraryResults();return;}

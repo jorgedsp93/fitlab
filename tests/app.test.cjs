@@ -263,7 +263,7 @@ test('update notices preserve active input nodes, and checks report current or o
   const a=app({program:'comeback8'},true);try{
     a.click('[data-open-day]');a.input('[data-field="w"]','25');const field=a.doc.querySelector('[data-field="w"]');field.click();a.run('showUpdateReady()');assert.equal(a.doc.querySelector('#appUpdate').hidden,false);assert.equal(field.isConnected,true);assert.equal(a.doc.activeElement,field);
     a.run("updateReady=false;go('more')");const saved=a.w.localStorage.getItem('fitlab_v1');let opts;
-    a.w.fetch=async(url,options)=>{opts=options;return new Response('<script src="app.js?v=13.3"></script>');};await a.run('checkAppUpdate()');assert.equal(opts.cache,'no-store');assert.match(a.doc.querySelector('#updateStatus').textContent,/up to date/);assert.equal(a.w.localStorage.getItem('fitlab_v1'),saved);
+    a.w.fetch=async(url,options)=>{opts=options;return new Response('<script src="app.js?v=13.4"></script>');};await a.run('checkAppUpdate()');assert.equal(opts.cache,'no-store');assert.match(a.doc.querySelector('#updateStatus').textContent,/up to date/);assert.equal(a.w.localStorage.getItem('fitlab_v1'),saved);
     a.w.fetch=async()=>{throw new Error('offline');};await a.run('checkAppUpdate()');assert.match(a.doc.querySelector('#updateStatus').textContent,/online/);assert.equal(a.w.localStorage.getItem('fitlab_v1'),saved);
   }finally{a.close();}
 });
@@ -412,3 +412,91 @@ test('Push/Pull restart link waits for a click and preserves the previous progra
     assert.equal(a.w.location.search,'');assert.match(a.doc.querySelector('.comeback-hero').textContent,/Push A/);
   }finally{a.close();}
 });
+
+test('Push/Pull and comeback prefill a specific higher weight after all required sets reach the rep ceiling',()=>{
+  for(const program of ['pushpull8','comeback8'])withApp({program,logs:{w1d0:{Dumbbell_Bench_Press:Array.from({length:3},()=>({w:'30',r:'12',done:true}))}}},a=>{
+    a.run('openDay(2,0)');
+    assert.equal(a.doc.querySelector('[data-ex="Dumbbell_Bench_Press"][data-field="w"]').value,'35');
+    assert.equal(a.doc.querySelector('[data-ex="Dumbbell_Bench_Press"][data-field="r"]').value,'8');
+    assert.match(a.doc.querySelector('.sugg').textContent,/35 lb each/);
+    assert.match(a.doc.querySelector('.exdetails').textContent,/Every required set reached 12 reps/);
+    assert.equal(a.run('S.logs.w1d0.Dumbbell_Bench_Press[0].w'),'30');
+    assert.equal(a.run('dayProgress(planFor(2,0)).done'),0);
+    const saved=a.w.localStorage.getItem('fitlab_v1');withApp(saved,b=>{b.run('openDay(2,0)');assert.equal(b.doc.querySelector('[data-ex="Dumbbell_Bench_Press"][data-field="w"]').value,'35');});
+  });
+});
+test('modern progression holds for incomplete, inconsistent or below-target performance and builds reps first',()=>{
+  const set=(w,r,done=true)=>({w:String(w),r:String(r),done});
+  const cases=[
+    {sets:[set(30,12),set(30,12)],w:30,r:8},
+    {sets:[set(30,12),set(30,12),set(30,12,false)],w:30,r:8},
+    {sets:[set(30,12),set(30,12),set(30,7)],w:30,r:8},
+    {sets:[set(30,12),set(25,12),set(25,12)],w:25,r:8},
+    {sets:[set(30,10),set(30,11),set(30,10)],w:30,r:11},
+    {sets:[set(30,12),set(30,12),set('',12)],w:30,r:8},
+  ];
+  for(const c of cases)withApp({program:'pushpull8',logs:{w1d0:{Dumbbell_Bench_Press:c.sets}}},a=>{
+    const s=a.run("suggest('Dumbbell_Bench_Press',planFor(2,0).ex[0],'w2d0')");assert.equal(s.weight,c.w);assert.equal(s.reps,c.r);
+  });
+});
+test('shared exercises respect both days set counts and the latest session before increasing',()=>withApp({program:'pushpull8'},a=>{
+  a.run("S.logs={w1d1:{Seated_Cable_Rows:[{w:'80',r:'12',done:true},{w:'80',r:'12',done:true}]}};");
+  assert.equal(a.run("suggest('Seated_Cable_Rows',planFor(1,4).ex[0],'w1d4').weight"),80);
+  a.run("S.logs.w1d4={Seated_Cable_Rows:[{w:'80',r:'12',done:true},{w:'80',r:'12',done:true},{w:'80',r:'12',done:false}]};");
+  assert.equal(a.run("suggest('Seated_Cable_Rows',planFor(2,1).ex[2],'w2d1').weight"),80);
+  a.run('S.logs.w1d4.Seated_Cable_Rows[2].done=true');
+  assert.equal(a.run("suggest('Seated_Cable_Rows',planFor(2,1).ex[2],'w2d1').weight"),85);
+}));
+test('progression uses the performed exercise only and does not borrow archived or other movement weights',()=>withApp({program:'pushpull8'},a=>{
+  a.run("S.logs={w1d0:{Dumbbell_Bench_Press:Array.from({length:3},()=>({w:'30',r:'12',done:true}))}};S.archives.classic12={logs:{w1d0:{Dumbbell_Shoulder_Press:[{w:'100',r:'12',done:true}]}}};");
+  assert.equal(a.run("suggest('Dumbbell_Shoulder_Press',planFor(2,0).ex[2],'w2d0').weight"),'');
+  assert.equal(a.run("suggest('Incline_Dumbbell_Press',planFor(1,3).ex[0],'w1d3').weight"),'');
+  a.run("S.logs={w1d0:{Seated_Dumbbell_Press:Array.from({length:2},()=>({w:'25',r:'12',done:true}))}};S.swaps.w1d0={Dumbbell_Shoulder_Press:'Seated_Dumbbell_Press'};S.swaps.w2d0={Dumbbell_Shoulder_Press:'Seated_Dumbbell_Press'};");
+  assert.equal(a.run("suggest('Seated_Dumbbell_Press',workoutExercises(planFor(2,0),'w2d0')[2],'w2d0').weight"),30);
+}));
+test('current workout suggestions use the actual load and explicit apply only changes unfinished sets',()=>withApp({program:'pushpull8',logs:{w1d0:{Dumbbell_Bench_Press:Array.from({length:3},()=>({w:'30',r:'12',done:true}))}}},a=>{
+  a.run('openDay(2,0)');
+  a.input('[data-ex="Dumbbell_Bench_Press"][data-field="w"][data-i="0"]','32.5');a.click('[data-ck^="Dumbbell_Bench_Press|0|"]');
+  a.input('[data-ex="Dumbbell_Bench_Press"][data-field="w"][data-i="1"]','40');a.run('render()');
+  assert.equal(a.run('S.logs.w2d0.Dumbbell_Bench_Press[1].w'),'40');
+  assert.equal(a.run("suggest('Dumbbell_Bench_Press',planFor(2,0).ex[0],'w2d0').weight"),32.5);
+  const completed=a.run('JSON.stringify(S.logs.w2d0.Dumbbell_Bench_Press[0])');
+  a.click('[data-apply-suggestion="Dumbbell_Bench_Press"]');
+  assert.equal(a.run('S.logs.w2d0.Dumbbell_Bench_Press[1].w'),'32.5');
+  assert.equal(a.run('JSON.stringify(S.logs.w2d0.Dumbbell_Bench_Press[0])'),completed);
+  assert.equal(a.run('dayProgress(planFor(2,0)).done'),1);
+}));
+test('exercise increases can be saved through the form without overwriting drafts, and survive units, backup and reload',()=>{
+  let saved;
+  withApp({program:'pushpull8',logs:{w1d0:{Dumbbell_Bench_Press:Array.from({length:3},()=>({w:'30',r:'12',done:true}))}}},a=>{
+    a.run('openDay(2,0)');a.input('[data-ex="Dumbbell_Bench_Press"][data-field="w"]','40');
+    a.input('[data-load-step-form="Dumbbell_Bench_Press"] input','2.5');a.click('[data-load-step-form="Dumbbell_Bench_Press"] button');
+    assert.equal(a.run('S.loadSteps.Dumbbell_Bench_Press.lb'),2.5);assert.equal(a.run('S.logs.w2d0.Dumbbell_Bench_Press[0].w'),'40');
+    assert.match(a.doc.querySelector('.sugg').textContent,/32.5 lb each/);
+    a.click('[data-apply-suggestion="Dumbbell_Bench_Press"]');assert.equal(a.run('S.logs.w2d0.Dumbbell_Bench_Press[0].w'),'32.5');
+    a.run("changeUnit('kg');setLoadStep('Dumbbell_Bench_Press','1');changeUnit('lb')");
+    assert.equal(a.run('loadStepFor(planFor(2,0).ex[0])'),2.5);assert.equal(a.run('S.loadSteps.Dumbbell_Bench_Press.kg'),1);
+    assert.equal(a.run('JSON.stringify(validateBackup(JSON.stringify(backupPayload())))===JSON.stringify(S)'),true);
+    a.run("switchTrainingProgram('comeback8');switchTrainingProgram('pushpull8')");saved=a.w.localStorage.getItem('fitlab_v1');
+  });
+  withApp(saved,a=>{assert.equal(a.run('S.loadSteps.Dumbbell_Bench_Press.lb'),2.5);assert.equal(a.run('S.loadSteps.Dumbbell_Bench_Press.kg'),1);});
+});
+test('metric suggestions and small dumbbell increases use the appropriate increments',()=>{
+  for(const [unit,id,w,r,next] of [['lb','Leg_Press',100,12,110],['kg','Leg_Press',100,12,105],['kg','Dumbbell_Bench_Press',20,12,22.5],['lb','Side_Lateral_Raise',10,15,12.5],['kg','Side_Lateral_Raise',5,15,6]])withApp({program:'pushpull8',unit,logs:{w1d0:{[id]:Array.from({length:3},()=>({w:String(w),r:String(r),done:true}))}}},a=>{
+    assert.equal(a.run(`suggest('${id}',planFor(2,0).ex.find(e=>e.id==='${id}'),'w2d0').weight`),next);
+  });
+});
+test('bodyweight and ambiguous assistance are not automatically increased, and timed sets retain seconds',()=>withApp({program:'pushpull8'},a=>{
+  a.run("S.logs={w1d1:{Pullups:[{w:'50',r:'12',done:true},{w:'50',r:'12',done:true},{w:'50',r:'12',done:true}]}};S.swaps.w1d1={'Wide-Grip_Lat_Pulldown':'Pullups'};");
+  assert.equal(a.run("suggest('Pullups',{id:'Pullups',sets:3,reps:'8–12'},'w2d1').weight"),50);
+  assert.equal(a.run("suggest('Plank',{id:'Plank',sets:2,reps:'20–40',timed:true},'w2d1').reps"),20);
+  assert.equal(a.run("suggest('Leg_Press',planFor(2,0).ex[4],'w2d0').weight"),'');
+}));
+test('invalid increase preferences are discarded and failed saves leave settings and drafts intact',()=>withApp({program:'pushpull8',loadSteps:{Dumbbell_Bench_Press:{lb:-5,kg:'2,5'},Unknown:{lb:5}}},a=>{
+  assert.equal(a.run('S.loadSteps.Dumbbell_Bench_Press.lb'),undefined);assert.equal(a.run('S.loadSteps.Dumbbell_Bench_Press.kg'),2.5);assert.equal(a.run('S.loadSteps.Unknown'),undefined);
+  assert.equal(a.run("setLoadStep('Dumbbell_Bench_Press','0')"),false);assert.equal(a.run("setLoadStep('Dumbbell_Bench_Press','NaN')"),false);
+  a.run("S.logs.w1d0={Dumbbell_Bench_Press:Array.from({length:3},()=>({w:'30',r:'12',done:true}))};openDay(2,0)");a.input('[data-ex="Dumbbell_Bench_Press"][data-field="w"]','40');
+  a.w.Storage.prototype.setItem=()=>{throw new Error('full');};
+  assert.equal(a.run("setLoadStep('Dumbbell_Bench_Press','2.5')"),false);assert.equal(a.run('S.loadSteps.Dumbbell_Bench_Press.lb'),undefined);
+  assert.equal(a.run("applySuggestion('Dumbbell_Bench_Press')"),false);assert.equal(a.run('S.logs.w2d0.Dumbbell_Bench_Press[0].w'),'40');
+}));
