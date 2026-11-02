@@ -84,3 +84,26 @@ input[data-number]{appearance:none;-webkit-appearance:none;touch-action:manipula
 .fb-training-note { display:flex; flex-wrap:wrap; align-items:center; gap:8px; font-size:13px; padding:12px; background:var(--surface2); border-radius:12px; margin:10px 0; }
 .fb-training-note span { flex:1; min-width:150px; }
 @media(max-width:360px) { .feedback-view .card { padding:14px; } .fb-face { width:36px; height:36px; } .fb-face-scale,.fb-rir-scale { gap:4px; } .fb-launch { grid-template-columns:1fr; } .fb-exercise-head img { width:76px; height:72px; } }
+
+/* The last set has a clear finish moment and an equally clear next day. */
+.completion-card { background:var(--accent); color:var(--accent-ink); border-radius:26px; padding:24px; margin:16px 0 22px; text-align:center; overflow:hidden; }
+.completion-art { width:104px; height:78px; display:block; margin:0 auto 8px; animation:completion-arrive .45s ease-out both; }
+.completion-card .eyebrow { color:inherit; opacity:.85; margin:0 0 8px; }
+.completion-card .completion-title { color:inherit; font-size:32px; letter-spacing:-1px; margin:0 0 6px; line-height:1.1; outline:none; }
+.completion-lead { font-size:16px; margin:0 0 18px; }
+.completion-stats { display:grid; grid-template-columns:1fr 1fr; gap:12px; padding:14px 0; border-top:1px solid currentColor; border-bottom:1px solid currentColor; }
+.completion-stats span { font-size:11px; }
+.completion-stats b { display:block; font-size:24px; line-height:1.3; }
+.completion-cooldown { font-size:12px; line-height:1.5; margin:14px 0; opacity:.9; }
+.completion-next { display:grid; gap:4px; text-align:left; margin:18px 0 14px; }
+.completion-next>span { font-size:10px; letter-spacing:.7px; opacity:.85; }
+.completion-next>b { font-size:20px; line-height:1.3; }
+.completion-next>small { font-size:12px; opacity:.9; }
+.completion-card .btn { width:100%; margin-top:10px; min-height:50px; }
+.completion-card .btn.primary { background:var(--accent-ink); color:var(--accent); justify-content:space-between; }
+.completion-card .btn.ghost { border:1px solid currentColor; color:inherit; background:transparent; }
+.completion-card .textlink { color:inherit; display:block; margin:14px auto 0; }
+.completion-card .fb-face { width:24px; height:24px; }
+@keyframes completion-arrive { from { opacity:0; transform:translateY(10px) scale(.9); } to { opacity:1; transform:none; } }
+@media(prefers-reduced-motion:reduce) { .completion-art { animation:none; } }
+@media(max-width:360px) { .completion-card { padding:20px; } .completion-card .completion-title { font-size:28px; } }

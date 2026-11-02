@@ -95,7 +95,7 @@ function clearFeedbackBody(){
 }
 function finishFeedback(){
   if(feedbackMode==='session'&&!feedbackCommit(()=>{feedbackSession().savedAt=Date.now();}))return;
-  go(feedbackFrom);if(feedbackFrom==='day')requestAnimationFrame(()=>document.querySelector('.reviewcard')?.scrollIntoView({block:'start'}));
+  go(feedbackFrom);if(feedbackFrom==='day')requestAnimationFrame(()=>{if(viewingPos&&isWorkoutComplete(planFor(viewingPos.week,viewingPos.dayIndex)))focusWorkoutCompletion();else document.querySelector('.reviewcard')?.scrollIntoView({block:'start'});});
 }
 function feedbackMap(){
   const reports=feedbackBody(),groups={};let base='';

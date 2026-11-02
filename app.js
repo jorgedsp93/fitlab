@@ -1110,7 +1110,7 @@ const STORAGE_KEY='fitlab_v1';
 const BACKUP_KEY='fitlab_backup_v12';
 function validDate(value){ if(typeof value!=='string'||!/^\d{4}-\d{2}-\d{2}$/.test(value))return false;const date=new Date(value+'T12:00:00Z');return Number.isFinite(date.getTime())&&date.toISOString().slice(0,10)===value; }
 function calendarDay(value){ const [y,m,d]=value.split('-').map(Number); return Date.UTC(y,m-1,d)/86400000; }
-const APP_VERSION='13.5';
+const APP_VERSION='13.6';
 const PROGRAM_FIELDS=['startDate','logs','done','reviewed','lastW','rides','flow','daily','swaps','sessionClocks','feedback'];
 function programSnapshot(state){return JSON.parse(JSON.stringify(Object.fromEntries(PROGRAM_FIELDS.map(key=>[key,state[key]]))));}
 function newState(){ return {program:'pushpull8',archives:{},sessionClocks:{},feedback:{},recovery:{muscles:{}},loadSteps:{},startDate:todayISO(),unit:'lb',logs:{},done:{},reviewed:{},lastW:{},bw:[],bf:[],heightCm:185.4,rides:{},flow:{},daily:{},swaps:{},theme:'light',schemaVersion:13}; }
@@ -1504,6 +1504,43 @@ const VIDEOS = {"Barbell_Bench_Press_-_Medium_Grip": "https://www.youtube.com/wa
 function videoLink(id,name){ return VIDEOS[id] || ytLink(name); }
 function dayProgress(plan){ const dk=dayKey(plan.week,plan.dayIndex); let tot=0,done=0; for(const e of workoutExercises(plan,dk)){ tot+=e.sets; done+=Math.min(exDoneCount(dk,e.id),e.sets);} return {done,tot,pct: tot?Math.round(done/tot*100):0}; }
 function isWorkoutComplete(plan){ if(plan.type==='rest') return !!S.done[dayKey(plan.week,plan.dayIndex)]; const p=dayProgress(plan); return p.tot>0 && p.done>=p.tot; }
+function nextProgramDay(plan){
+  const n=dayNum(dayKey(plan.week,plan.dayIndex))+1;
+  return n<programDays()?planFor(Math.floor(n/7)+1,n%7):null;
+}
+function workoutCompletionCard(plan,dk){
+  if(plan.type!=='workout'||!isWorkoutComplete(plan))return '';
+  const p=dayProgress(plan),next=nextProgramDay(plan),n=dayNum(dk)+1;
+  return `<section class="completion-card" aria-label="Workout complete">
+  <svg class="completion-art" viewBox="0 0 160 120" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M55 25h50v25c0 23-50 23-50 0Z" fill="currentColor" fill-opacity=".14"/><path d="M55 32H41v10c0 13 10 19 20 19M105 32h14v10c0 13-10 19-20 19M80 68v20M62 98h36l-5-10H67Z"/><path d="m70 45 7 7 14-16"/><path d="m29 21 4 5m95 42 6 2M26 77l-5 4M127 16l-4 6M42 100l-3-5"/></g><g fill="currentColor"><circle cx="17" cy="46" r="3"/><circle cx="144" cy="39" r="3"/><circle cx="113" cy="101" r="3"/></g></svg>
+  <p class="eyebrow">${esc(plan.title)} · Day ${n}</p><h2 class="completion-title" tabindex="-1">Congratulations!</h2><p class="completion-lead">You finished your workout.</p>
+  <div class="completion-stats"><span><b>${p.done} / ${p.tot}</b>sets complete</span><span><b>${workoutExercises(plan,dk).length}</b>exercises complete</span></div>
+  <p class="completion-cooldown">${S.sessionClocks[dk]?.endedAt?'Your session is saved. Take some time to recover.':'Finish with your five-minute cooldown before moving on.'}</p>
+  ${next?`<div class="completion-next"><span>UP NEXT · ${esc(fmtDate(dateForPos(next.week,next.dayIndex)))}</span><b>Day ${n+1} · ${esc(next.title)}</b><small>${next.type==='rest'?'Recovery day':`${next.ex.length} exercises · ${dayProgress(next).tot} sets`}</small></div><button class="btn primary" data-next-program-day="${dk}">Go to Day ${n+1}${icon('arrow')}</button>`:`<p class="completion-next">You reached the end of this program. Your training history is saved in Progress.</p><button class="btn primary" data-go="stats">View your progress${icon('arrow')}</button>`}
+  <button class="btn ghost" data-open-feedback="${dk}">${feedbackFace(4)}Rate how it felt</button>
+  ${view!=='day'?`<button class="textlink" data-open-day="${plan.week}.${plan.dayIndex}">Review completed workout</button>`:''}
+  </section>`;
+}
+function focusWorkoutCompletion(){document.querySelector('.completion-card')?.scrollIntoView({block:'start'});document.querySelector('.completion-title')?.focus({preventScroll:true});}
+function finishWorkoutSession(dk){
+  const previous={reviewed:S.reviewed[dk],clock:S.sessionClocks[dk]?{...S.sessionClocks[dk]}:null,timer:S.restTimer};
+  S.reviewed[dk]=true;
+  if(S.sessionClocks[dk]&&!S.sessionClocks[dk].endedAt)S.sessionClocks[dk].endedAt=Date.now();
+  delete S.restTimer;
+  if(!save()){
+    if(previous.reviewed===undefined)delete S.reviewed[dk];else S.reviewed[dk]=previous.reviewed;
+    if(previous.clock)S.sessionClocks[dk]=previous.clock;
+    if(previous.timer)S.restTimer=previous.timer;
+    return false;
+  }
+  stopRest({save:false});return true;
+}
+function continueAfterWorkout(dk){
+  const n=dayNum(dk);if(n<0||n>=programDays())return false;
+  const plan=planFor(Math.floor(n/7)+1,n%7),next=nextProgramDay(plan);
+  if(plan.type!=='workout'||!isWorkoutComplete(plan)||!next||!finishWorkoutSession(dk))return false;
+  openDay(next.week,next.dayIndex);return true;
+}
 function estimateSetSeconds(e,setCount){
   if(!setCount) return 0;
   return setCount*45 + Math.max(0,setCount-1)*(e.rest||60) + 30;
@@ -1559,6 +1596,10 @@ function startHourClock(dk){
 function hourCard(plan,dk){
   if(!isModern()||plan.type!=='workout')return '';
   const clock=S.sessionClocks[dk],c=hourClock(dk);
+  if(isWorkoutComplete(plan)){
+    if(!clock||c.ended)return '';
+    return `<section class="card hour-card" aria-label="Cooldown"><div class="section-row"><b>Cooldown</b><strong data-hour-clock="${dk}">${Math.floor(c.left/60)}:${String(c.left%60).padStart(2,'0')} left</strong></div><p class="small">Finish with five minutes of easy movement. Your session clock is still running.</p><button class="btn ghost sm" data-finish-workout="1">Finish session</button></section>`;
+  }
   return `<section class="card hour-card" aria-label="One-hour workout"><div class="section-row"><b>60 minutes maximum</b>${clock?`<strong data-hour-clock="${dk}">${c.ended?'Finished':`${Math.floor(c.left/60)}:${String(c.left%60).padStart(2,'0')} left`}</strong>`:'<span class="pill">Warm-up included</span>'}</div><p class="small">Full workout, every set. Warm up + practice for 10 minutes, follow the supersets below, then cool down for 5 minutes. Aim to finish by minute 55.</p><p class="small muted">Alternate the paired exercises; rest after both. Keep every exercise, set and rep target. The plan includes time to change equipment.</p>${clock?`<p class="hour-message" data-hour-message role="status">${hourMessage(dk)}</p>${!c.ended?'<button class="btn ghost sm" data-finish-workout="1">Finish session now</button>':''}`:`<button class="btn primary" data-start-hour="${dk}">Start 60-minute clock & warm-up</button><p class="note">Start when you begin warming up. Breaks count. The clock survives reloads; keep the app visible for prompts.</p>`}</section>`;
 }
 function setupProgram(){const setup=new URLSearchParams(location.search).get('setup');return setup==='pushpull'?'pushpull8':setup==='day1'?S.program:null;}
@@ -1708,10 +1749,10 @@ function renderComebackToday(){
   const next=Array.from({length:6},(_,i)=>(d+i+1)%7).find(i=>programSplit()[i].type==='workout');
   return `${header()}${restartTodayCard()}<div class="comeback-heading"><div><p class="eyebrow">DAY ${n+1} · WEEK ${w} OF 8 · ${esc(programPhases()[plan.phase].name)}</p><h1>${esc(PROGRAMS[S.program].headline)}</h1></div><button class="cycle-badge" data-go="plan" aria-label="View your training plan">8<span>WEEKS</span></button></div>
   ${weekStrip(w,d)}
-  <section class="comeback-hero" aria-label="Your workout"><div class="hero-label"><span>${ymd(date)===todayISO()?'TODAY':esc(fmtDate(date))}</span><span>${rest?'RECOVER':`${p.tot} SETS · 60 MIN MAX`}</span></div><h2>${esc(plan.title)}</h2><p>${rest?esc(plan.cardio.d):`${plan.ex.length} exercises · ${esc(plan.focus.map(x=>REGION[x]||cap(x)).filter((x,i,a)=>a.indexOf(x)===i).join(' / '))}`}</p>
-  ${rest?`<button class="btn hero-action" data-restdone="${dk}" aria-pressed="${complete}">${complete?'Recovery logged':'Mark recovery complete'}${icon(complete?'check':'leaf')}</button>`:`${p.done?`<div class="hero-progress">${p.done} of ${p.tot} sets logged</div>`:''}<button class="btn hero-action" data-open-day="${w}.${d}">${complete?'View workout':p.done?'Continue workout':'Start workout'}${icon('arrow')}</button>`}</section>
-  ${!rest?`<p class="note">Full workout · about ${workoutTimeEstimate(plan,dk).total} minutes with supersets, warm-up, rests and cooldown. Every planned set included · 60-minute maximum.</p>`:''}
-  ${!rest?feedbackLaunch(dk):`<button class="btn ghost" data-open-recovery="1">${feedbackIcon('body')}Readiness now</button>`}
+  ${complete&&!rest?workoutCompletionCard(plan,dk):`<section class="comeback-hero" aria-label="Your workout"><div class="hero-label"><span>${ymd(date)===todayISO()?'TODAY':esc(fmtDate(date))}</span><span>${rest?'RECOVER':`${p.tot} SETS · 60 MIN MAX`}</span></div><h2>${esc(plan.title)}</h2><p>${rest?esc(plan.cardio.d):`${plan.ex.length} exercises · ${esc(plan.focus.map(x=>REGION[x]||cap(x)).filter((x,i,a)=>a.indexOf(x)===i).join(' / '))}`}</p>
+  ${rest?`<button class="btn hero-action" data-restdone="${dk}" aria-pressed="${complete}">${complete?'Recovery logged':'Mark recovery complete'}${icon(complete?'check':'leaf')}</button>`:`${p.done?`<div class="hero-progress">${p.done} of ${p.tot} sets logged</div>`:''}<button class="btn hero-action" data-open-day="${w}.${d}">${complete?'View workout':p.done?'Continue workout':'Start workout'}${icon('arrow')}</button>`}</section>`}
+  ${!rest&&!complete?`<p class="note">Full workout · about ${workoutTimeEstimate(plan,dk).total} minutes with supersets, warm-up, rests and cooldown. Every planned set included · 60-minute maximum.</p>`:''}
+  ${!rest&&!complete?feedbackLaunch(dk):`<button class="btn ghost" data-open-recovery="1">${feedbackIcon('body')}Readiness now</button>`}
   <div class="week-summary"><span><b>${weekDone} / ${programSplit().filter(day=>day.type==='workout').length}</b> lifting sessions this week</span><button class="textlink" data-go="plan">View plan ${icon('arrow')}</button></div>
   <details class="disclosure"><summary>${rest?'Recovery notes':'Today’s exercises'}<span class="tiny muted">${rest?'Easy effort':`${plan.ex.length} moves`}</span></summary>${rest?`<p class="small muted">${esc(plan.cardio.d)}</p>`:workoutPreview(plan,dk)}</details>
   <details class="disclosure"><summary>Daily check-in<span class="tiny muted">Movement · food · weight</span></summary>${dailyLogCard(date,w,d,plan)}</details>
@@ -1725,6 +1766,7 @@ function renderDayView(){
   const {week:w,dayIndex:d}=viewingPos,plan=planFor(w,d),dk=dayKey(w,d),p=dayProgress(plan),date=dateForPos(w,d),time=workoutTimeEstimate(plan,dk);
   if(plan.type==='rest')return `${backHead(plan.title,fmtDate(date))}<div class="card"><div class="workout-art" style="margin-bottom:24px">${icon('leaf')}</div><h2>A little room to recover.</h2><p class="muted">${esc(plan.cardio.d)}</p><button class="btn primary" data-restdone="${dk}" aria-pressed="${!!S.done[dk]}">${S.done[dk]?'Recovery logged · undo':'Mark recovery complete'}</button></div>${dailyLogCard(date,w,d,plan)}`;
   return `${backHead(plan.title,`Week ${w} · ${date.toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'})}`)}
+  ${workoutCompletionCard(plan,dk)}
   ${hourCard(plan,dk)}
   <div class="workout-progress"><div class="progress-meta"><span>${p.done} of ${p.tot} sets logged</span><span>${p.done===p.tot?'Session complete':isModern()?`${p.tot-p.done} sets remaining`:`About ${time.remaining} min left`}</span></div><div class="bar"><i style="width:${p.pct}%"></i></div></div>
   ${renderWorkoutFlow(plan,dk)}
@@ -2558,7 +2600,7 @@ let rtInt=null;
 function restSecondsLeft(){return S.restTimer?Math.max(0,Math.ceil((S.restTimer.endsAt-Date.now())/1000)):0;}
 function tickRest(){const left=restSecondsLeft();if(!left){const hadTimer=!!S.restTimer;stopRest();if(hadTimer){toast('Rest complete. Ready when you are.');navigator.vibrate?.([120,60,120]);}return;}$('#restbar').classList.add('show');$('#rtnum').textContent=`${Math.floor(left/60)}:${String(left%60).padStart(2,'0')}`;$('#rtlabel').textContent=S.restTimer.label||'Rest';}
 function startRest(sec,label){if(!Number.isFinite(sec)||sec<=0)return;clearInterval(rtInt);S.restTimer={endsAt:Date.now()+sec*1000,label:label||'Rest'};save();tickRest();rtInt=setInterval(tickRest,250);}
-function stopRest(){clearInterval(rtInt);rtInt=null;delete S.restTimer;$('#restbar').classList.remove('show');save();}
+function stopRest(options={}){clearInterval(rtInt);rtInt=null;delete S.restTimer;$('#restbar').classList.remove('show');if(options.save!==false)save();}
 let toastTimer;
 function toast(message){const el=$('#toast');el.textContent=message;el.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('show'),3500);}
 $('#rtskip').onclick=()=>stopRest();
@@ -2583,7 +2625,8 @@ document.addEventListener('click',e=>{
   const ob=c('[data-open-block]');if(ob){openDay(...ob.dataset.openBlock.split('.').map(Number));return;}
   const od=c('[data-open-day]');if(od){openDay(...od.dataset.openDay.split('.').map(Number));return;}
   const flow=c('[data-flow-step]');if(flow&&viewingPos){const plan=planFor(viewingPos.week,viewingPos.dayIndex);setFlowIndex(plan,flowIndexFor(plan)+Number(flow.dataset.flowStep));render();window.scrollTo({top:0});return;}
-  if(c('[data-finish-workout]')&&viewingPos){const dk=dayKey(viewingPos.week,viewingPos.dayIndex);S.reviewed[dk]=true;if(S.sessionClocks[dk]&&!S.sessionClocks[dk].endedAt)S.sessionClocks[dk].endedAt=Date.now();stopRest();if(save())openFeedback(dk);return;}
+  if(c('[data-finish-workout]')&&viewingPos){const plan=planFor(viewingPos.week,viewingPos.dayIndex),dk=dayKey(plan.week,plan.dayIndex);if(finishWorkoutSession(dk)){if(isWorkoutComplete(plan)){render();focusWorkoutCompletion();}else openFeedback(dk);}return;}
+  const nextDay=c('[data-next-program-day]');if(nextDay){continueAfterWorkout(nextDay.dataset.nextProgramDay);return;}
   const swap=c('[data-swap-ex]');if(swap){setExerciseSwap(...swap.dataset.swapEx.split('|'));return;}
   const clear=c('[data-clear-swap]');if(clear){setExerciseSwap(...clear.dataset.clearSwap.split('|'),null);return;}
   const check=c('[data-ck]');if(check){toggleSet(check.dataset.ck);return;}
@@ -2626,7 +2669,7 @@ document.addEventListener('input',e=>{
   if(st.done){st.done=false;delete S.reviewed[dk];input.closest('.set-row')?.classList.remove('done');const button=input.closest('.set-row')?.querySelector('.ck');button?.setAttribute('aria-pressed','false');button?.setAttribute('aria-label',`Complete ${EXERCISES[ex].name} set ${Number(i)+1}`);updateProgress();}
   if(field==='w'&&Number.isFinite(entryNumber(input.value)))S.lastW[ex]=String(entryNumber(input.value));save();
 });
-function updateProgress(){if(!viewingPos)return;const plan=planFor(viewingPos.week,viewingPos.dayIndex),p=dayProgress(plan),time=workoutTimeEstimate(plan,dayKey(plan.week,plan.dayIndex));const bar=$('.workout-progress .bar>i');if(bar)bar.style.width=p.pct+'%';const meta=$('.workout-progress .progress-meta');if(meta)meta.innerHTML=`<span>${p.done} of ${p.tot} sets logged</span><span>${p.done===p.tot?'Session complete':isModern()?`${p.tot-p.done} sets remaining`:`About ${time.remaining} min left`}</span>`;$('.reviewcard')?.remove();}
+function updateProgress(){if(!viewingPos)return;const plan=planFor(viewingPos.week,viewingPos.dayIndex),p=dayProgress(plan),time=workoutTimeEstimate(plan,dayKey(plan.week,plan.dayIndex));const bar=$('.workout-progress .bar>i');if(bar)bar.style.width=p.pct+'%';const meta=$('.workout-progress .progress-meta');if(meta)meta.innerHTML=`<span>${p.done} of ${p.tot} sets logged</span><span>${p.done===p.tot?'Session complete':isModern()?`${p.tot-p.done} sets remaining`:`About ${time.remaining} min left`}</span>`;$('.reviewcard')?.remove();$('.completion-card')?.remove();}
 function toggleSet(token){
   if(!viewingPos)return;
   const [id,index]=token.split('|'),i=Number(index),dk=dayKey(viewingPos.week,viewingPos.dayIndex),st=S.logs[dk]?.[id]?.[i];if(!st)return;
@@ -2634,9 +2677,11 @@ function toggleSet(token){
   if(!st.done){const reps=entryNumber(st.r),weight=blank(st.w)?0:entryNumber(st.w);if(!Number.isInteger(reps)||reps<1||reps>1000){toast(`Enter the ${exercise.timed?'seconds held':'reps performed'} before completing this set.`);return;}const bw=EXERCISES[id].equipment==='body only';if((blank(st.w)&&!bw)||!Number.isFinite(weight)||weight<0||weight>5000){toast('Enter a valid weight. Use 0 for bodyweight.');return;}st.w=String(weight);st.r=String(reps);st.done=true;st.completedAt=new Date().toISOString();navigator.vibrate?.(20);
     const block=workoutBlocks(plan,dk).find(b=>b.ex.some(x=>x.id===id));
     const roundDone=block.ex.every(x=>x.sets<=i||S.logs[dk]?.[x.id]?.[i]?.done);
-    if(block.ex.length===1||roundDone)startRest(exercise.rest||60,'Rest');else{stopRest();toast('Set saved. Move to the paired exercise.');}
+    if(isWorkoutComplete(plan))stopRest({save:false});
+    else if(block.ex.length===1||roundDone)startRest(exercise.rest||60,'Rest');else{stopRest();toast('Set saved. Move to the paired exercise.');}
   }else{st.done=false;delete st.completedAt;stopRest();}
-  delete S.reviewed[dk];save();
+  delete S.reviewed[dk];const saved=save();
+  if(saved&&st.done&&isWorkoutComplete(plan)){render();focusWorkoutCompletion();return;}
   const y=window.scrollY,openDetails=[...document.querySelectorAll('.exextras')].map(x=>x.open);render();document.querySelectorAll('.exextras').forEach((x,j)=>x.open=!!openDetails[j]);window.scrollTo({top:y});document.querySelector(`[data-ck="${id}|${i}|${exercise.rest}"]`)?.focus({preventScroll:true});
 }
 // Photos are optional. A CDN outage must not block a workout or leave broken-image UI.

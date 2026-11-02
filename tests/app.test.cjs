@@ -263,7 +263,7 @@ test('update notices preserve active input nodes, and checks report current or o
   const a=app({program:'comeback8'},true);try{
     a.click('[data-open-day]');a.input('[data-field="w"]','25');const field=a.doc.querySelector('[data-field="w"]');field.click();a.run('showUpdateReady()');assert.equal(a.doc.querySelector('#appUpdate').hidden,false);assert.equal(field.isConnected,true);assert.equal(a.doc.activeElement,field);
     a.run("updateReady=false;go('more')");const saved=a.w.localStorage.getItem('fitlab_v1');let opts;
-    a.w.fetch=async(url,options)=>{opts=options;return new Response('<script src="app.js?v=13.5"></script>');};await a.run('checkAppUpdate()');assert.equal(opts.cache,'no-store');assert.match(a.doc.querySelector('#updateStatus').textContent,/up to date/);assert.equal(a.w.localStorage.getItem('fitlab_v1'),saved);
+    a.w.fetch=async(url,options)=>{opts=options;return new Response('<script src="app.js?v=13.6"></script>');};await a.run('checkAppUpdate()');assert.equal(opts.cache,'no-store');assert.match(a.doc.querySelector('#updateStatus').textContent,/up to date/);assert.equal(a.w.localStorage.getItem('fitlab_v1'),saved);
     a.w.fetch=async()=>{throw new Error('offline');};await a.run('checkAppUpdate()');assert.match(a.doc.querySelector('#updateStatus').textContent,/online/);assert.equal(a.w.localStorage.getItem('fitlab_v1'),saved);
   }finally{a.close();}
 });
@@ -377,7 +377,7 @@ test('all four sessions log 14 sets and rest correctly for paired and extra solo
     a.input('[data-ex="Side_Lateral_Raise"][data-field="w"]','10');a.click('[data-ck^="Side_Lateral_Raise|0|"]');assert.ok(a.run('restSecondsLeft()')>115);
     assert.match(a.doc.querySelector('.superset-note').textContent,/2 paired rounds.*1 remaining set of Dumbbell Bench Press/);
     for(const day of [0,1,3,4]){
-      a.run(`openDay(1,${day});for(const [index,block] of workoutBlocks(planFor(1,${day}),'w1d${day}').entries()){setFlowIndex(planFor(1,${day}),index);render();for(let round=0;round<Math.max(...block.ex.map(e=>e.sets));round++)for(const e of block.ex){if(round>=e.sets)continue;const set=S.logs.w1d${day}[e.id][round];if(set.done)continue;set.w='25';set.r='10';toggleSet(e.id+'|'+round+'|'+e.rest);const roundDone=block.ex.every(x=>x.sets<=round||S.logs.w1d${day}[x.id][round].done);if(!!S.restTimer!==roundDone)throw new Error('Incorrect rest after '+e.id+' set '+round);}}`);
+      a.run(`openDay(1,${day});for(const [index,block] of workoutBlocks(planFor(1,${day}),'w1d${day}').entries()){setFlowIndex(planFor(1,${day}),index);render();for(let round=0;round<Math.max(...block.ex.map(e=>e.sets));round++)for(const e of block.ex){if(round>=e.sets)continue;const set=S.logs.w1d${day}[e.id][round];if(set.done)continue;set.w='25';set.r='10';toggleSet(e.id+'|'+round+'|'+e.rest);const roundDone=block.ex.every(x=>x.sets<=round||S.logs.w1d${day}[x.id][round].done);if(!!S.restTimer!==(roundDone&&!isWorkoutComplete(planFor(1,${day}))))throw new Error('Incorrect rest after '+e.id+' set '+round);}}`);
       assert.equal(a.run(`dayProgress(planFor(1,${day})).done`),14);assert.equal(a.run(`workoutExportDetail(1,${day}).summary.doneSets`),14);
     }
     assert.equal(a.errors.length,0);
@@ -514,8 +514,8 @@ test('completed Day 1 opens a photo and scale check-in with no text entry; taps 
   });
   withApp(saved,a=>{a.click('[data-open-feedback="w1d0"]');assert.equal(a.doc.querySelector('[data-feedback-rir="Dumbbell_Bench_Press|3"]').getAttribute('aria-pressed'),'true');assert.equal(a.run('S.feedback.w1d0.muscles.quadriceps.score'),5);a.click('[data-feedback-save]');assert.equal(a.run('view'),'today');});
 });
-test('finish opens feedback, ends the clock, and preserves all logged work',()=>withApp({program:'pushpull8'},a=>{
-  completedPush(a);a.run('openDay(1,0);S.sessionClocks.w1d0={startedAt:Date.now()-2000000};');a.click('[data-finish-workout]');assert.equal(a.run('view'),'feedback');assert.ok(a.run('S.sessionClocks.w1d0.endedAt'));assert.equal(a.run('dayProgress(planFor(1,0)).done'),14);a.click('[data-feedback-save]');assert.equal(a.run('view'),'day');
+test('finish shows congratulations, ends the clock, and keeps feedback reachable',()=>withApp({program:'pushpull8'},a=>{
+  completedPush(a);a.run('openDay(1,0);S.sessionClocks.w1d0={startedAt:Date.now()-2000000};');a.click('[data-finish-workout]');assert.equal(a.run('view'),'day');assert.ok(a.doc.querySelector('.completion-card'));assert.ok(a.run('S.sessionClocks.w1d0.endedAt'));assert.equal(a.run('dayProgress(planFor(1,0)).done'),14);a.click('.completion-card [data-open-feedback]');a.click('[data-feedback-save]');assert.equal(a.run('view'),'day');
 }));
 test('effort selectively lowers, holds or advances load, and easy sets build reps within the range',()=>withApp({program:'pushpull8'},a=>{
   completedPush(a);a.click('[data-open-feedback]');
@@ -569,4 +569,43 @@ test('feedback navigation restores session versus readiness views through browse
   completedPush(a);a.click('[data-open-feedback]');const session=a.w.history.state;a.run("openFeedback(null,'recovery')");const recovery=a.w.history.state;
   a.w.dispatchEvent(new a.w.PopStateEvent('popstate',{state:session}));assert.equal(a.doc.querySelectorAll('.fb-exercise').length,6);
   a.w.dispatchEvent(new a.w.PopStateEvent('popstate',{state:recovery}));assert.equal(a.doc.querySelectorAll('.fb-exercise').length,0);assert.match(a.doc.querySelector('h1').textContent,/Ready/);
+}));
+
+test('the final set reveals and focuses congratulations with next-day and feedback actions',()=>withApp({program:'pushpull8'},a=>{
+  completedPush(a);a.run("S.logs.w1d0.Leg_Press[2].done=false;openDay(1,0,2);S.sessionClocks.w1d0={startedAt:Date.now()-45*60000};startRest(120,'Rest');");
+  assert.equal(a.doc.querySelector('.completion-card'),null);
+  a.click('[data-ck^="Leg_Press|2|"]');
+  assert.match(a.doc.querySelector('.completion-card').textContent,/Congratulations!/);assert.match(a.doc.querySelector('.completion-stats').textContent,/14 \/ 14/);
+  assert.equal(a.doc.activeElement,a.doc.querySelector('.completion-title'));assert.equal(a.run('!!S.restTimer'),false);assert.equal(a.run('S.sessionClocks.w1d0.endedAt'),undefined);
+  assert.match(a.doc.querySelector('[data-next-program-day]').textContent,/Go to Day 2/);
+  assert.ok(a.doc.querySelector('.completion-card [data-open-feedback]'));assert.equal(a.run('dayProgress(planFor(1,1)).done'),0);assert.equal(a.errors.length,0);
+}));
+test('Day 2 opens after completion without restarting the schedule or starting the next clock',()=>withApp({program:'pushpull8'},a=>{
+  completedPush(a);a.run('S.sessionClocks.w1d0={startedAt:Date.now()-3000000};render()');const start=a.run('S.startDate'),logs=a.run('JSON.stringify(S.logs.w1d0)');
+  a.click('[data-next-program-day="w1d0"]');assert.equal(a.run('view'),'day');assert.equal(a.run('viewingPos.dayIndex'),1);assert.match(a.doc.querySelector('h1').textContent,/Pull A/);
+  assert.equal(a.run('S.startDate'),start);assert.equal(a.run('JSON.stringify(S.logs.w1d0)'),logs);assert.ok(a.run('S.sessionClocks.w1d0.endedAt'));assert.equal(a.run('S.sessionClocks.w1d1'),undefined);assert.equal(a.run('dayProgress(planFor(1,1)).done'),0);
+}));
+test('saved Day 1 completion gets the celebration after reload and rating still returns to its next-day button',async()=>{
+  let saved;withApp({program:'pushpull8'},a=>{completedPush(a);saved=a.w.localStorage.getItem('fitlab_v1');});
+  const a=app(saved);try{
+    assert.match(a.doc.querySelector('.completion-card').textContent,/Congratulations!/);assert.ok(a.doc.querySelector('[data-next-program-day="w1d0"]'));
+    a.click('.completion-card [data-open-feedback]');a.click('[data-feedback-overall="4"]');a.click('[data-feedback-save]');assert.ok(a.doc.querySelector('[data-next-program-day="w1d0"]'));
+    a.click('[data-open-day="1.0"]');a.click('.completion-card [data-open-feedback]');a.click('[data-feedback-save]');await new Promise(resolve=>a.w.requestAnimationFrame(resolve));assert.equal(a.doc.activeElement,a.doc.querySelector('.completion-title'));
+  }finally{a.close();}
+});
+test('partial sessions and undone or edited sets do not claim full completion or allow advancing',()=>withApp({program:'pushpull8'},a=>{
+  completedPush(a);a.run('openDay(1,0,2)');a.click('[data-ck^="Leg_Press|2|"]');assert.equal(a.doc.querySelector('.completion-card'),null);assert.equal(a.run("continueAfterWorkout('w1d0')"),false);
+  a.click('[data-finish-workout]');assert.equal(a.run('view'),'feedback');assert.equal(a.run('dayProgress(planFor(1,0)).done'),13);
+  a.run('openDay(1,0,2)');a.click('[data-ck^="Leg_Press|2|"]');assert.ok(a.doc.querySelector('.completion-card'));
+  a.input('[data-ex="Leg_Press"][data-i="2"][data-field="w"]','105');assert.equal(a.doc.querySelector('.completion-card'),null);assert.equal(a.run("continueAfterWorkout('w1d0')"),false);
+}));
+test('continuing keeps recovery days, next-day lookup rolls weeks, and the final day stays in bounds',()=>withApp({program:'pushpull8'},a=>{
+  a.run("{const p=planFor(1,1);S.logs.w1d1=Object.fromEntries(p.ex.map(e=>[e.id,Array.from({length:e.sets},()=>({w:'30',r:'12',done:true}))]));openDay(1,1);}");
+  a.click('[data-next-program-day="w1d1"]');assert.equal(a.run('viewingPos.dayIndex'),2);assert.match(a.doc.querySelector('h1').textContent,/Easy cardio/);
+  assert.equal(a.run('nextProgramDay(planFor(1,6)).week'),2);assert.equal(a.run('nextProgramDay(planFor(1,6)).dayIndex'),0);assert.equal(a.run('nextProgramDay(planFor(8,6))'),null);
+}));
+test('failed completion save keeps the user on Day 1 with the original clock and stored history',()=>withApp({program:'pushpull8'},a=>{
+  completedPush(a);a.run('S.sessionClocks.w1d0={startedAt:Date.now()-1000000};save();render()');const before=a.w.localStorage.getItem('fitlab_v1');
+  a.run("Storage.prototype.setItem=function(){throw new Error('full')}");a.click('[data-next-program-day="w1d0"]');assert.equal(a.run('view'),'today');assert.equal(a.run('S.sessionClocks.w1d0.endedAt'),undefined);assert.equal(a.run('S.reviewed.w1d0'),undefined);
+  assert.equal(a.w.localStorage.getItem('fitlab_v1'),before);assert.equal(a.doc.querySelector('#storageWarning').hidden,false);
 }));

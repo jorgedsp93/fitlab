@@ -2,7 +2,7 @@
 
 An offline workout journal with an eight-week, four-day Push / Pull plan. Full sessions include legs, warm-up, rest and cooldown within a one-hour budget.
 
-## Current release: 13.5
+## Current release: 13.6
 
 - **Day 1 / Monday: Push A** — chest, shoulders, triceps, quads and calves.
 - **Day 2 / Tuesday: Pull A** — back, biceps, hamstrings and glutes.
@@ -18,9 +18,15 @@ Rest two minutes after each round. For a three-set lift paired with a two-set ex
 
 ## Start on your device
 
-[Open Push / Pull setup](https://jorgedsp93.github.io/fitlab/?setup=pushpull&release=13.5) and tap **Start Push / Pull today**. This starts Push A on the device’s current local date. Opening the link alone never resets progress. The current program is archived, a full recovery copy is saved, and body measurements remain. Existing comeback and classic programs stay available in **More** with their own schedules and logs; an update never silently reinterprets those sessions as push/pull.
+[Open Push / Pull setup](https://jorgedsp93.github.io/fitlab/?setup=pushpull&release=13.6) and tap **Start Push / Pull today**. This starts Push A on the device’s current local date. Opening the link alone never resets progress. The current program is archived, a full recovery copy is saved, and body measurements remain. Existing comeback and classic programs stay available in **More** with their own schedules and logs; an update never silently reinterprets those sessions as push/pull.
 
 New installs open Push / Pull by default. **More → Program settings → Restart at Day 1 today** restarts the currently selected program. Progress is local to each browser/device, and full backups include all saved programs.
+
+## Finish and move to the next day
+
+Checking the final working set brings a **Congratulations!** card into view with the completed set/exercise totals, a trophy illustration, **Go to Day 2** (or the next scheduled day), and **Rate how it felt**. It also appears for completed workouts saved before this update, including Day 1 on Today. Finishing a partial session opens its review without claiming the full workout is complete.
+
+The final set stops the rest timer. Allow time for your cooldown; the session clock finishes when you finish the session or move to the next day. The next-day button opens the next calendar day in the program, including recovery days and week changes, without changing the start date, starting a clock or marking future work complete. Feedback returns to the completion card so the next-day action stays easy to find. Editing or undoing a completed set removes the celebration until all sets are complete again.
 
 ## Visual workout feedback
 
