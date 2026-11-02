@@ -946,19 +946,66 @@ const COMEBACK_PHASES=[
   {name:'Progress',weeks:'Weeks 5–7',steps:7000,tag:'Add the smallest available weight when every set reaches the top of its range with two reps left.'},
   {name:'Check in',weeks:'Week 8',steps:7000,tag:'Compare loads, repetitions, waist and energy with week one. Keep the same controlled effort.'}
 ];
+// Four-day push/pull: knee-dominant legs join push; posterior chain joins pull.
+// Every day retains 14 working sets. Supersets change rest placement, not volume.
+const PUSHPULL_SPLIT=[
+  {key:'push-a',title:'Push A',focus:['chest','shoulders','triceps','quadriceps','calves'],type:'workout',ex:[
+    {id:'Dumbbell_Bench_Press',sets:3,reps:'8–12',rest:120,comp:true,ss:'ppa-1',ssName:'Chest + quads'},
+    {id:'Leg_Press',sets:3,reps:'8–12',rest:120,comp:true,ss:'ppa-1',ssName:'Chest + quads'},
+    {id:'Dumbbell_Shoulder_Press',sets:2,reps:'8–12',rest:90,comp:true,ss:'ppa-2',ssName:'Shoulders + calves'},
+    {id:'Standing_Calf_Raises',sets:2,reps:'12–20',rest:90,ss:'ppa-2',ssName:'Shoulders + calves'},
+    {id:'Side_Lateral_Raise',sets:2,reps:'12–15',rest:75,ss:'ppa-3',ssName:'Side delts + triceps'},
+    {id:'Triceps_Pushdown',sets:2,reps:'10–15',rest:75,ss:'ppa-3',ssName:'Side delts + triceps'}]},
+  {key:'pull-a',title:'Pull A',focus:['lats','middle back','biceps','hamstrings','glutes'],type:'workout',ex:[
+    {id:'Romanian_Deadlift',sets:3,reps:'8–10',rest:120,comp:true},
+    {id:'Wide-Grip_Lat_Pulldown',sets:3,reps:'8–12',rest:120,comp:true},
+    {id:'Seated_Cable_Rows',sets:2,reps:'8–12',rest:90,ss:'pla-1',ssName:'Back + hamstrings'},
+    {id:'Lying_Leg_Curls',sets:2,reps:'10–15',rest:90,ss:'pla-1',ssName:'Back + hamstrings'},
+    {id:'Face_Pull',sets:2,reps:'12–15',rest:75,ss:'pla-2',ssName:'Rear delts + biceps'},
+    {id:'Hammer_Curls',sets:2,reps:'10–12',rest:75,ss:'pla-2',ssName:'Rear delts + biceps'}]},
+  {key:'recovery',title:'Easy cardio & mobility',focus:['conditioning','mobility'],type:'rest'},
+  {key:'push-b',title:'Push B',focus:['chest','shoulders','triceps','quadriceps','calves'],type:'workout',ex:[
+    {id:'Incline_Dumbbell_Press',sets:3,reps:'8–12',rest:120,comp:true,ss:'ppb-1',ssName:'Chest + quads'},
+    {id:'Goblet_Squat',sets:3,reps:'8–12',rest:120,comp:true,ss:'ppb-1',ssName:'Chest + quads'},
+    {id:'Cable_Crossover',sets:2,reps:'12–15',rest:75,ss:'ppb-2',ssName:'Chest + calves'},
+    {id:'Standing_Calf_Raises',sets:2,reps:'12–20',rest:75,ss:'ppb-2',ssName:'Chest + calves'},
+    {id:'Side_Lateral_Raise',sets:2,reps:'12–15',rest:75,ss:'ppb-3',ssName:'Side delts + triceps'},
+    {id:'Standing_Dumbbell_Triceps_Extension',sets:2,reps:'10–15',rest:75,ss:'ppb-3',ssName:'Side delts + triceps'}]},
+  {key:'pull-b',title:'Pull B',focus:['lats','middle back','biceps','hamstrings','glutes'],type:'workout',ex:[
+    {id:'Barbell_Hip_Thrust',sets:3,reps:'8–12',rest:120,comp:true},
+    {id:'Seated_Cable_Rows',sets:3,reps:'8–12',rest:120,comp:true},
+    {id:'Wide-Grip_Lat_Pulldown',sets:2,reps:'8–12',rest:90,ss:'plb-1',ssName:'Back + hamstrings'},
+    {id:'Lying_Leg_Curls',sets:2,reps:'10–15',rest:90,ss:'plb-1',ssName:'Back + hamstrings'},
+    {id:'Face_Pull',sets:2,reps:'12–15',rest:75,ss:'plb-2',ssName:'Rear delts + biceps'},
+    {id:'Barbell_Curl',sets:2,reps:'10–12',rest:75,ss:'plb-2',ssName:'Rear delts + biceps'}]},
+  {key:'rest',title:'Rest & reset',focus:['recover','reset'],type:'rest'},
+  {key:'rest',title:'Rest & reset',focus:['recover','reset'],type:'rest'}
+];
+const PUSHPULL_PHASES=[
+  {name:'Set your baseline',weeks:'Weeks 1–2',steps:7000,tag:'Complete all 14 sets with controlled loads. Finish with 3 good reps left.'},
+  {name:'Build reps',weeks:'Weeks 3–4',steps:7000,tag:'Keep all sets. Add repetitions within the range while leaving 2–3 good reps.'},
+  {name:'Build strength',weeks:'Weeks 5–7',steps:7000,tag:'When every set reaches the top of its range with two reps left, add the smallest available weight.'},
+  {name:'Review',weeks:'Week 8',steps:7000,tag:'Keep the full session. Compare your weights, repetitions and effort with week one.'}
+];
+const PROGRAMS={
+  pushpull8:{name:'8-week Push / Pull',shortName:'Push / Pull · 8 weeks',weeks:8,split:PUSHPULL_SPLIT,phases:PUSHPULL_PHASES,summary:'Push, Pull, recovery, Push, Pull, rest, rest. Legs included. Full sessions within one hour.',headline:'Your Push / Pull plan.'},
+  classic12:{name:'Classic 12-week program',shortName:'Classic program',weeks:12,split:SPLIT,phases:PHASES,summary:'Five lifting days. Room to recover.',headline:'One session at a time.'},
+  comeback8:{name:'Your 8-week comeback',shortName:'8-week comeback',weeks:8,split:COMEBACK_SPLIT,phases:COMEBACK_PHASES,summary:'Four lifting days. One easy session. Two days to recover.',headline:'Your comeback starts here.'}
+};
 function isComeback(){return S.program==='comeback8';}
-function programWeeks(){return isComeback()?8:12;}
+function isModern(){return programWeeks()===8;}
+function programWeeks(){return PROGRAMS[S.program].weeks;}
 function programDays(){return programWeeks()*7;}
-function programSplit(){return isComeback()?COMEBACK_SPLIT:SPLIT;}
-function programPhases(){return isComeback()?COMEBACK_PHASES:PHASES;}
-function programName(){return isComeback()?'Your 8-week comeback':'Classic 12-week program';}
-const phaseOf = (w)=> isComeback()?(w<=2?0:w<=4?1:w<=7?2:3):(w<=4?0:w<=8?1:2);
+function programSplit(){return PROGRAMS[S.program].split;}
+function programPhases(){return PROGRAMS[S.program].phases;}
+function programName(){return PROGRAMS[S.program].name;}
+const phaseOf = (w)=> isModern()?(w<=2?0:w<=4?1:w<=7?2:3):(w<=4?0:w<=8?1:2);
 
 
 // One short cardio line per day. Riding (commute or recreational) always counts — log it on any day.
 function cardioFor(phase, dayIndex){
   const base = programSplit()[dayIndex];
-  if(isComeback())return {d:base.key==='recovery'?'20–30 minutes of easy cycling or brisk walking, then 10 minutes of mobility. A moderate bike commute can cover the cardio.':base.key==='rest'?'Rest, take a relaxed walk, and make room for sleep.':'Warm up for 5 minutes plus lighter practice sets. Choose a load that leaves a few good reps. Your bike commute counts toward cardio.'};
+  if(isModern())return {d:base.key==='recovery'?'20–30 minutes of easy cycling or brisk walking, then 10 minutes of mobility. A moderate bike commute can cover the cardio.':base.key==='rest'?'Rest, take a relaxed walk, and make room for sleep.':'Warm up for 5 minutes plus lighter practice sets. Choose a load that leaves a few good reps. Your bike commute counts toward cardio.'};
   if(base.key==='recovery') return { d:'Easy Zone 2 — a bike ride, walk or light row at a conversational pace, plus a few minutes of stretching.' };
   if(base.key==='rest') return { d:'Take it easy: light steps, stretch, good sleep. A casual ride is totally fine if you feel like it.' };
   let d;
@@ -977,6 +1024,7 @@ function planFor(week, dayIndex){
   if(base.type==='rest'){ day.ex=[]; return day; }
   day.ex = base.ex.map((e,i)=>{
     const x = Object.assign({}, e);
+    if(S.program==='pushpull8'){x.note=programPhases()[phase].tag;x.superset=!!x.ss;return x;}
     if(isComeback()){
       x.sets=week<=2||week===8?2:i<2?3:2;
       x.rest=i<2?120:75;
@@ -1062,15 +1110,15 @@ const STORAGE_KEY='fitlab_v1';
 const BACKUP_KEY='fitlab_backup_v12';
 function validDate(value){ if(typeof value!=='string'||!/^\d{4}-\d{2}-\d{2}$/.test(value))return false;const date=new Date(value+'T12:00:00Z');return Number.isFinite(date.getTime())&&date.toISOString().slice(0,10)===value; }
 function calendarDay(value){ const [y,m,d]=value.split('-').map(Number); return Date.UTC(y,m-1,d)/86400000; }
-const APP_VERSION='13.1';
+const APP_VERSION='13.2';
 const PROGRAM_FIELDS=['startDate','logs','done','reviewed','lastW','rides','flow','daily','swaps','sessionClocks'];
 function programSnapshot(state){return JSON.parse(JSON.stringify(Object.fromEntries(PROGRAM_FIELDS.map(key=>[key,state[key]]))));}
-function newState(){ return {program:'comeback8',archives:{},sessionClocks:{},startDate:todayISO(),unit:'lb',logs:{},done:{},reviewed:{},lastW:{},bw:[],bf:[],heightCm:185.4,rides:{},flow:{},daily:{},swaps:{},theme:'light',schemaVersion:13}; }
+function newState(){ return {program:'pushpull8',archives:{},sessionClocks:{},startDate:todayISO(),unit:'lb',logs:{},done:{},reviewed:{},lastW:{},bw:[],bf:[],heightCm:185.4,rides:{},flow:{},daily:{},swaps:{},theme:'light',schemaVersion:13}; }
 function record(value){ return value && typeof value==='object' && !Array.isArray(value); }
 function normalizeState(value,withArchives=true){
   if(!record(value)) throw new Error('Invalid FitLab data');
   const s=Object.assign(newState(),value);
-  s.program=value.program==='comeback8'?'comeback8':'classic12';
+  s.program=Object.hasOwn(PROGRAMS,value.program)?value.program:'classic12';
   if(!validDate(s.startDate)||s.startDate>todayISO()) s.startDate=todayISO();
   s.unit=s.unit==='kg'?'kg':'lb';
   s.theme=['light','dark','auto'].includes(s.theme)?s.theme:'light';
@@ -1091,12 +1139,12 @@ function normalizeState(value,withArchives=true){
   for(const [dk,swaps] of Object.entries(s.swaps)){
     const match=/^w(?:[1-9]|1[0-2])d([0-6])$/.exec(dk);
     if(!match||!record(swaps)){delete s.swaps[dk];continue;}
-    const planned=(s.program==='comeback8'?COMEBACK_SPLIT:SPLIT)[Number(match[1])].ex||[];
+    const planned=PROGRAMS[s.program].split[Number(match[1])].ex||[];
     const used=new Set(planned.filter(e=>!swaps[e.id]||!EXERCISES[swaps[e.id]]).map(e=>e.id));
     for(const e of planned){const target=swaps[e.id];if(!target)continue;if(!EXERCISES[target]||used.has(target)){delete swaps[e.id];used.add(e.id);}else used.add(target);}
   }
   s.archives={};
-  if(withArchives&&record(value.archives))for(const program of ['classic12','comeback8']){
+  if(withArchives&&record(value.archives))for(const program of Object.keys(PROGRAMS)){
     if(record(value.archives[program]))s.archives[program]=programSnapshot(normalizeState({...value.archives[program],program,archives:{}},false));
   }
   s.schemaVersion=13;
@@ -1387,7 +1435,7 @@ function suggest(exId,e,curDk){
   if(!prev){ return {weight:'', reps: rng.amrap?'':rng.min, note:`First time — pick a weight you can control for ${e.reps} reps. ${weightHint(exId,[])}`}; }
   const w=parseFloat(prev[0].w)||''; const reps=prev.map(s=>parseInt(s.r)||0); const repsStr=reps.join(', ');
   if(rng.amrap){ const tot=reps.reduce((a,b)=>a+b,0); return {weight:w, reps:'', note:`Last time: ${repsStr} reps (${tot} total). Beat it.`}; }
-  if(isComeback())return {weight:w,reps:Math.max(rng.min,Math.min(rng.max,Math.min(...reps)+1)),note:reps.every(r=>r>=rng.max)?'If every set felt controlled with two good reps left, choose the smallest available weight increase. Otherwise repeat this weight.':'Repeat a controlled load and add a repetition when you can. Leave 2–3 good reps.'};
+  if(isModern())return {weight:w,reps:Math.max(rng.min,Math.min(rng.max,Math.min(...reps)+1)),note:reps.every(r=>r>=rng.max)?'If every set felt controlled with two good reps left, choose the smallest available weight increase. Otherwise repeat this weight.':'Repeat a controlled load and add a repetition when you can. Leave 2–3 good reps.'};
   const inc=incFor(e);
   if(w && prev.length>=e.sets && prev.every(s=>Number(s.w)===w) && reps.every(r=>r>=rng.max)){ const nw=Math.round((w+inc)*10)/10; return {weight:nw, reps:rng.min, note:`You maxed the reps at ${formatEntryWeight(exId,w)} — go up to ${formatEntryWeight(exId,nw)} × ${rng.min}.`}; }
   if(w && reps.some(r=>r<rng.min)) return {weight:w, reps:rng.min, note:`Hold ${formatEntryWeight(exId,w)}. Last: ${repsStr}. Get ${rng.min}+ clean reps on every set.`};
@@ -1410,7 +1458,7 @@ function workoutTimeEstimate(plan,dk){
     const left=Math.max(0,e.sets-Math.min(exDoneCount(dk,e.id),e.sets));
     remaining+=estimateSetSeconds(e,left);
   }
-  if(isComeback()&&plan.type==='workout'){
+  if(isModern()&&plan.type==='workout'){
     const blocks=workoutBlocks(plan,dk);
     // Ten minutes preparation, five cooldown, block changes and full round rests.
     // Paired movements share one rest, with 30 seconds to move between exercises.
@@ -1446,19 +1494,21 @@ function tickHourClock(){
   if(message&&message.textContent!==next)message.textContent=next;
 }
 function startHourClock(dk){
-  if(!isComeback()||S.sessionClocks[dk])return false;
+  if(!isModern()||S.sessionClocks[dk])return false;
   S.sessionClocks[dk]={startedAt:Date.now()};
   if(!save()){delete S.sessionClocks[dk];return false;}
   render();return true;
 }
 function hourCard(plan,dk){
-  if(!isComeback()||plan.type!=='workout')return '';
+  if(!isModern()||plan.type!=='workout')return '';
   const clock=S.sessionClocks[dk],c=hourClock(dk);
   return `<section class="card hour-card" aria-label="One-hour workout"><div class="section-row"><b>60 minutes maximum</b>${clock?`<strong data-hour-clock="${dk}">${c.ended?'Finished':`${Math.floor(c.left/60)}:${String(c.left%60).padStart(2,'0')} left`}</strong>`:'<span class="pill">Warm-up included</span>'}</div><p class="small">Full workout, every set. Warm up + practice for 10 minutes, follow the supersets below, then cool down for 5 minutes. Aim to finish by minute 55.</p><p class="small muted">Alternate the paired exercises; rest after both. Keep every exercise, set and rep target. The plan includes time to change equipment.</p>${clock?`<p class="hour-message" data-hour-message role="status">${hourMessage(dk)}</p>${!c.ended?'<button class="btn ghost sm" data-finish-workout="1">Finish session now</button>':''}`:`<button class="btn primary" data-start-hour="${dk}">Start 60-minute clock & warm-up</button><p class="note">Start when you begin warming up. Breaks count. The clock survives reloads; keep the app visible for prompts.</p>`}</section>`;
 }
+function setupProgram(){const setup=new URLSearchParams(location.search).get('setup');return setup==='pushpull'?'pushpull8':setup==='day1'?S.program:null;}
 function restartTodayCard(){
-  if(new URLSearchParams(location.search).get('setup')!=='day1')return '';
-  return `<section class="card"><h2>Day 1, starting today</h2><p>Restart the eight-week comeback on ${prettyISO(todayISO())}. Every lifting session has a 60-minute limit, including warm-up and cooldown. A recovery copy of this device’s current progress is saved first.</p><button class="btn primary" data-restart-today>Restart at Day 1 today</button></section>`;
+  const target=setupProgram();if(!target)return '';
+  const p=PROGRAMS[target];
+  return `<section class="card"><h2>${esc(p.name)} · Day 1 today</h2><p>Start ${esc(p.name)} on ${prettyISO(todayISO())}. ${esc(p.summary)} A recovery copy of this device’s current progress is saved first; your other programs stay available in More.</p><button class="btn primary" data-restart-today="${target}">Start ${target==='pushpull8'?'Push / Pull':'Day 1'} today</button></section>`;
 }
 function minLabel(min){ return min===1?'1 min':`${min} min`; }
 function workoutBlocks(plan,dk){
@@ -1539,12 +1589,12 @@ const ICONS={
   weight:'<path d="M8 6a4 4 0 0 1 8 0M6 6h12l3 15H3Z"/>',sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1 1m12 12 1 1M5 19l1-1M18 6l1-1"/>'
 };
 function icon(name){return `<svg class="icon" viewBox="0 0 24 24" aria-hidden="true">${ICONS[name]||ICONS.train}</svg>`;}
-function header(){return `<header class="topbar"><div class="wordmark"><span class="brand-symbol">${icon('train')}</span>fitlab<span class="muted" style="font-weight:400">.</span></div><span class="topnote">${isComeback()?'8-week comeback':'Classic program'}</span></header>`;}
+function header(){return `<header class="topbar"><div class="wordmark"><span class="brand-symbol">${icon('train')}</span>fitlab<span class="muted" style="font-weight:400">.</span></div><span class="topnote">${esc(PROGRAMS[S.program].shortName)}</span></header>`;}
 function heading(title,subtitle){return `${header()}<div class="page-head"><h1>${esc(title)}</h1><p>${esc(subtitle)}</p></div>`;}
 function startStatusText(){const n=daysSinceStart();return n<0?`Starts ${prettyISO(S.startDate)}`:n>=programDays()?`${programWeeks()} weeks completed · started ${prettyISO(S.startDate)}`:`Week ${Math.floor(n/7)+1} · started ${prettyISO(S.startDate)}`;}
 function scheduleCard(){return `<div class="setupstatus">${esc(startStatusText())}</div>
   <label><span class="field-label">Program start date</span><input class="dateinput" type="date" id="startIn" value="${esc(S.startDate)}" max="${todayISO()}" aria-label="Program start date"></label>
-  <div class="setupactions"><button class="btn ghost sm" data-save-start="1">Update date</button><button class="btn ghost sm" data-restart-schedule="1">Start fresh on selected date</button><button class="btn primary sm" data-restart-today>Restart at Day 1 today</button></div>
+  <div class="setupactions"><button class="btn ghost sm" data-save-start="1">Update date</button><button class="btn ghost sm" data-restart-schedule="1">Start fresh on selected date</button><button class="btn primary sm" data-restart-today="${S.program}">Restart at Day 1 today</button></div>
   <p class="setupnote">Updating the date moves your schedule. Starting fresh saves a recovery backup before clearing the current program. Body measurements stay.</p>`;}
 function dailyLogCard(date,w,d,plan){
   const key=ymd(date),daily=S.daily[key]||{},ride=rideOn(w,d);
@@ -1567,9 +1617,9 @@ function renderNav(){const active=view==='day'?returnView:['library','guide'].in
 function selectedDayNumber(){return Math.min(programDays()-1,Math.max(0,Math.max(0,daysSinceStart())+dayOffset));}
 function weekStrip(week,day){return `<div class="weekstrip" aria-label="This week">${programSplit().map((_,d)=>{const date=dateForPos(week,d),done=isWorkoutComplete(planFor(week,d));return `<button data-select-day="${(week-1)*7+d}" class="${d===day?'selected':''} ${ymd(date)===todayISO()?'istoday':''}" aria-label="${esc(fmtDate(date))}, ${programSplit()[d].title}${done?', complete':''}" aria-pressed="${d===day}"><span class="weekday">${date.toLocaleDateString(undefined,{weekday:'short'})}</span><span class="date">${date.getDate()}</span>${done?'<span class="weekdot"></span>':''}</button>`;}).join('')}</div>`;}
 function renderToday(){
-  if(new URLSearchParams(location.search).get('setup')==='day1'&&(!isComeback()||daysSinceStart()>=programDays()))return `${header()}${restartTodayCard()}`;
+  if(setupProgram()&&(!isModern()||daysSinceStart()>=programDays()))return `${header()}${restartTodayCard()}`;
   const days=daysSinceStart();
-  if(isComeback()&&days<programDays())return renderComebackToday();
+  if(isModern()&&days<programDays())return renderComebackToday();
   if(days>=programDays()&&dayOffset===0)return `${heading('A chapter completed.',`Your ${programWeeks()}-week schedule has reached its end.`)}<div class="card"><div class="workout-art" style="margin-bottom:24px">${icon('check')}</div><h2>Keep the momentum.</h2><p class="muted">Your training history is in Progress. Start another cycle whenever you’re ready.</p><button class="btn primary" data-new-cycle="1">Start a new cycle</button><button class="textlink" data-go="stats">View your progress</button></div>`;
   const n=selectedDayNumber(),w=Math.floor(n/7)+1,d=n%7,plan=planFor(w,d),dk=dayKey(w,d),p=dayProgress(plan),complete=isWorkoutComplete(plan),date=dateForPos(w,d),time=workoutTimeEstimate(plan,dk);
   const isToday=ymd(date)===todayISO(),rest=plan.type==='rest';
@@ -1591,17 +1641,17 @@ function renderComebackToday(){
   const n=selectedDayNumber(),w=Math.floor(n/7)+1,d=n%7,plan=planFor(w,d),dk=dayKey(w,d),p=dayProgress(plan),date=dateForPos(w,d),rest=plan.type==='rest',complete=isWorkoutComplete(plan);
   const weekDone=programSplit().filter((day,i)=>day.type==='workout'&&isWorkoutComplete(planFor(w,i))).length;
   const next=Array.from({length:6},(_,i)=>(d+i+1)%7).find(i=>programSplit()[i].type==='workout');
-  return `${header()}${restartTodayCard()}<div class="comeback-heading"><div><p class="eyebrow">DAY ${n+1} · WEEK ${w} OF 8 · ${esc(COMEBACK_PHASES[plan.phase].name)}</p><h1>Your comeback<br>starts here.</h1></div><button class="cycle-badge" data-go="plan" aria-label="View your eight-week plan">8<span>WEEKS</span></button></div>
+  return `${header()}${restartTodayCard()}<div class="comeback-heading"><div><p class="eyebrow">DAY ${n+1} · WEEK ${w} OF 8 · ${esc(programPhases()[plan.phase].name)}</p><h1>${esc(PROGRAMS[S.program].headline)}</h1></div><button class="cycle-badge" data-go="plan" aria-label="View your training plan">8<span>WEEKS</span></button></div>
   ${weekStrip(w,d)}
   <section class="comeback-hero" aria-label="Your workout"><div class="hero-label"><span>${ymd(date)===todayISO()?'TODAY':esc(fmtDate(date))}</span><span>${rest?'RECOVER':`${p.tot} SETS · 60 MIN MAX`}</span></div><h2>${esc(plan.title)}</h2><p>${rest?esc(plan.cardio.d):`${plan.ex.length} exercises · ${esc(plan.focus.map(x=>REGION[x]||cap(x)).filter((x,i,a)=>a.indexOf(x)===i).join(' / '))}`}</p>
   ${rest?`<button class="btn hero-action" data-restdone="${dk}" aria-pressed="${complete}">${complete?'Recovery logged':'Mark recovery complete'}${icon(complete?'check':'leaf')}</button>`:`${p.done?`<div class="hero-progress">${p.done} of ${p.tot} sets logged</div>`:''}<button class="btn hero-action" data-open-day="${w}.${d}">${complete?'View workout':p.done?'Continue workout':'Start workout'}${icon('arrow')}</button>`}</section>
   ${!rest?`<p class="note">Full workout · about ${workoutTimeEstimate(plan,dk).total} minutes with supersets, warm-up, rests and cooldown. Every planned set included · 60-minute maximum.</p>`:''}
-  <div class="week-summary"><span><b>${weekDone} / 4</b> lifting sessions this week</span><button class="textlink" data-go="plan">View plan ${icon('arrow')}</button></div>
+  <div class="week-summary"><span><b>${weekDone} / ${programSplit().filter(day=>day.type==='workout').length}</b> lifting sessions this week</span><button class="textlink" data-go="plan">View plan ${icon('arrow')}</button></div>
   <details class="disclosure"><summary>${rest?'Recovery notes':'Today’s exercises'}<span class="tiny muted">${rest?'Easy effort':`${plan.ex.length} moves`}</span></summary>${rest?`<p class="small muted">${esc(plan.cardio.d)}</p>`:workoutPreview(plan,dk)}</details>
   <details class="disclosure"><summary>Daily check-in<span class="tiny muted">Movement · food · weight</span></summary>${dailyLogCard(date,w,d,plan)}</details>
-  <p class="nextnote">${rest?'Easy days support your next session.':esc(COMEBACK_PHASES[plan.phase].tag)}<br>Next lifting session: ${esc(programSplit()[next].title)}.</p>`;
+  <p class="nextnote">${rest?'Easy days support your next session.':esc(programPhases()[plan.phase].tag)}<br>Next lifting session: ${esc(programSplit()[next].title)}.</p>`;
 }
-function comebackPlanGuide(){return `<section class="plan-brief"><span class="pill">LEANER + STRONGER</span><p>Two sets per exercise to start. Build gradually, keep controlled reps, and log what you actually do.</p><details class="disclosure"><summary>How the eight weeks work</summary>${COMEBACK_PHASES.map(p=>`<div class="progression-row"><b>${p.weeks} · ${p.name}</b><p>${p.tag}</p></div>`).join('')}<p class="small muted">For the press + row superset, complete both movements and then rest two minutes. Accessory supersets use 75 seconds after both movements. Unpaired main lifts keep two-minute rests. Every exercise and set stays in the plan. Warm up first. Stop or substitute movements that cause sharp or joint pain. A missed day is not a reason to double up.</p></details><details class="disclosure"><summary>Food & recovery</summary><p class="small muted">Protein: ${esc(proteinTarget())}. Use a modest calorie deficit if leaning out is your goal, and adjust using your two-week weight trend. Compare morning weight averages and measure your waist weekly. Aim for 7–9 hours of sleep. Build toward 150 minutes of moderate activity weekly; bike commuting can count. Reduce extra cardio when your legs need recovery.</p></details></section>`;}
+function comebackPlanGuide(){return `<section class="plan-brief"><span class="pill">LEANER + STRONGER</span><p>${S.program==='pushpull8'?'Push trains chest, shoulders, triceps, quads and calves. Pull trains back, biceps, hamstrings and glutes. Six exercises and all 14 working sets each day.':'Two sets per exercise to start. Build gradually, keep controlled reps, and log what you actually do.'}</p><details class="disclosure"><summary>How the eight weeks work</summary>${programPhases().map(p=>`<div class="progression-row"><b>${p.weeks} · ${p.name}</b><p>${p.tag}</p></div>`).join('')}<p class="small muted">${S.program==='pushpull8'?'Complete one set of each paired movement, then take the displayed 75–120 second rest. Unpaired main lifts keep two-minute rests. The first Push superset pairs chest with quads; no back or biceps exercises are placed on Push days.':'For the press + row superset, complete both movements and then rest two minutes. Accessory supersets use 75 seconds after both movements. Unpaired main lifts keep two-minute rests.'} Every exercise and set stays in the plan. Warm up first. Stop or substitute movements that cause sharp or joint pain. A missed day is not a reason to double up.</p></details><details class="disclosure"><summary>Food & recovery</summary><p class="small muted">Protein: ${esc(proteinTarget())}. Use a modest calorie deficit if leaning out is your goal, and adjust using your two-week weight trend. Compare morning weight averages and measure your waist weekly. Aim for 7–9 hours of sleep. Build toward 150 minutes of moderate activity weekly; bike commuting can count. Reduce extra cardio when your legs need recovery.</p></details></section>`;}
 function workoutPreview(plan,dk){return `<div class="previewlist">${workoutBlocks(plan,dk).map((b,i)=>`<button class="previewblock ${isBlockComplete(b,dk)?'done':''}" data-open-block="${plan.week}.${plan.dayIndex}.${i}"><span class="previewnum">${isBlockComplete(b,dk)?icon('check'):String(i+1).padStart(2,'0')}</span><span class="previewmain"><span class="previewtitle">${esc(b.title)}</span><span class="previewsub" style="display:block">${b.ex.length>1?esc(b.ex.map(e=>EXERCISES[e.id].name).join(' + ')):esc(`${b.ex[0].sets} sets · ${b.ex[0].reps} ${b.ex[0].timed?'seconds':'reps'}`)}</span></span><span class="previewcount">${blockDoneCount(b,dk)}/${blockTotalSets(b)}</span></button>`).join('')}</div>`;}
 function backHead(title,sub){return `<button class="backbtn" data-back="1">${icon('back')}Back to ${returnView==='stats'?'progress':returnView==='plan'?'plan':'today'}</button><div class="workout-header"><div><h1>${esc(title)}</h1><div class="small muted">${esc(sub)}</div></div></div>`;}
 function renderDayView(){
@@ -1610,7 +1660,7 @@ function renderDayView(){
   if(plan.type==='rest')return `${backHead(plan.title,fmtDate(date))}<div class="card"><div class="workout-art" style="margin-bottom:24px">${icon('leaf')}</div><h2>A little room to recover.</h2><p class="muted">${esc(plan.cardio.d)}</p><button class="btn primary" data-restdone="${dk}" aria-pressed="${!!S.done[dk]}">${S.done[dk]?'Recovery logged · undo':'Mark recovery complete'}</button></div>${dailyLogCard(date,w,d,plan)}`;
   return `${backHead(plan.title,`Week ${w} · ${date.toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'})}`)}
   ${hourCard(plan,dk)}
-  <div class="workout-progress"><div class="progress-meta"><span>${p.done} of ${p.tot} sets logged</span><span>${p.done===p.tot?'Session complete':isComeback()?`${p.tot-p.done} sets remaining`:`About ${time.remaining} min left`}</span></div><div class="bar"><i style="width:${p.pct}%"></i></div></div>
+  <div class="workout-progress"><div class="progress-meta"><span>${p.done} of ${p.tot} sets logged</span><span>${p.done===p.tot?'Session complete':isModern()?`${p.tot-p.done} sets remaining`:`About ${time.remaining} min left`}</span></div><div class="bar"><i style="width:${p.pct}%"></i></div></div>
   ${renderWorkoutFlow(plan,dk)}
   <div class="workout-footer"><details class="disclosure"><summary>Session overview</summary>${workoutPreview(plan,dk)}</details>
   ${p.done?`<button class="textlink" data-finish-workout="1">${S.reviewed[dk]?'View workout review':'Finish & review session'}</button>`:''}
@@ -1642,7 +1692,7 @@ function workoutEvaluationCard(plan,dk){
 }
 function renderPlan(){
   const current=Math.min(programWeeks(),Math.max(1,todayPos().week)),w=selectedWeek||current;
-  return `${heading(isComeback()?'Your 8-week comeback.':'Your training plan.',isComeback()?'Four lifting days. One easy session. Two days to recover.':'12 weeks. Five training days. Room to recover.')}${isComeback()?comebackPlanGuide():''}<div class="phase-track">${programPhases().map((p,i)=>`<div class="${phaseOf(w)===i?'on':''}"><b>${p.name}</b>${p.weeks}</div>`).join('')}</div><div class="week-picker"><label><span class="field-label">Choose week</span><select id="planWeek" aria-label="Choose week">${Array.from({length:programWeeks()},(_,i)=>`<option value="${i+1}" ${w===i+1?'selected':''}>Week ${i+1}${i+1===current?' · current':''}</option>`).join('')}</select></label><span class="small muted">${dateForPos(w,0).toLocaleDateString(undefined,{month:'short',day:'numeric'})} – ${dateForPos(w,6).toLocaleDateString(undefined,{month:'short',day:'numeric'})}</span></div><div class="card tight">${programSplit().map((p,d)=>{const date=dateForPos(w,d),plan=planFor(w,d),done=isWorkoutComplete(plan),progress=dayProgress(plan);return `<button class="plan-day ${ymd(date)===todayISO()?'today':''} ${done?'done':''}" data-open-day="${w}.${d}" aria-label="${esc(fmtDate(date))}, ${p.title}${done?', complete':''}"><span class="plan-date"><small>${date.toLocaleDateString(undefined,{weekday:'short'})}</small>${date.getDate()}</span><span class="meta"><b>${p.title}</b><span>${p.type==='rest'?'Rest & reset':`${plan.ex.length} exercises · ${progress.tot} sets`}</span></span><span class="status">${done?icon('check'):progress.done?`${progress.done}/${progress.tot}`:icon('arrow')}</span></button>`;}).join('')}</div><button class="menurow" data-go="library">${icon('book')}<span><b>Exercise library</b><small>Find your form. Explore alternatives.</small></span>${icon('arrow')}</button><details class="disclosure"><summary>Program settings</summary>${scheduleCard()}</details>`;
+  return `${heading(programName(),PROGRAMS[S.program].summary)}${isModern()?comebackPlanGuide():''}<div class="phase-track">${programPhases().map((p,i)=>`<div class="${phaseOf(w)===i?'on':''}"><b>${p.name}</b>${p.weeks}</div>`).join('')}</div><div class="week-picker"><label><span class="field-label">Choose week</span><select id="planWeek" aria-label="Choose week">${Array.from({length:programWeeks()},(_,i)=>`<option value="${i+1}" ${w===i+1?'selected':''}>Week ${i+1}${i+1===current?' · current':''}</option>`).join('')}</select></label><span class="small muted">${dateForPos(w,0).toLocaleDateString(undefined,{month:'short',day:'numeric'})} – ${dateForPos(w,6).toLocaleDateString(undefined,{month:'short',day:'numeric'})}</span></div><div class="card tight">${programSplit().map((p,d)=>{const date=dateForPos(w,d),plan=planFor(w,d),done=isWorkoutComplete(plan),progress=dayProgress(plan);return `<button class="plan-day ${ymd(date)===todayISO()?'today':''} ${done?'done':''}" data-open-day="${w}.${d}" aria-label="${esc(fmtDate(date))}, ${p.title}${done?', complete':''}"><span class="plan-date"><small>${date.toLocaleDateString(undefined,{weekday:'short'})}</small>${date.getDate()}</span><span class="meta"><b>${p.title}</b><span>${p.type==='rest'?'Rest & reset':`${plan.ex.length} exercises · ${progress.tot} sets`}</span></span><span class="status">${done?icon('check'):progress.done?`${progress.done}/${progress.tot}`:icon('arrow')}</span></button>`;}).join('')}</div><button class="menurow" data-go="library">${icon('book')}<span><b>Exercise library</b><small>Find your form. Explore alternatives.</small></span>${icon('arrow')}</button><details class="disclosure"><summary>Program settings</summary>${scheduleCard()}</details>`;
 }
 function libraryResults(){const query=libraryQuery.toLowerCase().trim(),groups={};for(const id in EXERCISES){const x=EXERCISES[id];if(query&&!`${x.name} ${x.equipment} ${x.primary.join(' ')}`.toLowerCase().includes(query))continue;const g=REGION[x.primary[0]]||'Other';(groups[g]??=[]).push(id);}return Object.keys(groups).length?Object.entries(groups).map(([g,ids])=>`<h2 class="libgroup-title">${g}</h2>${ids.map(id=>{const x=EXERCISES[id];return `<button class="librow" data-ex="${id}"><img src="${x.images[0]}" alt="" loading="lazy"><span><b>${esc(x.name)}</b><small>${esc(cap(x.equipment||'bodyweight'))}</small></span>${icon('arrow')}</button>`;}).join('')}`).join(''):'<p class="empty">No matching exercises. Try a muscle group or equipment name.</p>';}
 function renderLibrary(){return `${heading('Find your form.','Every exercise, with photos and step-by-step cues.')}<input class="searchfield" id="exerciseSearch" type="search" aria-label="Search exercises" placeholder="Search exercises, muscles, equipment…" value="${esc(libraryQuery)}"><div id="libraryResults">${libraryResults()}</div>`;}
@@ -2333,9 +2383,9 @@ function setStartDate(value){
   if(!makeRecoveryCopy())return false;
   S.startDate=value;dayOffset=0;selectedWeek=null;save();render();toast('Program start updated.');return true;
 }
-function programPicker(){const other=isComeback()?'classic12':'comeback8',hasArchive=!!S.archives[other];return `<section class="card program-picker"><span class="eyebrow">TRAINING PROGRAM</span><h3>${programName()}</h3><p class="small muted">${isComeback()?(hasArchive?'Four lifting days + one easy session. Your previous program and logs are saved.':'Four lifting days + one easy session. Each program keeps its own schedule and logs.'):(hasArchive?'Your original schedule and workout history. Your comeback plan is saved separately.':'Your original five-day split. Each program keeps its own schedule and logs.')}</p><button class="btn ghost" data-program="${other}">${hasArchive?'Open':'Start'} ${other==='classic12'?'classic 12-week program':'8-week comeback'}</button></section>`;}
+function programPicker(){return `<section class="card program-picker"><span class="eyebrow">TRAINING PROGRAM</span><h3>${esc(programName())}</h3><p class="small muted">${esc(PROGRAMS[S.program].summary)} Each program keeps its own schedule and logs.</p><div class="exportactions">${Object.entries(PROGRAMS).filter(([id])=>id!==S.program).map(([id,p])=>`<button class="btn ghost" data-program="${id}">${S.archives[id]?'Open':'Start'} ${esc(p.name)}</button>`).join('')}</div></section>`;}
 function switchTrainingProgram(program){
-  if(!['classic12','comeback8'].includes(program)||program===S.program)return false;
+  if(!Object.hasOwn(PROGRAMS,program)||program===S.program)return false;
   const previous=S,next={...S,archives:{...S.archives,[S.program]:programSnapshot(S)}};
   Object.assign(next,programSnapshot(next.archives[program]||newState()),{program});
   delete next.restTimer;S=next;
@@ -2362,8 +2412,9 @@ function hasScheduleProgress(){return Object.values(S.logs).some(log=>Object.val
 function clearScheduleProgress(){for(const k of ['logs','done','reviewed','rides','flow','daily','swaps','lastW','sessionClocks'])S[k]={};delete S.restTimer;stopRest();}
 function makeRecoveryCopy(){try{localStorage.setItem(BACKUP_KEY,JSON.stringify(S));return true;}catch{toast('Could not save a recovery copy. Download a backup first.');return false;}}
 function restartScheduleFrom(value,opts={}){
+  if(opts.program&&!Object.hasOwn(PROGRAMS,opts.program))return false;
   const date=value||todayISO();if(!validDate(date)||date>todayISO()){toast('Choose a valid start date on or before today.');return false;}
-  if(opts.confirm!==false&&!confirm(`Start a new ${opts.program==='comeback8'?8:programWeeks()}-week cycle on ${prettyISO(date)}? Current workouts and check-ins will be cleared. A recovery copy will be saved; body measurements stay.`))return false;
+  if(opts.confirm!==false&&!confirm(`Start a new ${PROGRAMS[opts.program||S.program].weeks}-week cycle on ${prettyISO(date)}? Current workouts and check-ins will be cleared. A recovery copy will be saved; body measurements stay.`))return false;
   if(!makeRecoveryCopy())return false;
   const previous=JSON.parse(JSON.stringify(S));
   if(opts.program&&opts.program!==S.program){S.archives[S.program]=programSnapshot(S);S.program=opts.program;}
@@ -2426,7 +2477,7 @@ function openDay(w,d,block){if(!Number.isInteger(w)||w<1||w>programWeeks()||!Num
 document.addEventListener('click',e=>{
   const t=e.target;if(!(t instanceof Element))return;const c=s=>t.closest(s);
   const hourButton=c('[data-start-hour]');if(hourButton){startHourClock(hourButton.dataset.startHour);return;}
-  if(c('[data-restart-today]')){restartScheduleFrom(todayISO(),{program:'comeback8'});return;}
+  const restart=c('[data-restart-today]');if(restart){restartScheduleFrom(todayISO(),{program:restart.dataset.restartToday||S.program});return;}
   const programButton=c('[data-program]');if(programButton){switchTrainingProgram(programButton.dataset.program);return;}
   if(c('[data-check-update]')){checkAppUpdate();return;}
   if(c('[data-reload-app]')){if(save())location.reload();return;}
@@ -2484,7 +2535,7 @@ document.addEventListener('input',e=>{
   if(st.done){st.done=false;delete S.reviewed[dk];input.closest('.set-row')?.classList.remove('done');const button=input.closest('.set-row')?.querySelector('.ck');button?.setAttribute('aria-pressed','false');button?.setAttribute('aria-label',`Complete ${EXERCISES[ex].name} set ${Number(i)+1}`);updateProgress();}
   if(field==='w'&&Number.isFinite(entryNumber(input.value)))S.lastW[ex]=String(entryNumber(input.value));save();
 });
-function updateProgress(){if(!viewingPos)return;const plan=planFor(viewingPos.week,viewingPos.dayIndex),p=dayProgress(plan),time=workoutTimeEstimate(plan,dayKey(plan.week,plan.dayIndex));const bar=$('.workout-progress .bar>i');if(bar)bar.style.width=p.pct+'%';const meta=$('.workout-progress .progress-meta');if(meta)meta.innerHTML=`<span>${p.done} of ${p.tot} sets logged</span><span>${p.done===p.tot?'Session complete':isComeback()?`${p.tot-p.done} sets remaining`:`About ${time.remaining} min left`}</span>`;$('.reviewcard')?.remove();}
+function updateProgress(){if(!viewingPos)return;const plan=planFor(viewingPos.week,viewingPos.dayIndex),p=dayProgress(plan),time=workoutTimeEstimate(plan,dayKey(plan.week,plan.dayIndex));const bar=$('.workout-progress .bar>i');if(bar)bar.style.width=p.pct+'%';const meta=$('.workout-progress .progress-meta');if(meta)meta.innerHTML=`<span>${p.done} of ${p.tot} sets logged</span><span>${p.done===p.tot?'Session complete':isModern()?`${p.tot-p.done} sets remaining`:`About ${time.remaining} min left`}</span>`;$('.reviewcard')?.remove();}
 function toggleSet(token){
   if(!viewingPos)return;
   const [id,index]=token.split('|'),i=Number(index),dk=dayKey(viewingPos.week,viewingPos.dayIndex),st=S.logs[dk]?.[id]?.[i];if(!st)return;

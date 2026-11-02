@@ -1,30 +1,36 @@
 # FitLab
 
-An offline workout journal with an eight-week return-to-training plan: four lifting sessions, one easy cardio/mobility session, and two rest days per seven-day cycle.
+An offline workout journal with an eight-week, four-day Push / Pull plan. Full sessions include legs, warm-up, rest and cooldown within a one-hour budget.
 
-## Current release: 13.1
+## Current release: 13.2
 
-- Today leads with one workout card; exercises and daily habits expand on demand.
-- Plan contains all eight weeks, gradual set progression, training guidance, and food/recovery notes. The cycle starts on the device’s current local date; its days follow that start date rather than fixed weekdays.
-- Existing 12-week schedules and logs are archived before the comeback program starts. More lets users reopen either program with its own schedule and logs. Body measurements and appearance settings are shared. Full backups include both programs.
-- More includes a network update check. Updates never automatically replace an active input; an available update offers Save & reload.
-- Workouts save locally in the current browser. Use More → Your data & backups before switching devices or clearing browser data.
+- **Day 1 / Monday: Push A** — chest, shoulders, triceps, quads and calves.
+- **Day 2 / Tuesday: Pull A** — back, biceps, hamstrings and glutes.
+- **Wednesday:** easy cardio and mobility.
+- **Thursday / Friday:** Push B / Pull B.
+- **Weekend:** rest. Dates follow the selected start date, so Day 1 can be any weekday.
+
+Each lifting session has six exercises and 14 working sets throughout the eight weeks. Progress by improving controlled repetitions and then load, with no automatic cuts to exercises or sets. Start with loads that leave about three good reps; increase only when the full prescribed range feels controlled.
+
+Push supersets pair chest with quads, pressing or chest isolation with calves, and side delts with triceps. Pull days keep the first two lifts separate, then pair back with leg curls and rear delts with biceps. All 32 lifting sessions are estimated at 47–53 minutes, including ten minutes of warm-up/practice, five minutes of cooldown, rests and equipment transitions. Actual equipment delays can vary.
+
+## Start on your device
+
+[Open Push / Pull setup](https://jorgedsp93.github.io/fitlab/?setup=pushpull&release=13.2) and tap **Start Push / Pull today**. This starts Push A on the device’s current local date. Opening the link alone never resets progress. The current program is archived, a full recovery copy is saved, and body measurements remain. Existing comeback and classic programs stay available in **More** with their own schedules and logs; an update never silently reinterprets those sessions as push/pull.
+
+New installs open Push / Pull by default. **More → Program settings → Restart at Day 1 today** restarts the currently selected program. Progress is local to each browser/device, and full backups include all saved programs.
 
 ## One hour, including warm-up
 
-The comeback plan includes preparation, light practice, working sets, rest, equipment changes and cooldown in its estimates. The 32 lifting sessions across eight weeks are planned within 55 minutes, with a 60-minute maximum. Every exercise, prescribed set and repetition target is retained. Upper days pair the press and row and the last two accessories; lower days pair accessories while keeping the main lifts separate. Rest two minutes after a press/row round and 75 seconds after an accessory round. The estimate includes 30 seconds to switch between paired movements.
+Open a workout and tap **Start 60-minute clock & warm-up** when you begin. The clock includes breaks and survives reloads. Complete one set of each paired exercise, then take the displayed rest. The two-minute main-lift rests and 75–90-second accessory rests are included in the estimate. Every planned set stays visible. At minute 50, a prompt reminds you to finish the planned sets and cool down; minute 55 leaves five minutes to finish. Keep the app visible for timely prompts; background or locked-phone alerts are not guaranteed.
 
-Open a workout and tap **Start 60-minute clock & warm-up** when you begin. The clock includes breaks and survives reloads. At minute 50 it prompts you to finish the planned sets and cool down; at minute 55 it reminds you of the final five minutes. The planned full workout fits inside 55 minutes. It does not mark unfinished sets complete. Keep the app visible for prompts; background or locked-phone alerts are not guaranteed.
-
-**More → Program settings → Restart at Day 1 today** starts the comeback on the device’s current local date, saves a recovery copy first, and retains body measurements. [Open the restart screen](https://jorgedsp93.github.io/fitlab/?setup=day1&release=13.1) on the device you train with. Opening the link does not change progress until you press Restart and confirm.
-
-The warm-up allowance follows the general-to-specific approach described by [NSCA](https://www.nsca.com/education/articles/kinetic-select/introduction-to-dynamic-warm-up/); the superset structure is informed by [NSCA’s time-efficient training guidance](https://www.nsca.com/education/articles/ptq/time-efficient-training). The time budget is a FitLab scheduling estimate, not a guarantee against equipment delays.
+The grouping follows [NSCA’s discussion of push/pull split routines](https://www.nsca.com/education/articles/kinetic-select/determination-of-resistance-training-frequency/) and [time-efficient superset training](https://www.nsca.com/education/articles/ptq/time-efficient-training). Exercise selection and time estimates are FitLab programming choices.
 
 ## Features
 
 - **Today:** a weekly date strip, your session, daily habits, and bodyweight logging.
 - **Workout:** set-by-set logging, exercise demonstrations, supported alternatives, superset-aware rest timers, and a session review.
-- **Plan:** eight comeback weeks, or the classic 12-week program, browsable one week at a time.
+- **Plan:** eight push/pull or comeback weeks, or the classic 12-week program, browsable one week at a time.
 - **Progress:** session history, bodyweight trends, optional body-fat estimates, and Garmin exports.
 - **More:** light/dark/system themes, lb/kg conversion, exercise search, program settings, backup and restore.
 

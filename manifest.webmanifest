@@ -1,7 +1,7 @@
 {
   "name": "FitLab · Your daily practice",
   "short_name": "FitLab",
-  "description": "Your 12-week training plan, workout journal, and progress.",
+  "description": "Your push/pull training plan, one-hour workouts, and progress.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",

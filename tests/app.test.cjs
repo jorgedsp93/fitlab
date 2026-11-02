@@ -193,8 +193,8 @@ test('measurement estimation submits through its real button and decimal drafts 
   withApp(saved,a=>{a.click('[data-open-day]');assert.equal(a.doc.querySelector('[data-field="w"]').value,'22.5');assert.equal(a.doc.querySelector('[data-ck]').getAttribute('aria-pressed'),'false');});
 });
 
-test('new installs start the eight-week program, with four lifting days and gradual volume',()=>{
-  const a=app(undefined,true);try{
+test('the preserved comeback program keeps four lifting days and its gradual volume',()=>{
+  const a=app({program:'comeback8'},true);try{
     assert.equal(a.run('S.program'),'comeback8');assert.match(a.doc.querySelector('.topnote').textContent,/8-week/);
     assert.equal(a.run("programSplit().filter(d=>d.type==='workout').length"),4);
     assert.equal(a.run("programSplit().filter(d=>d.key==='recovery').length"),1);
@@ -209,7 +209,7 @@ test('new installs start the eight-week program, with four lifting days and grad
 });
 
 test('all 56 comeback days and their workout blocks render, accept typed sets and survive completion',()=>{
-  const a=app(undefined,true);try{
+  const a=app({program:'comeback8'},true);try{
     a.run(`for(let w=1;w<=8;w++)for(let d=0;d<7;d++){openDay(w,d);const p=planFor(w,d);for(let b=0;b<workoutBlocks(p,dayKey(w,d)).length;b++){setFlowIndex(p,b);render();const e=workoutBlocks(p,dayKey(w,d))[b].ex[0];if(!EXERCISES[e.id])throw new Error('Missing exercise '+e.id);const weight=document.querySelector('[data-field="w"]');weight.click();weight.value=EXERCISES[e.id].equipment==='body only'?'0':'25';weight.dispatchEvent(new Event('input',{bubbles:true}));document.querySelector('[data-ck]').click();if(!S.logs[dayKey(w,d)][e.id][0].done)throw new Error('Set did not complete');}}`);
     assert.equal(a.errors.length,0);
   }finally{a.close();}
@@ -233,7 +233,7 @@ test('legacy upgrade archives the complete old program once and both programs re
 });
 
 test('unit conversion includes archived programs and program switches cannot discard drafts',()=>{
-  const a=app(undefined,true);try{
+  const a=app({program:'comeback8'},true);try{
     a.click('[data-open-day]');a.input('[data-field="w"]','100');a.run("switchTrainingProgram('classic12');changeUnit('kg');switchTrainingProgram('comeback8')");
     assert.ok(Math.abs(a.run('Number(S.logs.w1d0.Dumbbell_Bench_Press[0].w)')-45.359)<.001);
     a.run("changeUnit('lb');switchTrainingProgram('classic12');switchTrainingProgram('comeback8')");assert.ok(Math.abs(a.run('Number(S.logs.w1d0.Dumbbell_Bench_Press[0].w)')-100)<.005);
@@ -251,7 +251,7 @@ test('failed upgrade or program save leaves the existing program and stored hist
 });
 
 test('plank entry logs seconds, and Garmin exports retain actual hold duration',()=>{
-  const a=app(undefined,true);try{
+  const a=app({program:'comeback8'},true);try{
     a.run('openDay(1,1,4)');assert.match(a.doc.querySelector('.set-hd').textContent,/Seconds/);
     a.input('[data-field="r"]','35');a.click('[data-ck]');
     const detail=a.run('workoutExportDetail(1,1)'),set=detail.exercises[0].sets[0];assert.equal(set.reps,null);assert.equal(set.durationSeconds,35);assert.equal(a.run('activeSetSeconds(workoutExportDetail(1,1).exercises[0].sets[0])'),35);
@@ -260,16 +260,16 @@ test('plank entry logs seconds, and Garmin exports retain actual hold duration',
 });
 
 test('update notices preserve active input nodes, and checks report current or offline status without touching logs',async()=>{
-  const a=app(undefined,true);try{
+  const a=app({program:'comeback8'},true);try{
     a.click('[data-open-day]');a.input('[data-field="w"]','25');const field=a.doc.querySelector('[data-field="w"]');field.click();a.run('showUpdateReady()');assert.equal(a.doc.querySelector('#appUpdate').hidden,false);assert.equal(field.isConnected,true);assert.equal(a.doc.activeElement,field);
     a.run("updateReady=false;go('more')");const saved=a.w.localStorage.getItem('fitlab_v1');let opts;
-    a.w.fetch=async(url,options)=>{opts=options;return new Response('<script src="app.js?v=13.1"></script>');};await a.run('checkAppUpdate()');assert.equal(opts.cache,'no-store');assert.match(a.doc.querySelector('#updateStatus').textContent,/up to date/);assert.equal(a.w.localStorage.getItem('fitlab_v1'),saved);
+    a.w.fetch=async(url,options)=>{opts=options;return new Response('<script src="app.js?v=13.2"></script>');};await a.run('checkAppUpdate()');assert.equal(opts.cache,'no-store');assert.match(a.doc.querySelector('#updateStatus').textContent,/up to date/);assert.equal(a.w.localStorage.getItem('fitlab_v1'),saved);
     a.w.fetch=async()=>{throw new Error('offline');};await a.run('checkAppUpdate()');assert.match(a.doc.querySelector('#updateStatus').textContent,/online/);assert.equal(a.w.localStorage.getItem('fitlab_v1'),saved);
   }finally{a.close();}
 });
 
 test('replacing a timed hold with a repetition exercise changes the input and export units',()=>{
-  const a=app(undefined,true);try{
+  const a=app({program:'comeback8'},true);try{
     a.run('openDay(1,1,4)');assert.equal(a.run("setExerciseSwap('w1d1','Plank','Dead_Bug')"),true);
     assert.match(a.doc.querySelector('.set-hd').textContent,/Reps/);assert.doesNotMatch(a.doc.querySelector('.set-hd').textContent,/Seconds/);
     a.input('[data-field="r"]','8');a.click('[data-ck]');const set=a.run('workoutExportDetail(1,1).exercises[0].sets[0]');assert.equal(set.reps,8);assert.equal(set.durationSeconds,null);
@@ -277,7 +277,7 @@ test('replacing a timed hold with a repetition exercise changes the input and ex
 });
 
 test('all comeback lifting days fit within 55 planned minutes including preparation and cooldown',()=>{
-  const a=app(undefined,true);try{
+  const a=app({program:'comeback8'},true);try{
     for(let week=1;week<=8;week++)for(let day=0;day<7;day++){
       const p=a.run(`planFor(${week},${day})`);if(p.type!=='workout')continue;
       const minutes=a.run(`workoutTimeEstimate(planFor(${week},${day}),'w${week}d${day}').total`);
@@ -287,7 +287,7 @@ test('all comeback lifting days fit within 55 planned minutes including preparat
   }finally{a.close();}
 });
 test('hour clock survives reloads and counts breaks; 50 and 55 minute prompts preserve partial work',()=>{
-  let saved;const a=app(undefined,true);try{
+  let saved;const a=app({program:'comeback8'},true);try{
     a.run('openDay(1,0)');a.click('[data-start-hour]');
     const began=a.run('S.sessionClocks.w1d0.startedAt');a.run("startHourClock('w1d0')");assert.equal(a.run('S.sessionClocks.w1d0.startedAt'),began);
     a.run('S.sessionClocks.w1d0.startedAt=Date.now()-50*60000;tickHourClock();save()');
@@ -317,7 +317,7 @@ test('failed restart save keeps the original schedule and logs in memory and sto
   }finally{a.close();}
 });
 test('supersets retain every original comeback exercise, set and rep target for all eight weeks',()=>{
-  const a=app(undefined,true);try{
+  const a=app({program:'comeback8'},true);try{
     for(let week=1;week<=8;week++)for(const day of [0,1,3,4]){
       const result=a.run(`(()=>{const p=planFor(${week},${day});return {base:COMEBACK_SPLIT[${day}].ex,ex:p.ex,blocks:workoutBlocks(p,'w${week}d${day}')};})()`);
       assert.deepEqual(Array.from(result.ex,e=>e.id),Array.from(result.base,e=>e.id));
@@ -328,10 +328,60 @@ test('supersets retain every original comeback exercise, set and rep target for 
   }finally{a.close();}
 });
 test('Day 1 superset rests only after the press and row are both completed',()=>{
-  const a=app(undefined,true);try{
+  const a=app({program:'comeback8'},true);try{
     a.run('openDay(1,0)');assert.match(a.doc.querySelector('.superset-note').textContent,/Press \+ row/);
     a.input('[data-ex="Dumbbell_Bench_Press"][data-field="w"]','25');a.click('[data-ck^="Dumbbell_Bench_Press|0|"]');assert.equal(a.run('!!S.restTimer'),false);
     a.input('[data-ex="Seated_Cable_Rows"][data-field="w"]','50');a.click('[data-ck^="Seated_Cable_Rows|0|"]');assert.ok(a.run('restSecondsLeft()')>115);
     assert.equal(a.run('dayProgress(planFor(1,0)).tot'),10);assert.equal(a.run('dayProgress(planFor(1,0)).done'),2);
+  }finally{a.close();}
+});
+
+test('new installs open Push A today and show the four-day push/pull schedule',()=>{
+  const a=app(undefined,true);try{
+    assert.equal(a.run('S.program'),'pushpull8');assert.equal(a.run('S.startDate'),a.run('todayISO()'));
+    assert.match(a.doc.querySelector('.topnote').textContent,/Push \/ Pull/);assert.match(a.doc.querySelector('.comeback-hero').textContent,/Push A/);
+    assert.deepEqual(Array.from(a.run('programSplit().map(d=>d.key)')),['push-a','pull-a','recovery','push-b','pull-b','rest','rest']);
+    a.click('[data-go="plan"]');assert.match(a.doc.querySelector('#app').textContent,/Legs included/);
+  }finally{a.close();}
+});
+test('all 32 push/pull sessions retain six exercises and 14 sets within 55 planned minutes',()=>{
+  const a=app(undefined,true);try{
+    for(let week=1;week<=8;week++)for(const day of [0,1,3,4]){
+      const p=a.run(`planFor(${week},${day})`);
+      assert.equal(p.ex.length,6);assert.equal(p.ex.reduce((sum,e)=>sum+e.sets,0),14);
+      assert.ok(a.run(`workoutTimeEstimate(planFor(${week},${day}),'w${week}d${day}').total`)<=55);
+      for(const e of p.ex)assert.ok(a.run(`!!EXERCISES[${JSON.stringify(e.id)}]`));
+      const ids=Array.from(p.ex,e=>e.id);
+      if(day===0||day===3){assert.ok(!ids.some(id=>/Rows|Pulldown|Curl|Face_Pull|Deadlift/.test(id)));assert.ok(ids.some(id=>/Leg_Press|Squat/.test(id)));}
+      else{assert.ok(!ids.some(id=>/Bench|Shoulder_Press|Triceps/.test(id)));assert.ok(ids.some(id=>/Deadlift|Hip_Thrust/.test(id)));}
+    }
+  }finally{a.close();}
+});
+test('the complete Push A logs all 14 sets and rests only after each paired round',()=>{
+  const a=app(undefined,true);try{
+    a.run('openDay(1,0)');a.input('[data-ex="Dumbbell_Bench_Press"][data-field="w"]','25');a.click('[data-ck^="Dumbbell_Bench_Press|0|"]');assert.equal(a.run('!!S.restTimer'),false);
+    a.input('[data-ex="Leg_Press"][data-field="w"]','100');a.click('[data-ck^="Leg_Press|0|"]');assert.ok(a.run('restSecondsLeft()')>115);
+    a.run(`for(const [index,block] of workoutBlocks(planFor(1,0),'w1d0').entries()){setFlowIndex(planFor(1,0),index);render();for(let round=0;round<Math.max(...block.ex.map(e=>e.sets));round++)for(const e of block.ex){const set=S.logs.w1d0[e.id][round];if(set.done)continue;set.w='25';set.r='10';toggleSet(e.id+'|'+round+'|'+e.rest);}}`);
+    assert.equal(a.run('dayProgress(planFor(1,0)).done'),14);assert.equal(a.run('workoutExportDetail(1,0).summary.doneSets'),14);assert.equal(a.errors.length,0);
+  }finally{a.close();}
+});
+test('switching from comeback to Push/Pull preserves old logs and restores both programs after reload',()=>{
+  const a=app({program:'comeback8',startDate:'2026-10-23',logs:{w1d0:{Dumbbell_Bench_Press:[{w:'25',r:'10',done:true}]}},bw:[{d:'2026-10-23',v:200}]},true);let saved;try{
+    assert.equal(a.run('S.program'),'comeback8');
+    a.run("switchTrainingProgram('pushpull8')");assert.equal(a.run('S.startDate'),a.run('todayISO()'));assert.equal(a.run('Object.keys(S.logs).length'),0);
+    assert.equal(a.run('S.archives.comeback8.logs.w1d0.Dumbbell_Bench_Press[0].done'),true);
+    a.run('openDay(1,0)');a.input('[data-ex="Leg_Press"][data-field="w"]','100');saved=a.w.localStorage.getItem('fitlab_v1');
+  }finally{a.close();}
+  const b=app(saved,true);try{
+    assert.equal(b.run('S.program'),'pushpull8');assert.equal(b.run('S.logs.w1d0.Leg_Press[0].w'),'100');
+    b.run("switchTrainingProgram('comeback8')");assert.equal(b.run('S.startDate'),'2026-10-23');assert.equal(b.run('S.logs.w1d0.Dumbbell_Bench_Press[0].done'),true);assert.equal(b.run('S.bw.length'),1);
+  }finally{b.close();}
+});
+test('Push/Pull restart link waits for a click and preserves the previous program',()=>{
+  const a=app({program:'comeback8',startDate:'2026-10-23',logs:{w1d0:{Dumbbell_Bench_Press:[{w:'25',r:'10',done:true}]}}},true,w=>w.history.replaceState(null,'','?setup=pushpull'));try{
+    assert.equal(a.run('S.program'),'comeback8');assert.match(a.doc.querySelector('[data-restart-today]').textContent,/Start Push \/ Pull today/);
+    a.click('[data-restart-today]');assert.equal(a.run('S.program'),'pushpull8');assert.equal(a.run('S.startDate'),a.run('todayISO()'));
+    assert.equal(a.run('S.archives.comeback8.logs.w1d0.Dumbbell_Bench_Press[0].done'),true);assert.equal(JSON.parse(a.w.localStorage.getItem('fitlab_backup_v12')).program,'comeback8');
+    assert.equal(a.w.location.search,'');assert.match(a.doc.querySelector('.comeback-hero').textContent,/Push A/);
   }finally{a.close();}
 });
