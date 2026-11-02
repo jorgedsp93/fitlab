@@ -263,7 +263,7 @@ test('update notices preserve active input nodes, and checks report current or o
   const a=app({program:'comeback8'},true);try{
     a.click('[data-open-day]');a.input('[data-field="w"]','25');const field=a.doc.querySelector('[data-field="w"]');field.click();a.run('showUpdateReady()');assert.equal(a.doc.querySelector('#appUpdate').hidden,false);assert.equal(field.isConnected,true);assert.equal(a.doc.activeElement,field);
     a.run("updateReady=false;go('more')");const saved=a.w.localStorage.getItem('fitlab_v1');let opts;
-    a.w.fetch=async(url,options)=>{opts=options;return new Response('<script src="app.js?v=13.2"></script>');};await a.run('checkAppUpdate()');assert.equal(opts.cache,'no-store');assert.match(a.doc.querySelector('#updateStatus').textContent,/up to date/);assert.equal(a.w.localStorage.getItem('fitlab_v1'),saved);
+    a.w.fetch=async(url,options)=>{opts=options;return new Response('<script src="app.js?v=13.3"></script>');};await a.run('checkAppUpdate()');assert.equal(opts.cache,'no-store');assert.match(a.doc.querySelector('#updateStatus').textContent,/up to date/);assert.equal(a.w.localStorage.getItem('fitlab_v1'),saved);
     a.w.fetch=async()=>{throw new Error('offline');};await a.run('checkAppUpdate()');assert.match(a.doc.querySelector('#updateStatus').textContent,/online/);assert.equal(a.w.localStorage.getItem('fitlab_v1'),saved);
   }finally{a.close();}
 });
@@ -357,12 +357,39 @@ test('all 32 push/pull sessions retain six exercises and 14 sets within 55 plann
     }
   }finally{a.close();}
 });
-test('the complete Push A logs all 14 sets and rests only after each paired round',()=>{
+test('push/pull keeps upper-body pairs together before the lower-body pair',()=>{
+  const a=app(undefined,true);try{
+    const lower=new Set(['Leg_Press','Standing_Calf_Raises','Goblet_Squat','Romanian_Deadlift','Barbell_Hip_Thrust','Lying_Leg_Curls']);
+    for(const day of [0,1,3,4]){
+      const blocks=a.run(`workoutBlocks(planFor(1,${day}),'w1d${day}')`);
+      assert.equal(blocks.length,3);
+      for(const [index,block] of blocks.entries()){
+        assert.equal(block.ex.length,2);
+        assert.ok(block.ex.every(e=>lower.has(e.id)===(index===2)));
+        assert.ok(block.ex.every(e=>e.rest===120));
+      }
+    }
+  }finally{a.close();}
+});
+test('all four sessions log 14 sets and rest correctly for paired and extra solo sets',()=>{
   const a=app(undefined,true);try{
     a.run('openDay(1,0)');a.input('[data-ex="Dumbbell_Bench_Press"][data-field="w"]','25');a.click('[data-ck^="Dumbbell_Bench_Press|0|"]');assert.equal(a.run('!!S.restTimer'),false);
-    a.input('[data-ex="Leg_Press"][data-field="w"]','100');a.click('[data-ck^="Leg_Press|0|"]');assert.ok(a.run('restSecondsLeft()')>115);
-    a.run(`for(const [index,block] of workoutBlocks(planFor(1,0),'w1d0').entries()){setFlowIndex(planFor(1,0),index);render();for(let round=0;round<Math.max(...block.ex.map(e=>e.sets));round++)for(const e of block.ex){const set=S.logs.w1d0[e.id][round];if(set.done)continue;set.w='25';set.r='10';toggleSet(e.id+'|'+round+'|'+e.rest);}}`);
-    assert.equal(a.run('dayProgress(planFor(1,0)).done'),14);assert.equal(a.run('workoutExportDetail(1,0).summary.doneSets'),14);assert.equal(a.errors.length,0);
+    a.input('[data-ex="Side_Lateral_Raise"][data-field="w"]','10');a.click('[data-ck^="Side_Lateral_Raise|0|"]');assert.ok(a.run('restSecondsLeft()')>115);
+    assert.match(a.doc.querySelector('.superset-note').textContent,/2 paired rounds.*1 remaining set of Dumbbell Bench Press/);
+    for(const day of [0,1,3,4]){
+      a.run(`openDay(1,${day});for(const [index,block] of workoutBlocks(planFor(1,${day}),'w1d${day}').entries()){setFlowIndex(planFor(1,${day}),index);render();for(let round=0;round<Math.max(...block.ex.map(e=>e.sets));round++)for(const e of block.ex){if(round>=e.sets)continue;const set=S.logs.w1d${day}[e.id][round];if(set.done)continue;set.w='25';set.r='10';toggleSet(e.id+'|'+round+'|'+e.rest);const roundDone=block.ex.every(x=>x.sets<=round||S.logs.w1d${day}[x.id][round].done);if(!!S.restTimer!==roundDone)throw new Error('Incorrect rest after '+e.id+' set '+round);}}`);
+      assert.equal(a.run(`dayProgress(planFor(1,${day})).done`),14);assert.equal(a.run(`workoutExportDetail(1,${day}).summary.doneSets`),14);
+    }
+    assert.equal(a.errors.length,0);
+  }finally{a.close();}
+});
+test('regrouping an active workout preserves completed upper/lower sets, start date and clock',()=>{
+  const startedAt=Date.now()-600000;
+  const a=app({program:'pushpull8',startDate:'2026-11-02',logs:{w1d0:{Dumbbell_Bench_Press:[{w:'25',r:'10',done:true}],Leg_Press:[{w:'100',r:'12',done:true}]}},sessionClocks:{w1d0:{startedAt}},flow:{w1d0:0}},true);try{
+    a.run('openDay(1,0)');assert.equal(a.run('dayProgress(planFor(1,0)).done'),2);
+    assert.equal(a.run('S.logs.w1d0.Dumbbell_Bench_Press[0].w'),'25');
+    a.run('setFlowIndex(planFor(1,0),2);render()');assert.equal(a.run('S.logs.w1d0.Leg_Press[0].w'),'100');assert.equal(a.doc.querySelector('[data-ck^="Leg_Press|0|"]').getAttribute('aria-pressed'),'true');
+    assert.equal(a.run('S.startDate'),'2026-11-02');assert.equal(a.run('S.sessionClocks.w1d0.startedAt'),startedAt);
   }finally{a.close();}
 });
 test('switching from comeback to Push/Pull preserves old logs and restores both programs after reload',()=>{
@@ -370,7 +397,7 @@ test('switching from comeback to Push/Pull preserves old logs and restores both 
     assert.equal(a.run('S.program'),'comeback8');
     a.run("switchTrainingProgram('pushpull8')");assert.equal(a.run('S.startDate'),a.run('todayISO()'));assert.equal(a.run('Object.keys(S.logs).length'),0);
     assert.equal(a.run('S.archives.comeback8.logs.w1d0.Dumbbell_Bench_Press[0].done'),true);
-    a.run('openDay(1,0)');a.input('[data-ex="Leg_Press"][data-field="w"]','100');saved=a.w.localStorage.getItem('fitlab_v1');
+    a.run('openDay(1,0,2)');a.input('[data-ex="Leg_Press"][data-field="w"]','100');saved=a.w.localStorage.getItem('fitlab_v1');
   }finally{a.close();}
   const b=app(saved,true);try{
     assert.equal(b.run('S.program'),'pushpull8');assert.equal(b.run('S.logs.w1d0.Leg_Press[0].w'),'100');

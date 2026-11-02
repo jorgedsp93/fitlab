@@ -950,34 +950,34 @@ const COMEBACK_PHASES=[
 // Every day retains 14 working sets. Supersets change rest placement, not volume.
 const PUSHPULL_SPLIT=[
   {key:'push-a',title:'Push A',focus:['chest','shoulders','triceps','quadriceps','calves'],type:'workout',ex:[
-    {id:'Dumbbell_Bench_Press',sets:3,reps:'8–12',rest:120,comp:true,ss:'ppa-1',ssName:'Chest + quads'},
-    {id:'Leg_Press',sets:3,reps:'8–12',rest:120,comp:true,ss:'ppa-1',ssName:'Chest + quads'},
-    {id:'Dumbbell_Shoulder_Press',sets:2,reps:'8–12',rest:90,comp:true,ss:'ppa-2',ssName:'Shoulders + calves'},
-    {id:'Standing_Calf_Raises',sets:2,reps:'12–20',rest:90,ss:'ppa-2',ssName:'Shoulders + calves'},
-    {id:'Side_Lateral_Raise',sets:2,reps:'12–15',rest:75,ss:'ppa-3',ssName:'Side delts + triceps'},
-    {id:'Triceps_Pushdown',sets:2,reps:'10–15',rest:75,ss:'ppa-3',ssName:'Side delts + triceps'}]},
+    {id:'Dumbbell_Bench_Press',sets:3,reps:'8–12',rest:120,comp:true,ss:'ppa-1',ssName:'Upper body · chest + side delts'},
+    {id:'Side_Lateral_Raise',sets:2,reps:'12–15',rest:120,ss:'ppa-1',ssName:'Upper body · chest + side delts'},
+    {id:'Dumbbell_Shoulder_Press',sets:2,reps:'8–12',rest:120,comp:true,ss:'ppa-2',ssName:'Upper body · shoulders + triceps'},
+    {id:'Triceps_Pushdown',sets:2,reps:'10–15',rest:120,ss:'ppa-2',ssName:'Upper body · shoulders + triceps'},
+    {id:'Leg_Press',sets:3,reps:'8–12',rest:120,comp:true,ss:'ppa-3',ssName:'Lower body · quads + calves'},
+    {id:'Standing_Calf_Raises',sets:2,reps:'12–20',rest:120,ss:'ppa-3',ssName:'Lower body · quads + calves'}]},
   {key:'pull-a',title:'Pull A',focus:['lats','middle back','biceps','hamstrings','glutes'],type:'workout',ex:[
-    {id:'Romanian_Deadlift',sets:3,reps:'8–10',rest:120,comp:true},
-    {id:'Wide-Grip_Lat_Pulldown',sets:3,reps:'8–12',rest:120,comp:true},
-    {id:'Seated_Cable_Rows',sets:2,reps:'8–12',rest:90,ss:'pla-1',ssName:'Back + hamstrings'},
-    {id:'Lying_Leg_Curls',sets:2,reps:'10–15',rest:90,ss:'pla-1',ssName:'Back + hamstrings'},
-    {id:'Face_Pull',sets:2,reps:'12–15',rest:75,ss:'pla-2',ssName:'Rear delts + biceps'},
-    {id:'Hammer_Curls',sets:2,reps:'10–12',rest:75,ss:'pla-2',ssName:'Rear delts + biceps'}]},
+    {id:'Wide-Grip_Lat_Pulldown',sets:3,reps:'8–12',rest:120,comp:true,ss:'pla-1',ssName:'Upper body · back + rear delts'},
+    {id:'Face_Pull',sets:2,reps:'12–15',rest:120,ss:'pla-1',ssName:'Upper body · back + rear delts'},
+    {id:'Seated_Cable_Rows',sets:2,reps:'8–12',rest:120,ss:'pla-2',ssName:'Upper body · back + biceps'},
+    {id:'Hammer_Curls',sets:2,reps:'10–12',rest:120,ss:'pla-2',ssName:'Upper body · back + biceps'},
+    {id:'Romanian_Deadlift',sets:3,reps:'8–10',rest:120,comp:true,ss:'pla-3',ssName:'Lower body · hamstrings + glutes'},
+    {id:'Lying_Leg_Curls',sets:2,reps:'10–15',rest:120,ss:'pla-3',ssName:'Lower body · hamstrings + glutes'}]},
   {key:'recovery',title:'Easy cardio & mobility',focus:['conditioning','mobility'],type:'rest'},
   {key:'push-b',title:'Push B',focus:['chest','shoulders','triceps','quadriceps','calves'],type:'workout',ex:[
-    {id:'Incline_Dumbbell_Press',sets:3,reps:'8–12',rest:120,comp:true,ss:'ppb-1',ssName:'Chest + quads'},
-    {id:'Goblet_Squat',sets:3,reps:'8–12',rest:120,comp:true,ss:'ppb-1',ssName:'Chest + quads'},
-    {id:'Cable_Crossover',sets:2,reps:'12–15',rest:75,ss:'ppb-2',ssName:'Chest + calves'},
-    {id:'Standing_Calf_Raises',sets:2,reps:'12–20',rest:75,ss:'ppb-2',ssName:'Chest + calves'},
-    {id:'Side_Lateral_Raise',sets:2,reps:'12–15',rest:75,ss:'ppb-3',ssName:'Side delts + triceps'},
-    {id:'Standing_Dumbbell_Triceps_Extension',sets:2,reps:'10–15',rest:75,ss:'ppb-3',ssName:'Side delts + triceps'}]},
+    {id:'Incline_Dumbbell_Press',sets:3,reps:'8–12',rest:120,comp:true,ss:'ppb-1',ssName:'Upper body · chest + side delts'},
+    {id:'Side_Lateral_Raise',sets:2,reps:'12–15',rest:120,ss:'ppb-1',ssName:'Upper body · chest + side delts'},
+    {id:'Cable_Crossover',sets:2,reps:'12–15',rest:120,ss:'ppb-2',ssName:'Upper body · chest + triceps'},
+    {id:'Standing_Dumbbell_Triceps_Extension',sets:2,reps:'10–15',rest:120,ss:'ppb-2',ssName:'Upper body · chest + triceps'},
+    {id:'Goblet_Squat',sets:3,reps:'8–12',rest:120,comp:true,ss:'ppb-3',ssName:'Lower body · quads + calves'},
+    {id:'Standing_Calf_Raises',sets:2,reps:'12–20',rest:120,ss:'ppb-3',ssName:'Lower body · quads + calves'}]},
   {key:'pull-b',title:'Pull B',focus:['lats','middle back','biceps','hamstrings','glutes'],type:'workout',ex:[
-    {id:'Barbell_Hip_Thrust',sets:3,reps:'8–12',rest:120,comp:true},
-    {id:'Seated_Cable_Rows',sets:3,reps:'8–12',rest:120,comp:true},
-    {id:'Wide-Grip_Lat_Pulldown',sets:2,reps:'8–12',rest:90,ss:'plb-1',ssName:'Back + hamstrings'},
-    {id:'Lying_Leg_Curls',sets:2,reps:'10–15',rest:90,ss:'plb-1',ssName:'Back + hamstrings'},
-    {id:'Face_Pull',sets:2,reps:'12–15',rest:75,ss:'plb-2',ssName:'Rear delts + biceps'},
-    {id:'Barbell_Curl',sets:2,reps:'10–12',rest:75,ss:'plb-2',ssName:'Rear delts + biceps'}]},
+    {id:'Seated_Cable_Rows',sets:3,reps:'8–12',rest:120,comp:true,ss:'plb-1',ssName:'Upper body · back + rear delts'},
+    {id:'Face_Pull',sets:2,reps:'12–15',rest:120,ss:'plb-1',ssName:'Upper body · back + rear delts'},
+    {id:'Wide-Grip_Lat_Pulldown',sets:2,reps:'8–12',rest:120,ss:'plb-2',ssName:'Upper body · back + biceps'},
+    {id:'Barbell_Curl',sets:2,reps:'10–12',rest:120,ss:'plb-2',ssName:'Upper body · back + biceps'},
+    {id:'Barbell_Hip_Thrust',sets:3,reps:'8–12',rest:120,comp:true,ss:'plb-3',ssName:'Lower body · glutes + hamstrings'},
+    {id:'Lying_Leg_Curls',sets:2,reps:'10–15',rest:120,ss:'plb-3',ssName:'Lower body · glutes + hamstrings'}]},
   {key:'rest',title:'Rest & reset',focus:['recover','reset'],type:'rest'},
   {key:'rest',title:'Rest & reset',focus:['recover','reset'],type:'rest'}
 ];
@@ -1110,7 +1110,7 @@ const STORAGE_KEY='fitlab_v1';
 const BACKUP_KEY='fitlab_backup_v12';
 function validDate(value){ if(typeof value!=='string'||!/^\d{4}-\d{2}-\d{2}$/.test(value))return false;const date=new Date(value+'T12:00:00Z');return Number.isFinite(date.getTime())&&date.toISOString().slice(0,10)===value; }
 function calendarDay(value){ const [y,m,d]=value.split('-').map(Number); return Date.UTC(y,m-1,d)/86400000; }
-const APP_VERSION='13.2';
+const APP_VERSION='13.3';
 const PROGRAM_FIELDS=['startDate','logs','done','reviewed','lastW','rides','flow','daily','swaps','sessionClocks'];
 function programSnapshot(state){return JSON.parse(JSON.stringify(Object.fromEntries(PROGRAM_FIELDS.map(key=>[key,state[key]]))));}
 function newState(){ return {program:'pushpull8',archives:{},sessionClocks:{},startDate:todayISO(),unit:'lb',logs:{},done:{},reviewed:{},lastW:{},bw:[],bf:[],heightCm:185.4,rides:{},flow:{},daily:{},swaps:{},theme:'light',schemaVersion:13}; }
@@ -1558,6 +1558,14 @@ function blockLabel(block){
   if(block.ex.length===1) return 'Exercise';
   return block.ex.length===2 ? 'Superset' : 'Circuit';
 }
+function supersetInstructions(block){
+  const rounds=Math.min(...block.ex.map(e=>e.sets));
+  const extra=block.ex.filter(e=>e.sets>rounds);
+  const rest=Math.max(...block.ex.map(e=>e.rest||60));
+  const restLabel=`${Math.floor(rest/60)}:${String(rest%60).padStart(2,'0')}`;
+  if(!extra.length)return `Alternate the two moves. Rest ${restLabel} after each round.`;
+  return `Do ${rounds} paired rounds, resting ${restLabel} after each. Then complete ${extra.map(e=>`${e.sets-rounds} remaining set${e.sets-rounds===1?'':'s'} of ${EXERCISES[e.id].name}`).join(' and ')} on its own, with the same rest.`;
+}
 function blockSummary(block,dk){
   const names=block.ex.map(e=>EXERCISES[e.id]?.name||e.id).join(' + ');
   return `${names} · ${blockDoneCount(block,dk)}/${blockTotalSets(block)} sets`;
@@ -1651,7 +1659,7 @@ function renderComebackToday(){
   <details class="disclosure"><summary>Daily check-in<span class="tiny muted">Movement · food · weight</span></summary>${dailyLogCard(date,w,d,plan)}</details>
   <p class="nextnote">${rest?'Easy days support your next session.':esc(programPhases()[plan.phase].tag)}<br>Next lifting session: ${esc(programSplit()[next].title)}.</p>`;
 }
-function comebackPlanGuide(){return `<section class="plan-brief"><span class="pill">LEANER + STRONGER</span><p>${S.program==='pushpull8'?'Push trains chest, shoulders, triceps, quads and calves. Pull trains back, biceps, hamstrings and glutes. Six exercises and all 14 working sets each day.':'Two sets per exercise to start. Build gradually, keep controlled reps, and log what you actually do.'}</p><details class="disclosure"><summary>How the eight weeks work</summary>${programPhases().map(p=>`<div class="progression-row"><b>${p.weeks} · ${p.name}</b><p>${p.tag}</p></div>`).join('')}<p class="small muted">${S.program==='pushpull8'?'Complete one set of each paired movement, then take the displayed 75–120 second rest. Unpaired main lifts keep two-minute rests. The first Push superset pairs chest with quads; no back or biceps exercises are placed on Push days.':'For the press + row superset, complete both movements and then rest two minutes. Accessory supersets use 75 seconds after both movements. Unpaired main lifts keep two-minute rests.'} Every exercise and set stays in the plan. Warm up first. Stop or substitute movements that cause sharp or joint pain. A missed day is not a reason to double up.</p></details><details class="disclosure"><summary>Food & recovery</summary><p class="small muted">Protein: ${esc(proteinTarget())}. Use a modest calorie deficit if leaning out is your goal, and adjust using your two-week weight trend. Compare morning weight averages and measure your waist weekly. Aim for 7–9 hours of sleep. Build toward 150 minutes of moderate activity weekly; bike commuting can count. Reduce extra cardio when your legs need recovery.</p></details></section>`;}
+function comebackPlanGuide(){return `<section class="plan-brief"><span class="pill">LEANER + STRONGER</span><p>${S.program==='pushpull8'?'Push trains chest, shoulders, triceps, quads and calves. Pull trains back, biceps, hamstrings and glutes. Six exercises and all 14 working sets each day.':'Two sets per exercise to start. Build gradually, keep controlled reps, and log what you actually do.'}</p><details class="disclosure"><summary>How the eight weeks work</summary>${programPhases().map(p=>`<div class="progression-row"><b>${p.weeks} · ${p.name}</b><p>${p.tag}</p></div>`).join('')}<p class="small muted">${S.program==='pushpull8'?'Finish both upper-body supersets first, then the lower-body superset. Rest two minutes after each paired round. Where one movement has three sets and its partner has two, complete two paired rounds, then the remaining set on its own. Keep about three good reps in reserve as you adjust to the new pairings.':'For the press + row superset, complete both movements and then rest two minutes. Accessory supersets use 75 seconds after both movements. Unpaired main lifts keep two-minute rests.'} Every exercise and set stays in the plan. Warm up first. Stop or substitute movements that cause sharp or joint pain. A missed day is not a reason to double up.</p></details><details class="disclosure"><summary>Food & recovery</summary><p class="small muted">Protein: ${esc(proteinTarget())}. Use a modest calorie deficit if leaning out is your goal, and adjust using your two-week weight trend. Compare morning weight averages and measure your waist weekly. Aim for 7–9 hours of sleep. Build toward 150 minutes of moderate activity weekly; bike commuting can count. Reduce extra cardio when your legs need recovery.</p></details></section>`;}
 function workoutPreview(plan,dk){return `<div class="previewlist">${workoutBlocks(plan,dk).map((b,i)=>`<button class="previewblock ${isBlockComplete(b,dk)?'done':''}" data-open-block="${plan.week}.${plan.dayIndex}.${i}"><span class="previewnum">${isBlockComplete(b,dk)?icon('check'):String(i+1).padStart(2,'0')}</span><span class="previewmain"><span class="previewtitle">${esc(b.title)}</span><span class="previewsub" style="display:block">${b.ex.length>1?esc(b.ex.map(e=>EXERCISES[e.id].name).join(' + ')):esc(`${b.ex[0].sets} sets · ${b.ex[0].reps} ${b.ex[0].timed?'seconds':'reps'}`)}</span></span><span class="previewcount">${blockDoneCount(b,dk)}/${blockTotalSets(b)}</span></button>`).join('')}</div>`;}
 function backHead(title,sub){return `<button class="backbtn" data-back="1">${icon('back')}Back to ${returnView==='stats'?'progress':returnView==='plan'?'plan':'today'}</button><div class="workout-header"><div><h1>${esc(title)}</h1><div class="small muted">${esc(sub)}</div></div></div>`;}
 function renderDayView(){
@@ -1682,7 +1690,7 @@ function exBlock(e,dk){
   <button class="restbtn" data-rest="${e.rest}|${esc(x.name)}">${icon('clock')}Rest ${e.rest>=60?`${Math.floor(e.rest/60)}:${String(e.rest%60).padStart(2,'0')}`:`${e.rest}s`}</button></section>`;
 }
 function renderWorkoutFlow(plan,dk){const blocks=workoutBlocks(plan,dk),idx=flowIndexFor(plan),b=blocks[idx],atEnd=idx===blocks.length-1,p=dayProgress(plan);if(!b)return '';
-  return `<section class="flowcard" aria-label="Workout logging"><div class="flowtop"><span class="eyebrow">${blockLabel(b)} ${idx+1} of ${blocks.length}</span><div class="blockdots" aria-hidden="true">${blocks.map((x,i)=>`<i class="${isBlockComplete(x,dk)?'done':idx===i?'on':''}"></i>`).join('')}</div></div>${b.ex.length>1?`<div class="superset-note"><b>${esc(b.title)}</b><br>Alternate the two moves. Rest after each round.</div>`:''}
+  return `<section class="flowcard" aria-label="Workout logging"><div class="flowtop"><span class="eyebrow">${blockLabel(b)} ${idx+1} of ${blocks.length}</span><div class="blockdots" aria-hidden="true">${blocks.map((x,i)=>`<i class="${isBlockComplete(x,dk)?'done':idx===i?'on':''}"></i>`).join('')}</div></div>${b.ex.length>1?`<div class="superset-note"><b>${esc(b.title)}</b><br>${esc(supersetInstructions(b))}</div>`:''}
   ${b.ex.map(e=>exBlock(e,dk)).join('')}<div class="flowactions"><button class="btn ghost" data-flow-step="-1" ${idx===0?'disabled':''}>Previous</button><button class="btn primary" ${atEnd?`data-finish-workout="1" ${p.done?'':'disabled'}`:'data-flow-step="1"'}>${atEnd?'Finish & review':'Next exercise'}${icon('arrow')}</button></div><div class="flowhint">Your entries save on this device as you type.</div></section>`;
 }
 function workoutEvaluationCard(plan,dk){

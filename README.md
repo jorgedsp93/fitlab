@@ -2,7 +2,7 @@
 
 An offline workout journal with an eight-week, four-day Push / Pull plan. Full sessions include legs, warm-up, rest and cooldown within a one-hour budget.
 
-## Current release: 13.2
+## Current release: 13.3
 
 - **Day 1 / Monday: Push A** — chest, shoulders, triceps, quads and calves.
 - **Day 2 / Tuesday: Pull A** — back, biceps, hamstrings and glutes.
@@ -12,19 +12,21 @@ An offline workout journal with an eight-week, four-day Push / Pull plan. Full s
 
 Each lifting session has six exercises and 14 working sets throughout the eight weeks. Progress by improving controlled repetitions and then load, with no automatic cuts to exercises or sets. Start with loads that leave about three good reps; increase only when the full prescribed range feels controlled.
 
-Push supersets pair chest with quads, pressing or chest isolation with calves, and side delts with triceps. Pull days keep the first two lifts separate, then pair back with leg curls and rear delts with biceps. All 32 lifting sessions are estimated at 47–53 minutes, including ten minutes of warm-up/practice, five minutes of cooldown, rests and equipment transitions. Actual equipment delays can vary.
+Every day finishes two upper-body supersets before moving to one lower-body superset. Push A pairs bench press with lateral raises, shoulder press with triceps pushdowns, then leg press with calf raises. Push B pairs incline press with lateral raises, cable crossover with triceps extensions, then goblet squat with calf raises. Pull A pairs pulldowns with face pulls, rows with hammer curls, then Romanian deadlifts with leg curls. Pull B pairs rows with face pulls, pulldowns with barbell curls, then hip thrusts with leg curls.
+
+Rest two minutes after each round. For a three-set lift paired with a two-set exercise, do two paired rounds and the remaining set alone; the app states this explicitly and the timer still works for that final set. All original exercises, set counts and rep targets remain. All 32 lifting sessions are estimated at 52 minutes, including ten minutes of warm-up/practice, five minutes of cooldown, rests and equipment transitions. Actual equipment delays and recovery needs can vary. This update preserves the current start date, logged sets and running session clock.
 
 ## Start on your device
 
-[Open Push / Pull setup](https://jorgedsp93.github.io/fitlab/?setup=pushpull&release=13.2) and tap **Start Push / Pull today**. This starts Push A on the device’s current local date. Opening the link alone never resets progress. The current program is archived, a full recovery copy is saved, and body measurements remain. Existing comeback and classic programs stay available in **More** with their own schedules and logs; an update never silently reinterprets those sessions as push/pull.
+[Open Push / Pull setup](https://jorgedsp93.github.io/fitlab/?setup=pushpull&release=13.3) and tap **Start Push / Pull today**. This starts Push A on the device’s current local date. Opening the link alone never resets progress. The current program is archived, a full recovery copy is saved, and body measurements remain. Existing comeback and classic programs stay available in **More** with their own schedules and logs; an update never silently reinterprets those sessions as push/pull.
 
 New installs open Push / Pull by default. **More → Program settings → Restart at Day 1 today** restarts the currently selected program. Progress is local to each browser/device, and full backups include all saved programs.
 
 ## One hour, including warm-up
 
-Open a workout and tap **Start 60-minute clock & warm-up** when you begin. The clock includes breaks and survives reloads. Complete one set of each paired exercise, then take the displayed rest. The two-minute main-lift rests and 75–90-second accessory rests are included in the estimate. Every planned set stays visible. At minute 50, a prompt reminds you to finish the planned sets and cool down; minute 55 leaves five minutes to finish. Keep the app visible for timely prompts; background or locked-phone alerts are not guaranteed.
+Open a workout and tap **Start 60-minute clock & warm-up** when you begin. The clock includes breaks and survives reloads. Complete one set of each paired exercise, then take the displayed rest. Two minutes of rest after every round, including the final solo set when prescribed, are included in the estimate. Every planned set stays visible. At minute 50, a prompt reminds you to finish the planned sets and cool down; minute 55 leaves five minutes to finish. Keep the app visible for timely prompts; background or locked-phone alerts are not guaranteed.
 
-The grouping follows [NSCA’s discussion of push/pull split routines](https://www.nsca.com/education/articles/kinetic-select/determination-of-resistance-training-frequency/) and [time-efficient superset training](https://www.nsca.com/education/articles/ptq/time-efficient-training). Exercise selection and time estimates are FitLab programming choices.
+The split uses [NSCA’s discussion of push/pull split routines](https://www.nsca.com/education/articles/kinetic-select/determination-of-resistance-training-frequency/) and [time-efficient superset training](https://www.nsca.com/education/articles/ptq/time-efficient-training). Exercise selection, upper/lower grouping and time estimates are FitLab programming choices.
 
 ## Features
 
